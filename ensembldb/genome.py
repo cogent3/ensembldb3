@@ -498,7 +498,7 @@ class Genome(object):
 
     FeatureCoordLevels = property(_feature_coord_levels)
 
-    def getFeatures(self, region=None, feature_types=None, where_feature=None,
+    def get_features(self, region=None, feature_types=None, where_feature=None,
                     coord_name=None, start=None, end=None, strand=None,
                     ensembl_coord=False):
         """returns Region instances for the specified location"""

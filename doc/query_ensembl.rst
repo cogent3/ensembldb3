@@ -196,7 +196,7 @@ The ``Gene`` region also has convenience methods for examining properties of it'
     >>> print longest.Cds
     ATGCCTATTGGATCCAAA...
 
-All Regions have a ``getFeatures`` method which differs from that on genome only in that the genomic coordinates are automatically entered for you. Regions also have the ability to return their sequence as an annotated ``cogent`` sequence. The method on ``Gene`` simply queries the parent genome using the gene's own location as the coordinate for the currently supported region types. We will query ``brca2`` asking for gene features, the end-result will be a ``cogent`` sequence that can be used to obtain the CDS, for instance, using the standard ``cogent`` annotation capabilities.
+All Regions have a ``get_features`` method which differs from that on genome only in that the genomic coordinates are automatically entered for you. Regions also have the ability to return their sequence as an annotated ``cogent`` sequence. The method on ``Gene`` simply queries the parent genome using the gene's own location as the coordinate for the currently supported region types. We will query ``brca2`` asking for gene features, the end-result will be a ``cogent`` sequence that can be used to obtain the CDS, for instance, using the standard ``cogent`` annotation capabilities.
 
 .. doctest::
 
@@ -240,11 +240,11 @@ This has the effect of returning any gene whose ``BioType`` includes the phrase 
 Getting ESTs
 ^^^^^^^^^^^^
 
-Ensembl's ``otherfeatures`` database mirrors the structure of the ``core`` database and contains EST information. Hence, the ``Est`` region inherits directly from ``Gene`` (ie has many of the same properties). ``est`` is a supported ``feature_types`` for the ``getFeatures`` method. You can also directly query for an EST using Ensembl's ``StableID``. Here, however, we'll just query for ``Est`` that map to the ``brca2`` region.
+Ensembl's ``otherfeatures`` database mirrors the structure of the ``core`` database and contains EST information. Hence, the ``Est`` region inherits directly from ``Gene`` (ie has many of the same properties). ``est`` is a supported ``feature_types`` for the ``get_features`` method. You can also directly query for an EST using Ensembl's ``StableID``. Here, however, we'll just query for ``Est`` that map to the ``brca2`` region.
 
 .. doctest::
 
-    >>> ests = human.getFeatures(feature_types='est', region=brca2)
+    >>> ests = human.get_features(feature_types='est', region=brca2)
     >>> for est in ests:
     ...     print est
     Est(Species='Homo sapiens'; BioType='protein_coding'; Description='None';...
@@ -321,7 +321,7 @@ We can also use a slightly more involved query to find all variants within the g
 
 .. doctest::
 
-    >>> brca2_snps = human.getFeatures(feature_types='variation',
+    >>> brca2_snps = human.get_features(feature_types='variation',
     ...                      region=brca2)
     >>> for snp in brca2_snps:
     ...     if 'missense_variant' in snp.Effect:
@@ -335,7 +335,7 @@ We can also use a slightly more involved query to find all variants within the g
 Other Region Types
 ^^^^^^^^^^^^^^^^^^
 
-These can be obtained from the genome instance using the genomes ``getFeatures`` method. At present, only repeats, CpG islands, variation, EST's and genes can be obtained through this method. There's also ``GenericRegion``, which is precisely that.
+These can be obtained from the genome instance using the genomes ``get_features`` method. At present, only repeats, CpG islands, variation, EST's and genes can be obtained through this method. There's also ``GenericRegion``, which is precisely that.
 
 In Ensembl's databases, each type of feature may be recorded at multiple coordinate levels. Accordingly, each level is checked to obtain full information of that feature. 
 

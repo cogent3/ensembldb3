@@ -233,7 +233,7 @@ We query the genome for repeats within a specific coordinate range on chromosome
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> repeats = human.getFeatures(coord_name='13', start=32305473, end=32315473, feature_types='repeat')
+    >>> repeats = human.get_features(coord_name='13', start=32305473, end=32315473, feature_types='repeat')
     >>> for repeat in repeats:
     ...     print repeat.RepeatClass
     ...     print repeat
@@ -250,7 +250,7 @@ We query the genome for CpG islands within a specific coordinate range on chromo
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> islands = human.getFeatures(coord_name='11', start=2129111, end=2149604, feature_types='cpg')
+    >>> islands = human.get_features(coord_name='11', start=2129111, end=2149604, feature_types='cpg')
     >>> for island in islands:
     ...     print island
     ...     break

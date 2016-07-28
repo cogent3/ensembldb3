@@ -51,7 +51,7 @@ class TestGenome(GenomeTestBase):
         """should correctly return record for ENSESTG00000000010"""
         est = self.human.get_est_matching(StableId='ENSESTG00000000010')
         direct = list(est)[0]
-        ests = self.human.getFeatures(feature_types='est', coord_name=6,
+        ests = self.human.get_features(feature_types='est', coord_name=6,
                                       start=99994000, end=100076519)
         stable_ids = [est.StableId for est in ests]
         self.assertContains(stable_ids, direct.StableId)
@@ -581,7 +581,7 @@ class TestFeatures(GenomeTestBase):
 
     def test_CpG_island(self):
         """should return correct CpG islands"""
-        CpGislands = self.human.getFeatures(region=self.igf2,
+        CpGislands = self.human.get_features(region=self.igf2,
                                             feature_types='CpG')
         expected_stats = [(630, 757), (652, 537), (3254, 3533)]
         obs_stats = [(int(island.Score), len(island))
@@ -592,7 +592,7 @@ class TestFeatures(GenomeTestBase):
     def test_get_multiple_features(self):
         """should not fail to get multiple feature types"""
         regions =\
-            self.human.getFeatures(feature_types=['repeat', 'gene', 'cpg'],
+            self.human.get_features(feature_types=['repeat', 'gene', 'cpg'],
                                    coord_name=1, start=869936, end=901867)
         for region in regions:
             pass
@@ -600,14 +600,14 @@ class TestFeatures(GenomeTestBase):
     def test_repeats(self):
         """should correctly return a repeat"""
         loc = self.igf2.Location.resized(-1000, 1000)
-        repeats = list(self.human.getFeatures(
+        repeats = list(self.human.get_features(
             region=loc, feature_types='repeat'))
         self.assertTrue(len(repeats) >= 4)
 
     def test_genes(self):
         """should correctly identify igf2 within a region"""
         loc = self.igf2.Location.resized(-1000, 1000)
-        genes = self.human.getFeatures(region=loc, feature_types='gene')
+        genes = self.human.get_features(region=loc, feature_types='gene')
         symbols = [g.Symbol.lower() for g in genes]
         self.assertContains(symbols, self.igf2.Symbol.lower())
 
@@ -618,14 +618,14 @@ class TestFeatures(GenomeTestBase):
         rat = self.rat.getRegion(coord_name='12', start=4282534, end=4324019,
                                  strand='+')
         for region in [mouse, rat]:
-            features = region.getFeatures(feature_types=['gene'])
+            features = region.get_features(feature_types=['gene'])
             ann_seq = region.getAnnotatedSeq(feature_types='gene')
             genes = ann_seq.get_annotations_matching('gene')
             self.assertTrue(genes != [])
 
     def test_get_variation_feature(self):
         """should correctly return variation features within a region"""
-        snps = self.human.getFeatures(feature_types='variation',
+        snps = self.human.get_features(feature_types='variation',
                                       region=self.brca2)
         # snp coordname, start, end should satsify constraints of brca2 loc
         c = 0
@@ -641,7 +641,7 @@ class TestFeatures(GenomeTestBase):
         """should apply gene feature data in a manner consistent with strand
         and the Cogent sequence annotations slice should return the same
         result"""
-        plus = list(self.human.getFeatures(feature_types='gene',
+        plus = list(self.human.get_features(feature_types='gene',
                                            coord_name=13,
                                            start=31787610,
                                            end=31871820))[0]
@@ -703,7 +703,7 @@ class TestFeatures(GenomeTestBase):
     def test_get_features_from_nt(self):
         """should correctly return the encompassing gene from 1nt"""
         snp = list(self.human.getVariation(Symbol='rs34213141'))[0]
-        genes = list(self.human.getFeatures(feature_types='gene', region=snp))
+        genes = list(self.human.get_features(feature_types='gene', region=snp))
         self.assertTrue('ENSG00000254997' in [g.StableId for g in genes])
 
 

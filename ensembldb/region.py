@@ -107,19 +107,19 @@ class _Region(LazyRecord):
 
     Symbol = property(_get_symbol)
 
-    def getFeatures(self, feature_types, where_feature=None):
+    def get_features(self, feature_types, where_feature=None):
         """queries the parent genome for feature types corresponding to this
         region
         where_feature: the returned region can either lie 'within' this region,
         'overlap' this region, or 'span' this region"""
-        return self.genome.getFeatures(self.Location,
+        return self.genome.get_features(self.Location,
                                        feature_types=feature_types,
                                        where_feature=where_feature)
 
     def _get_variants(self):
         """constructs the variants attribute"""
         if 'Variants' not in self._cached:
-            variants = self.genome.getFeatures(
+            variants = self.genome.get_features(
                 feature_types='variation', region=self)
             self._cached['Variants'] = tuple(variants)
 
@@ -141,7 +141,7 @@ class _Region(LazyRecord):
         return data
 
     def getAnnotatedSeq(self, feature_types=None, where_feature=None):
-        regions = list(self.getFeatures(feature_types=feature_types,
+        regions = list(self.get_features(feature_types=feature_types,
                                         where_feature=where_feature))
         # seq_map is on the + strand, regardless the actual strand of sequence
         seq_map = Map(locations=[(self.Location.start, self.Location.end)],

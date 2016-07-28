@@ -53,7 +53,7 @@ class TestFeatureCoordLevels(TestCase):
         coord = dict(coord_name=9, start=21727352, end=21729141)
         region = self.chicken.getRegion(**coord)
         # repeat is recorded at contig level, strand is 0
-        repeats = region.getFeatures(feature_types='repeat')
+        repeats = region.get_features(feature_types='repeat')
         expect = [("9", 21727499, 21727527), ("9", 21728009, 21728018),
                   ("9", 21728169, 21728178)]
         obs = []
@@ -65,7 +65,7 @@ class TestFeatureCoordLevels(TestCase):
     def test_cpg(self):
         # contain 3 CpG island recorded at chromosome level
         coord1 = dict(coord_name=26, start=105184, end=184346)
-        cpgs1 = self.chicken.getFeatures(feature_types='cpg', **coord1)
+        cpgs1 = self.chicken.get_features(feature_types='cpg', **coord1)
         exp = [("26", 112153, 113139), ("26", 134125, 135050),
                ("26", 178899, 180227)]
         obs = []
@@ -76,7 +76,7 @@ class TestFeatureCoordLevels(TestCase):
 
         # test cpg features record at scaffold level:
         coord2 = dict(coord_name='JH376196.1', start=1, end=14640)
-        cpgs2 = self.chicken.getFeatures(feature_types='cpg', **coord2)
+        cpgs2 = self.chicken.get_features(feature_types='cpg', **coord2)
         self.assertEqual(len(list(cpgs2)), 3)
 
 
