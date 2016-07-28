@@ -457,13 +457,13 @@ Ensembl stores multiple sequence alignments for selected species. For a given gr
                            743              14           35736  EPO_LOW_COVERAGE...
     ----------------------------------------------------------------------------...
 
-The ``align_method`` and ``align_clade`` columns can be used as arguments to ``getSyntenicRegions``. This method is responsible for returning ``SyntenicRegions`` instances for a given coordinate from a species. As it's possible that multiple records may be found from the multiple alignment for a given set of coordinates, the result of calling this method is a python generator. The returned regions have a length, defined by the full set of aligned sequences. If the ``omit_redundant`` argument is used, then positions with gaps in all sampled species will be removed in the alignment to be returned. The length of the syntenic region, however, is the length of the unfiltered alignment.
+The ``align_method`` and ``align_clade`` columns can be used as arguments to ``get_syntenic_regions``. This method is responsible for returning ``SyntenicRegions`` instances for a given coordinate from a species. As it's possible that multiple records may be found from the multiple alignment for a given set of coordinates, the result of calling this method is a python generator. The returned regions have a length, defined by the full set of aligned sequences. If the ``omit_redundant`` argument is used, then positions with gaps in all sampled species will be removed in the alignment to be returned. The length of the syntenic region, however, is the length of the unfiltered alignment.
 
 .. note:: It's important to realise that multiple alignments are from these clades. Hence, sequence regions that you might expect would result in a contiguous alignment in the species subset of interest may be returned as separate ``SyntenicRegions`` due to the influence on the alignment of the other species.
 
 .. doctest::
 
-    >>> syntenic_regions = compara.getSyntenicRegions(region=brca2,
+    >>> syntenic_regions = compara.get_syntenic_regions(region=brca2,
     ...                      align_method='EPO', align_clade='eutherian')
     >>> for syntenic_region in syntenic_regions:
     ...     print syntenic_region
@@ -504,7 +504,7 @@ Printing the ``method_species_links`` table provides all the necessary informati
     ...
     >>> print gene
     Gene(Species='Otolemur garnettii'; BioType='protein_coding'...
-    >>> syntenic = compara_pair.getSyntenicRegions(region=gene,
+    >>> syntenic = compara_pair.get_syntenic_regions(region=gene,
     ...          align_method='LASTZ_NET', align_clade='H.sap-O.gar')
     ...
     >>> for region in syntenic:

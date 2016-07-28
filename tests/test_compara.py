@@ -74,7 +74,7 @@ class TestCompara(ComparaTestBase):
     def test_getting_alignment(self):
         mid = "ENSMUSG00000041147"
         brca2 = self.comp.Mouse.getGeneByStableId(StableId=mid)
-        result = list(self.comp.getSyntenicRegions(region=brca2,
+        result = list(self.comp.get_syntenic_regions(region=brca2,
                                                    align_method='PECAN', align_clade='vertebrates'))[0]
         aln = result.get_alignment(feature_types='gene')
         # to improve test robustness across Ensembl releases, where alignment
@@ -110,7 +110,7 @@ class TestCompara(ComparaTestBase):
         assembly gap"""
         start = 100000
         end = start + 100000
-        related = list(self.comp.getSyntenicRegions(Species='mouse',
+        related = list(self.comp.get_syntenic_regions(Species='mouse',
                                                     coord_name='1', start=start, end=end,
                                                     align_method='PECAN', align_clade='vertebrates'))
         self.assertEqual(related, [])
@@ -187,7 +187,7 @@ class TestSyntenicRegions(TestCase):
         # print self.comp.method_species_links
         for coord, expect in coords_expected[1:]:
             syntenic = list(
-                self.comp.getSyntenicRegions(method_clade_id=742, **coord))[0]
+                self.comp.get_syntenic_regions(method_clade_id=742, **coord))[0]
             # check the slope computed from the expected and returned
             # coordinates is ~ 1
             got_names = dict([(n.split(':')[0], n.split(':'))
@@ -210,7 +210,7 @@ class TestSyntenicRegions(TestCase):
         genome block associations for multiple coord systems"""
         gene = self.comp.Human.getGeneByStableId(StableId='ENSG00000188554')
         # this should simply not raise any exceptions
-        syntenic_regions = list(self.comp.getSyntenicRegions(region=gene,
+        syntenic_regions = list(self.comp.get_syntenic_regions(region=gene,
                                                              align_method='PECAN',
                                                              align_clade='vertebrates'))
 

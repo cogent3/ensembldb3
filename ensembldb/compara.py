@@ -333,7 +333,7 @@ class Compara(object):
                                     dnafrag_table.c.genome_db_id.in_(list(self.genome_taxon.keys()))))
         return query.execute().fetchall()
 
-    def getSyntenicRegions(self, Species=None, coord_name=None, start=None,
+    def get_syntenic_regions(self, Species=None, coord_name=None, start=None,
                            end=None, strand=1, ensembl_coord=False, region=None,
                            align_method=None, align_clade=None, method_clade_id=None):
         """returns a SyntenicRegions instance

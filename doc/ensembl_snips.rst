@@ -330,7 +330,7 @@ We first get the syntenic region corresponding to human gene *BRCA2*.
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> human_brca2 = compara.Human.getGeneByStableId(StableId='ENSG00000139618')
-    >>> regions = compara.getSyntenicRegions(region=human_brca2, align_method='EPO', align_clade='primates')
+    >>> regions = compara.get_syntenic_regions(region=human_brca2, align_method='EPO', align_clade='primates')
     >>> for region in regions:
     ...     print region
     SyntenicRegions:
@@ -359,7 +359,7 @@ alignment method in the vertebrates clade:
     >>> compara = Compara(species, release=66)
     >>> clade = "vertebrates"
     >>> chrom, start, end, strand = "X", 155754928, 155755079, "-"
-    >>> regions = compara.getSyntenicRegions(Species="mouse", coord_name=chrom, 
+    >>> regions = compara.get_syntenic_regions(Species="mouse", coord_name=chrom, 
     ...                                      start=start, end=end, align_method="PECAN", 
     ...                                      align_clade=clade, strand=strand)     
     >>> aligned_pairs = [r for r in regions]
@@ -381,7 +381,7 @@ instance, whose coordinates can be pulled from the ``Location`` attribute.
 
 This example shows that mouse region ``X:155754928-155755079`` aligns only to human region ``X:20222659-20223163``.
 
-.. note:: Sometimes, the genomic coordinates given to ``getSyntenicRegions`` will contain multiple alignments between the pair of genomes, in which case two or more regions will be returned in ``aligned_pairs``.
+.. note:: Sometimes, the genomic coordinates given to ``get_syntenic_regions`` will contain multiple alignments between the pair of genomes, in which case two or more regions will be returned in ``aligned_pairs``.
 
 Getting related genes
 ---------------------
