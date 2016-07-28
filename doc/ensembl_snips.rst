@@ -109,7 +109,7 @@ We use the stable ID for *BRCA2*.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> gene = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> gene = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print gene
     Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; Symbol='BRCA2')
 
@@ -146,7 +146,7 @@ We get the canonical transcripts for *BRCA2*.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript
     Transcript(Species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
@@ -158,7 +158,7 @@ Get the CDS for a transcript
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> cds = transcript.Cds
     >>> print type(cds)
@@ -173,7 +173,7 @@ Look at all transcripts for a gene
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> for transcript in brca2.Transcripts:
     ...     print transcript
     Transcript(Species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
@@ -188,7 +188,7 @@ We show just for the canonical transcript.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print brca2.CanonicalTranscript.Exons[0]
     Exon(StableId=ENSE00001184784, Rank=1)
 
@@ -201,7 +201,7 @@ We show just for the canonical transcript.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> for intron in brca2.CanonicalTranscript.Introns:
     ...     print intron
     Intron(TranscriptId=ENST00000380152, Rank=1)
@@ -216,7 +216,7 @@ Inspect the genomic coordinate for a feature
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print brca2.Location.coord_name
     13
     >>> print brca2.Location.start
@@ -270,7 +270,7 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript.Variants
     (<cogent.db.ensembl.region.Variation object at ...
@@ -329,7 +329,7 @@ We first get the syntenic region corresponding to human gene *BRCA2*.
     >>> from ensembldb import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
-    >>> human_brca2 = compara.Human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> human_brca2 = compara.Human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> regions = compara.get_syntenic_regions(region=human_brca2, align_method='EPO', align_clade='primates')
     >>> for region in regions:
     ...     print region

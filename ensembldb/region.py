@@ -492,7 +492,7 @@ class Transcript(_StableRegion):
         query = sql.select([gene_table.c.stable_id],
                            gene_table.c.gene_id == gene_id)
         record = asserted_one(query.execute())
-        gene = self.genome.getGeneByStableId(record[0])
+        gene = self.genome.get_gene_by_stableid(record[0])
         return gene
 
     Gene = property(_get_gene)

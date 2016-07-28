@@ -42,7 +42,7 @@ class GenomeTestBase(TestCase):
     rat = Genome(Species="rat", release=release, account=account)
     macaq = Genome(Species="macaque", release=release, account=account)
     gorilla = Genome(Species="gorilla", release=release, account=account)
-    brca2 = human.getGeneByStableId(StableId="ENSG00000139618")
+    brca2 = human.get_gene_by_stableid(StableId="ENSG00000139618")
 
 
 class TestGenome(GenomeTestBase):
@@ -127,12 +127,12 @@ class TestGenome(GenomeTestBase):
         """should correctly return a gorilla gene"""
         self.gorilla = Genome(
             Species="gorilla", release=release, account=account)
-        gene = self.gorilla.getGeneByStableId('ENSGGOG00000005730')
+        gene = self.gorilla.get_gene_by_stableid('ENSGGOG00000005730')
         self.assertEqual(str(gene.Seq[:10]), 'TGGGAGTCCA')
 
     def test_diff_strand_contig_chrom(self):
         """get correct sequence when contig and chromosome strands differ"""
-        gene = self.gorilla.getGeneByStableId('ENSGGOG00000001953')
+        gene = self.gorilla.get_gene_by_stableid('ENSGGOG00000001953')
         cds = gene.CanonicalTranscript.Cds
         self.assertEqual(str(cds), 'ATGGCCCAGGATCTCAGCGAGAAGGACCTGTTGAAGATG'
                          'GAGGTGGAGCAGCTGAAGAAAGAAGTGAAAAACACAAGAATTCCGATTTCCAAAGCGGGAAAGGAAAT'
@@ -181,11 +181,11 @@ class TestGene(GenomeTestBase):
     def test_translated_exons(self):
         """should correctly translate a gene with 2 exons but 1st exon
         transcribed"""
-        gene = self.mouse.getGeneByStableId(StableId='ENSMUSG00000036136')
+        gene = self.mouse.get_gene_by_stableid(StableId='ENSMUSG00000036136')
         transcript = gene.getMember('ENSMUST00000041133')
         self.assertTrue(len(transcript.ProteinSeq) > 0)
         # now one on the - strand
-        gene = self.mouse.getGeneByStableId(StableId='ENSMUSG00000045912')
+        gene = self.mouse.get_gene_by_stableid(StableId='ENSMUSG00000045912')
         transcript = gene.Transcripts[0]
         self.assertTrue(len(transcript.ProteinSeq) > 0)
 
@@ -195,7 +195,7 @@ class TestGene(GenomeTestBase):
         # complex. This case has a macaque gene which we correctly
         # infer the CDS boundaries for according to Ensembl, but the CDS
         # length is not divisible by 3.
-        gene = self.macaq.getGeneByStableId(StableId='ENSMMUG00000001551')
+        gene = self.macaq.get_gene_by_stableid(StableId='ENSMMUG00000001551')
         transcript = gene.getMember('ENSMMUT00000002194')
         # the following works because we enforce the length being divisble by 3
         # in producing ProteinSeq
@@ -212,7 +212,7 @@ class TestGene(GenomeTestBase):
     def test_exon_phases(self):
         """correctly identify phase for an exon"""
         stable_id = 'ENSG00000171408'
-        gene = self.human.getGeneByStableId(StableId=stable_id)
+        gene = self.human.get_gene_by_stableid(StableId=stable_id)
         exon1 = gene.Transcripts[1].Exons[0]
         # first two bases of codon missing
         self.assertEqual(exon1.PhaseStart, 2)
@@ -232,14 +232,14 @@ class TestGene(GenomeTestBase):
 
         canon_ids = 'ENSG00000111729 ENSG00000177151 ENSG00000237276 ENSG00000251184'.split()
         for index, stable_id in enumerate(canon_ids):
-            gene = self.human.getGeneByStableId(StableId=stable_id)
+            gene = self.human.get_gene_by_stableid(StableId=stable_id)
             transcript = gene.CanonicalTranscript
             prot_seq = transcript.ProteinSeq
 
     def test_gene_transcripts(self):
         """should return multiple transcripts"""
         stable_id = 'ENSG00000012048'
-        gene = self.human.getGeneByStableId(StableId=stable_id)
+        gene = self.human.get_gene_by_stableid(StableId=stable_id)
         self.assertTrue(len(gene.Transcripts) > 1)
         # .. and correctly construct the Cds and location
         for transcript in gene.Transcripts:
@@ -251,7 +251,7 @@ class TestGene(GenomeTestBase):
         # ENSG00000123552 is protein coding, ENSG00000206629 is ncRNA
         for stable_id, max_cds_length in [('ENSG00000123552', 2445),
                                           ('ENSG00000206629', 164)]:
-            gene = self.human.getGeneByStableId(StableId=stable_id)
+            gene = self.human.get_gene_by_stableid(StableId=stable_id)
             ts = gene.getLongestCdsTranscript()
             self.assertEqual(len(ts.Cds), max_cds_length)
             self.assertEqual(ts.getCdsLength(), max(gene.getCdsLengths()))
@@ -259,13 +259,13 @@ class TestGene(GenomeTestBase):
     def test_get_longest_cds_transcript1(self):
         """should correctly return transcript with longest cds"""
         stable_id = 'ENSG00000178591'
-        gene = self.human.getGeneByStableId(StableId=stable_id)
+        gene = self.human.get_gene_by_stableid(StableId=stable_id)
         ts = gene.getLongestCdsTranscript()
         self.assertEqual(ts.getCdsLength(), max(gene.getCdsLengths()))
 
     def test_rna_transcript_cds(self):
         """should return a Cds for an RNA gene too"""
-        rna_gene = self.human.getGeneByStableId(StableId='ENSG00000210049')
+        rna_gene = self.human.get_gene_by_stableid(StableId='ENSG00000210049')
         self.assertTrue(rna_gene.Transcripts[0].getCdsLength() > 0)
 
     def test_gene_annotation(self):
@@ -330,12 +330,12 @@ class TestGene(GenomeTestBase):
     def test_get_gene_by_stable_id(self):
         """should correctly handle getting gene by stable_id"""
         stable_id = 'ENSG00000012048'
-        gene = self.human.getGeneByStableId(StableId=stable_id)
+        gene = self.human.get_gene_by_stableid(StableId=stable_id)
         self.assertEqual(gene.StableId, stable_id)
 
         # if invalid stable_id, should just return None
         stable_id = 'ENSG00000XXXXX'
-        gene = self.human.getGeneByStableId(StableId=stable_id)
+        gene = self.human.get_gene_by_stableid(StableId=stable_id)
         self.assertEqual(gene, None)
 
     def test_get_transcript_by_stable_id(self):
@@ -350,7 +350,7 @@ class TestGene(GenomeTestBase):
         transcript = self.human.getTranscriptByStableId(StableId=stable_id)
         self.assertEqual(transcript.StableId, stable_id)
         gene = transcript.Gene
-        brca2 = self.human.getGeneByStableId(StableId='ENSG00000139618')
+        brca2 = self.human.get_gene_by_stableid(StableId='ENSG00000139618')
         self.assertEqual(brca2.CanonicalTranscript.StableId,
                          transcript.StableId)
         self.assertEqual(
@@ -366,7 +366,7 @@ class TestGene(GenomeTestBase):
 
     def test_gene_on_transcript(self):
         """Transcript instances Gene attribute should be complete"""
-        brca2 = self.human.getGeneByStableId(StableId='ENSG00000139618')
+        brca2 = self.human.get_gene_by_stableid(StableId='ENSG00000139618')
         transcript = self.human.getTranscriptByStableId(
             StableId='ENST00000380152')
         self.assertEqual(transcript.Gene.Symbol, brca2.Symbol)
@@ -577,7 +577,7 @@ class TestVariation(GenomeTestBase):
 class TestFeatures(GenomeTestBase):
 
     def setUp(self):
-        self.igf2 = self.human.getGeneByStableId(StableId='ENSG00000167244')
+        self.igf2 = self.human.get_gene_by_stableid(StableId='ENSG00000167244')
 
     def test_CpG_island(self):
         """should return correct CpG islands"""

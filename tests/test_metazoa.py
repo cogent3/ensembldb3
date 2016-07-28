@@ -26,13 +26,13 @@ class MZ_TestCompara(MZ_ComparaTestBase):
 
     def test_query_genome(self):
         """compara should attach valid genome attributes by common name"""
-        brca2 = self.comp.Dmelanogaster.getGeneByStableId("FBgn0050169")
+        brca2 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0050169")
         self.assertEqual(brca2.Symbol.lower(), 'brca2')
 
     def test_get_related_genes(self):
         """should correctly return the related gene regions from each genome"""
         # using sc35, a splicing factor
-        sc35 = self.comp.Dmelanogaster.getGeneByStableId("FBgn0040286")
+        sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0040286")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
         self.assertEqual("ortholog_one2one", Orthologs.Relationships[0])
@@ -40,14 +40,14 @@ class MZ_TestCompara(MZ_ComparaTestBase):
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""
         # here, it is brca2
-        brca2 = self.comp.Dmelanogaster.getGeneByStableId(
+        brca2 = self.comp.Dmelanogaster.get_gene_by_stableid(
             StableId='FBgn0050169')
         orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship='ortholog_one2one')
         self.assertEqual(len(orthologs.Members), 2)
 
     def test_get_collection(self):
-        sc35 = self.comp.Dmelanogaster.getGeneByStableId(
+        sc35 = self.comp.Dmelanogaster.get_gene_by_stableid(
             StableId="FBgn0040286")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")

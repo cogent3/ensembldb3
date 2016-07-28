@@ -97,11 +97,11 @@ The positions employed on Ensembl's web-site, and in their MySQL database differ
 Selecting Gene's
 ^^^^^^^^^^^^^^^^
 
-The genome can be queried for gene's in a number of ways. You can search for genes using the ``Genome.getGeneByStableId`` method which requires you know the Ensembl stable id.
+The genome can be queried for gene's in a number of ways. You can search for genes using the ``Genome.get_gene_by_stableid`` method which requires you know the Ensembl stable id.
 
 .. doctest::
     
-    >>> brca1 = human.getGeneByStableId(StableId='ENSG00000012048')
+    >>> brca1 = human.get_gene_by_stableid(StableId='ENSG00000012048')
     >>> print brca1.Description
     breast cancer 1, early onset...
 
@@ -373,7 +373,7 @@ The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to
 
 .. doctest::
 
-    >>> brca2 = compara.Human.getGeneByStableId(StableId='ENSG00000139618')
+    >>> brca2 = compara.Human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print brca2
     Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast...
 
@@ -499,7 +499,7 @@ Printing the ``method_species_links`` table provides all the necessary informati
 
 .. doctest::
     
-    >>> gene = compara_pair.Bushbaby.getGeneByStableId(
+    >>> gene = compara_pair.Bushbaby.get_gene_by_stableid(
     ...                             StableId='ENSOGAG00000003166')
     ...
     >>> print gene
