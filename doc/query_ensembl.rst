@@ -267,7 +267,7 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
 
 .. doctest::
 
-    >>> nsyn_variants = human.getVariation(Effect='missense_variant')
+    >>> nsyn_variants = human.get_variation(Effect='missense_variant')
     >>> for i, nsyn_variant in enumerate(nsyn_variants):
     ...     if nsyn_variant.Effect == 'missense_variant' and\
     ...                          nsyn_variant.AlleleFreqs:

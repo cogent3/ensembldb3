@@ -467,7 +467,7 @@ class TestVariation(GenomeTestBase):
         # supplement this test with some synonymous snp's, where they have no
         # peptide alleles
         for i in range(4):
-            snp = list(self.human.getVariation(Symbol=self.snp_names[i]))[0]
+            snp = list(self.human.get_variation(Symbol=self.snp_names[i]))[0]
             self.assertEqual(snp.Ancestral, self.ancestral[i])
             self.assertEqual(snp.Symbol, self.snp_names[i])
             self.assertEqual(set(snp.Effect), set(self.snp_effects[i]))
@@ -478,20 +478,20 @@ class TestVariation(GenomeTestBase):
         """Somatic attribute of variants should be correct"""
         symbols_somatic = [('COSM256414', True), ('rs80359189', False)]
         for symbol, expect in symbols_somatic:
-            snp = list(self.human.getVariation(Symbol=symbol, somatic=True,
+            snp = list(self.human.get_variation(Symbol=symbol, somatic=True,
                                                flanks_match_ref=False))[0]
             self.assertEqual(snp.Somatic, expect)
 
     def test_num_alleles(self):
         """should correctly infer the number of alleles"""
         for i in range(4):
-            snp = list(self.human.getVariation(Symbol=self.snp_names[i]))[0]
+            snp = list(self.human.get_variation(Symbol=self.snp_names[i]))[0]
             self.assertEqual(len(snp), self.snp_nt_len[i])
 
     def test_get_peptide_alleles(self):
         """should correctly infer the peptide alleles"""
         for i in range(4):
-            snp = list(self.human.getVariation(Symbol=self.snp_names[i]))[0]
+            snp = list(self.human.get_variation(Symbol=self.snp_names[i]))[0]
             if 'missense_variant' not in snp.Effect:
                 continue
 
@@ -499,13 +499,13 @@ class TestVariation(GenomeTestBase):
 
     def test_no_pep_alleles(self):
         """handle case where coding_sequence_variant has no peptide alleles"""
-        snp = list(self.human.getVariation(Symbol='CM033341'))[0]
+        snp = list(self.human.get_variation(Symbol='CM033341'))[0]
         self.assertTrue(snp.PeptideAlleles is None)
 
     def test_get_peptide_location(self):
         """should return correct location for aa variants"""
         index = self.snp_names.index('rs11545807')
-        snp = list(self.human.getVariation(Symbol=self.snp_names[index]))[0]
+        snp = list(self.human.get_variation(Symbol=self.snp_names[index]))[0]
         self.assertEqual(snp.TranslationLocation, 95)
 
     def test_validation_status(self):
@@ -520,7 +520,7 @@ class TestVariation(GenomeTestBase):
                 ('rs10792769', set(['cluster', 'freq', '1000Genome',
                                     'hapmap', 'doublehit']), func))
         for name, status, conv in data:
-            snp = list(self.human.getVariation(Symbol=name))[0]
+            snp = list(self.human.get_variation(Symbol=name))[0]
             got = conv(snp.Validation)
             self.assertTrue(status & got)
 
@@ -528,25 +528,25 @@ class TestVariation(GenomeTestBase):
         """should correctly get the flanking sequence if matches reference genome"""
 
         for i in range(4):  # only have flanking sequence for 3
-            snp = list(self.human.getVariation(Symbol=self.snp_names[i],
+            snp = list(self.human.get_variation(Symbol=self.snp_names[i],
                                                flanks_match_ref=False))[0]
             self.assertEqual(snp.FlankingSeq, self.snp_flanks[i])
 
     def test_variation_seq(self):
         """should return the sequence for a Variation snp if asked"""
-        snp = list(self.human.getVariation(Symbol=self.snp_names[0]))[0]
+        snp = list(self.human.get_variation(Symbol=self.snp_names[0]))[0]
         self.assertContains(snp.Alleles, str(snp.Seq))
 
     def test_get_validation_condition(self):
         """simple test of SNP validation status"""
         snp_status = [('rs94', False), ('rs90', True)]
         for symbol, status in snp_status:
-            snp = list(self.human.getVariation(Symbol=symbol, validated=True))
+            snp = list(self.human.get_variation(Symbol=symbol, validated=True))
             self.assertEqual(snp != [], status)
 
     def test_allele_freqs(self):
         """exercising getting AlleleFreq data"""
-        snp = list(self.human.getVariation(Symbol='rs34213141'))[0]
+        snp = list(self.human.get_variation(Symbol='rs34213141'))[0]
         expect = set([('A', '0.0303'), ('G', '0.9697')])
         allele_freqs = snp.AlleleFreqs
         allele_freqs = set((a, '%.4f' % f)
@@ -555,14 +555,14 @@ class TestVariation(GenomeTestBase):
 
     def test_by_effect(self):
         """excercising select SNPs by effect"""
-        for snp in self.human.getVariation(Effect='missense_variant', limit=1):
+        for snp in self.human.get_variation(Effect='missense_variant', limit=1):
             break
 
     def test_complex_query(self):
         """only return non-somatic SNPs that are validated and match reference"""
         i = 0
         limit = 10
-        for snp in self.human.getVariation(Effect='missense_variant', like=False,
+        for snp in self.human.get_variation(Effect='missense_variant', like=False,
                                            validated=True, somatic=False,
                                            flanks_match_ref=True, limit=limit):
             self.assertEqual(snp.Somatic, False)
@@ -702,7 +702,7 @@ class TestFeatures(GenomeTestBase):
 
     def test_get_features_from_nt(self):
         """should correctly return the encompassing gene from 1nt"""
-        snp = list(self.human.getVariation(Symbol='rs34213141'))[0]
+        snp = list(self.human.get_variation(Symbol='rs34213141'))[0]
         genes = list(self.human.get_features(feature_types='gene', region=snp))
         self.assertTrue('ENSG00000254997' in [g.StableId for g in genes])
 

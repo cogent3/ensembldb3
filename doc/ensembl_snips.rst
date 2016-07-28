@@ -286,7 +286,7 @@ We get a single SNP and print it's allele frequencies.
 
 .. doctest::
     
-    >>> snp = list(human.getVariation(Symbol='rs34213141'))[0]
+    >>> snp = list(human.get_variation(Symbol='rs34213141'))[0]
     >>> print snp.AlleleFreqs
     =================================
     allele      freq    population_id

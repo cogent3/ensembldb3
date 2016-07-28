@@ -547,7 +547,7 @@ class Genome(object):
                                               other_coord, where_feature):
                         yield region
 
-    def getVariation(self, Effect=None, Symbol=None, like=True,
+    def get_variation(self, Effect=None, Symbol=None, like=True,
                      validated=False, somatic=False, flanks_match_ref=False,
                      limit=None):
         """returns a generator of Variation instances
