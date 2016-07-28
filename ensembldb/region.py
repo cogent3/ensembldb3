@@ -235,7 +235,7 @@ class _StableRegion(GenericRegion):
         # record for obtaining a stable_id
         table_name = self._attr_ensembl_table_map['StableId']
 
-        if self.genome.GeneralRelease >= 65:
+        if self.genome.general_release >= 65:
             func_name = '_get_%s_record' % (table_name + '_stable_id')
         else:
             func_name = '_get_%s_record' % table_name
@@ -285,7 +285,7 @@ class Gene(_StableRegion):
         super(Gene, self).__init__(genome, db, Location=Location)
 
         self._attr_ensembl_table_map = dict(StableId=['gene_stable_id',
-                                                      'gene'][genome.GeneralRelease >= 65],
+                                                      'gene'][genome.general_release >= 65],
                                             Symbol='xref',
                                             Description='gene', BioType='gene', Location='gene',
                                             CanonicalTranscript='gene',
@@ -458,7 +458,7 @@ class Transcript(_StableRegion):
         super(Transcript, self).__init__(genome, db, Location=Location)
 
         self._attr_ensembl_table_map = dict(StableId=['transcript_stable_id',
-                                                      'transcript'][genome.GeneralRelease >= 65],
+                                                      'transcript'][genome.general_release >= 65],
                                             Location='transcript',
                                             Status='transcript',
                                             TranslatedExons='translation')
@@ -862,7 +862,7 @@ class Exon(_StableRegion):
         _StableRegion.__init__(self, genome, db, Location=Location)
 
         self._attr_ensembl_table_map = dict(StableId=['exon_stable_id',
-                                                      'exon'][genome.GeneralRelease >= 65],
+                                                      'exon'][genome.general_release >= 65],
                                             Location='exon')
 
         self.exon_id = exon_id
@@ -885,7 +885,7 @@ class Exon(_StableRegion):
         return self.Rank != other.Rank
 
     def _get_exon_stable_id_record(self):
-        if self.genome.GeneralRelease >= 65:
+        if self.genome.general_release >= 65:
             # release >= 65, data is just in the exon table
             self._get_exon_record()
             return
@@ -992,7 +992,7 @@ class Variation(_Region):
 
         super(Variation, self).__init__()
 
-        if genome.GeneralRelease < 70:
+        if genome.general_release < 70:
             self._get_flanking_seq_data = self._get_flanking_seq_data_lt_70
         else:
             self._get_flanking_seq_data = self._get_flanking_seq_data_ge_70
@@ -1032,7 +1032,7 @@ class Variation(_Region):
     def _get_variation_table_record(self):
         # this is actually the variation_feature table
         consequence_type = 'consequence_type'
-        if self.genome.GeneralRelease > 67:
+        if self.genome.general_release > 67:
             consequence_type += 's'  # change to plural column name
 
         attr_name_map = [('Effect', consequence_type, _set_to_string),
@@ -1168,7 +1168,7 @@ class Variation(_Region):
         self._table_rows['allele_table'] = records
         data = []
 
-        if self.genome.GeneralRelease > 71:
+        if self.genome.general_release > 71:
             sample_id = 'population_id'
         else:
             sample_id = 'sample_id'

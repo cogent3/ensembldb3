@@ -60,12 +60,12 @@ class MZ_Genome(TestCase):
     def test_get_general_release(self):
         """should correctly infer the general release"""
         rel_lt_65 = Genome('D.melanogaster', release=22, account=account)
-        self.assertEqual(rel_lt_65.GeneralRelease, 75)
+        self.assertEqual(rel_lt_65.general_release, 75)
         self.assertEqual(rel_lt_65.CoreDb.db_name,
                          'drosophila_melanogaster_core_22_75_546')
 
         rel_gt_65 = Genome('D.melanogaster', release=23, account=account)
-        self.assertEqual(rel_gt_65.GeneralRelease, 76)
+        self.assertEqual(rel_gt_65.general_release, 76)
         self.assertEqual(rel_gt_65.CoreDb.db_name,
                          'drosophila_melanogaster_core_23_76_546')
 

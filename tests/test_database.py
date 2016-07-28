@@ -68,7 +68,7 @@ class TestDatabase(TestCase):
         human = Database(account=account, release=release,
                          species='human', db_type='core')
         table_names = [n.split('.')[1] for n in expect]
-        got = dict(human.getTablesRowCount(table_names).tolist())
+        got = dict(human.get_tables_row_count(table_names).tolist())
         for dbname in expect:
             self.assertTrue(got[dbname] >= expect[dbname])
 

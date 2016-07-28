@@ -94,7 +94,7 @@ class Database(object):
         table = self.get_table(table_name)
         return hasattr(table.c, column)
 
-    def getTablesRowCount(self, table_name=None):
+    def get_tables_row_count(self, table_name=None):
         """returns a cogent Table object with the row count for each table
         in the database
 

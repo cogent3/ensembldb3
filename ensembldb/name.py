@@ -75,17 +75,17 @@ class EnsemblDbName(object):
 
         release, build = get_version_from_name(db_name)
         self.release = release
-        self.GeneralRelease = self.release
+        self.general_release = self.release
 
         if len(build) == 1:
             if self.Type != 'compara':
                 self.Build = build[0]
             else:
                 self.Build = None
-                self.GeneralRelease = build[0]
+                self.general_release = build[0]
         elif build:
             self.Build = build[1]
-            self.GeneralRelease = build[0]
+            self.general_release = build[0]
         else:
             self.Build = None
 

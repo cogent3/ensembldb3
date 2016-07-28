@@ -192,7 +192,7 @@ class Compara(object):
 
         StableId = StableId or gene_region.StableId
 
-        if list(self._genomes.values())[0].GeneralRelease > 75:
+        if list(self._genomes.values())[0].general_release > 75:
             mem_name = 'gene_member'
             mem_id = 'gene_member_id'
             frag_strand = 'dnafrag_strand'

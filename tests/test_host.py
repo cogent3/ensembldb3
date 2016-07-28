@@ -57,11 +57,11 @@ class TestEnsemblDbName(TestCase):
         self.assertEqual(n.Prefix, 'aedes_aegypti')
         self.assertEqual(n.Type, 'core')
         self.assertEqual(n.release, '5')
-        self.assertEqual(n.GeneralRelease, '58')
+        self.assertEqual(n.general_release, '58')
         self.assertEqual(n.Build, '1e')
         n = EnsemblDbName('ensembl_compara_metazoa_6_59')
         self.assertEqual(n.release, '6')
-        self.assertEqual(n.GeneralRelease, '59')
+        self.assertEqual(n.general_release, '59')
         self.assertEqual(n.Type, 'compara')
 
 

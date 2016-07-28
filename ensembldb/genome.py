@@ -120,7 +120,7 @@ class Genome(object):
                           species=self.Species, pool_recycle=self._pool_recycle)
         if self._core_db is None and db_type == 'core':
             self._core_db = Database(db_type='core', **connection)
-            gen_rel = self.CoreDb.db_name.GeneralRelease
+            gen_rel = self.CoreDb.db_name.general_release
             gen_rel = int(re.findall(r'^\d+', str(gen_rel))[0])
             self._gen_release = gen_rel
         elif self._var_db is None and db_type == 'variation':
@@ -147,7 +147,7 @@ class Genome(object):
     OtherFeaturesDb = property(_get_other_db)
 
     @property
-    def GeneralRelease(self):
+    def general_release(self):
         """returns True if the general Ensembl release is >= 65"""
         # General release is used here as to support Ensembl genomes
         if self._gen_release is None:
@@ -223,7 +223,7 @@ class Genome(object):
 
         # after release 65, the gene_id_table is removed. The following is to maintain
         # support for earlier releases
-        release_ge_65 = self.GeneralRelease >= 65
+        release_ge_65 = self.general_release >= 65
         if release_ge_65:
             gene_id_table = None
         else:
@@ -318,7 +318,7 @@ class Genome(object):
 
         # after release 65, the transcript_id_table is removed. The following is to maintain
         # support for earlier releases
-        release_ge_65 = self.GeneralRelease >= 65
+        release_ge_65 = self.general_release >= 65
         if release_ge_65:
             transcript_id_table = None
         else:
@@ -442,7 +442,7 @@ class Genome(object):
 
         # after release 65, the gene_id_table is removed. The following is to maintain
         # support for earlier releases.
-        if self.GeneralRelease >= 65:
+        if self.general_release >= 65:
             gene_id_table = None
         else:
             gene_id_table = db.get_table('gene_stable_id')
@@ -568,7 +568,7 @@ class Genome(object):
         #  if we don't have Symbol, then we deal with Effect
 
         consequence_type = 'consequence_type'
-        if self.GeneralRelease > 67:
+        if self.general_release > 67:
             consequence_type += 's'  # change to plural column name
 
         if Effect is not None:
@@ -641,7 +641,7 @@ class Genome(object):
             db = self.CoreDb
 
         consequence_type = 'consequence_type'
-        if self.GeneralRelease > 67:
+        if self.general_release > 67:
             consequence_type += 's'  # change to plural column name
 
         property_map = {'effect': ('variation_feature', consequence_type),
