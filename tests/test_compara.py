@@ -52,7 +52,7 @@ class TestCompara(ComparaTestBase):
     def test_get_related_genes(self):
         """should correctly return the related gene regions from each genome"""
         brca2 = self.comp.Mouse.getGeneByStableId("ENSMUSG00000041147")
-        Orthologs = self.comp.getRelatedGenes(gene_region=brca2,
+        Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship="ortholog_one2one")
         self.assertEqual("ortholog_one2one", Orthologs.Relationships[0])
 
@@ -60,13 +60,13 @@ class TestCompara(ComparaTestBase):
         """should handle case where gene is absent from one of the genomes"""
         clec2d = self.comp.Mouse.getGeneByStableId(
             StableId='ENSMUSG00000030157')
-        orthologs = self.comp.getRelatedGenes(gene_region=clec2d,
+        orthologs = self.comp.get_related_genes(gene_region=clec2d,
                                               Relationship='ortholog_one2many')
         self.assertTrue(len(orthologs.Members) < 4)
 
     def test_get_collection(self):
         brca2 = self.comp.Human.getGeneByStableId(StableId="ENSG00000139618")
-        Orthologs = self.comp.getRelatedGenes(gene_region=brca2,
+        Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship="ortholog_one2one")
         collection = Orthologs.getSeqCollection()
         self.assertTrue(len(collection.Seqs[0]) > 1000)
@@ -120,7 +120,7 @@ class TestCompara(ComparaTestBase):
         expect = set(['Homo sapiens', 'Ornithorhynchus anatinus',
                       'Mus musculus', 'Rattus norvegicus'])
         brca1 = self.comp.Human.getGeneByStableId(StableId="ENSG00000012048")
-        Orthologs = self.comp.getRelatedGenes(gene_region=brca1,
+        Orthologs = self.comp.get_related_genes(gene_region=brca1,
                                               Relationship="ortholog_one2one")
         self.assertEqual(Orthologs.getSpeciesSet(), expect)
 

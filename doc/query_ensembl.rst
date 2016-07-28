@@ -389,7 +389,7 @@ So we use the ``brca2`` instance above and search for orthologs among the human,
 
 .. doctest::
 
-    >>> orthologs = compara.getRelatedGenes(gene_region=brca2,
+    >>> orthologs = compara.get_related_genes(gene_region=brca2,
     ...                 Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
@@ -400,7 +400,7 @@ I could also have done that query using a ``StableId``, which I now do using the
 
 .. doctest::
 
-    >>> orthologs = compara.getRelatedGenes(StableId='ENSMUSG00000041147',
+    >>> orthologs = compara.get_related_genes(StableId='ENSMUSG00000041147',
     ...                 Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
@@ -435,7 +435,7 @@ We can also search for other relationship types, which we do here for a histone.
 
 .. doctest::
 
-    >>> paralogs = compara.getRelatedGenes(StableId='ENSG00000164032',
+    >>> paralogs = compara.get_related_genes(StableId='ENSG00000164032',
     ...             Relationship='within_species_paralog')
     >>> print paralogs
     RelatedGenes:

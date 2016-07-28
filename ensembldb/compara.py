@@ -174,7 +174,7 @@ class Compara(object):
 
     method_species_links = property(_get_method_link_species_set)
 
-    def getRelatedGenes(self, gene_region=None, StableId=None,
+    def get_related_genes(self, gene_region=None, StableId=None,
                         Relationship=None, DEBUG=False):
         """returns a RelatedGenes instance.
 

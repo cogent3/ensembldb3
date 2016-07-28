@@ -33,7 +33,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         """should correctly return the related gene regions from each genome"""
         # using sc35, a splicing factor
         sc35 = self.comp.Dmelanogaster.getGeneByStableId("FBgn0040286")
-        Orthologs = self.comp.getRelatedGenes(gene_region=sc35,
+        Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
         self.assertEqual("ortholog_one2one", Orthologs.Relationships[0])
 
@@ -42,14 +42,14 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         # here, it is brca2
         brca2 = self.comp.Dmelanogaster.getGeneByStableId(
             StableId='FBgn0050169')
-        orthologs = self.comp.getRelatedGenes(gene_region=brca2,
+        orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship='ortholog_one2one')
         self.assertEqual(len(orthologs.Members), 2)
 
     def test_get_collection(self):
         sc35 = self.comp.Dmelanogaster.getGeneByStableId(
             StableId="FBgn0040286")
-        Orthologs = self.comp.getRelatedGenes(gene_region=sc35,
+        Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
         collection = Orthologs.getSeqCollection()
         self.assertTrue(len(collection.Seqs[0]) > 1000)

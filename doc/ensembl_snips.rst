@@ -407,7 +407,7 @@ We get the one-to-one orthologs for *BRCA2*.
     >>> from ensembldb import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
-    >>> orthologs = compara.getRelatedGenes(StableId='ENSG00000139618',
+    >>> orthologs = compara.get_related_genes(StableId='ENSG00000139618',
     ...                  Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
@@ -448,7 +448,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     >>> latin_to_common = dict(zip(latin_names, common_names))
     >>> compara = Compara(common_names, release=76, account=account)
     >>> for gene in compara.Human.getGenesMatching(BioType='protein_coding'):
-    ...     orthologs = compara.getRelatedGenes(gene,
+    ...     orthologs = compara.get_related_genes(gene,
     ...                                  Relationship='ortholog_one2one')
     ...     # make sure all species represented
     ...     if orthologs is None or orthologs.getSpeciesSet() != latin_names:
@@ -475,7 +475,7 @@ Get within species paralogs
 
 .. doctest::
     
-    >>> paralogs = compara.getRelatedGenes(StableId='ENSG00000164032',
+    >>> paralogs = compara.get_related_genes(StableId='ENSG00000164032',
     ...             Relationship='within_species_paralog')
     >>> print paralogs
     RelatedGenes:
