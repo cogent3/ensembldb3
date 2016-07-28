@@ -14,7 +14,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 81
+release = 81
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -24,19 +24,19 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=Release)
+    account = get_ensembl_account(release=release)
 
 
 class TestDatabase(TestCase):
 
     def test_connect(self):
-        human = Database(account=account, release=Release,
+        human = Database(account=account, release=release,
                          species='human', db_type='core')
         gene = human.getTable('gene')
 
     def test_get_distinct(self):
         """should return list of strings"""
-        db = Database(account=account, release=Release,
+        db = Database(account=account, release=release,
                       species='human', db_type='variation')
         tn, tc = 'variation_feature', 'consequence_types'
         expected = set(('3_prime_UTR_variant', 'splice_acceptor_variant',
@@ -44,7 +44,7 @@ class TestDatabase(TestCase):
         got = db.getDistinct(tn, tc)
         self.assertNotEqual(set(got) & expected, set())
 
-        db = Database(account=account, release=Release,
+        db = Database(account=account, release=release,
                       species='human', db_type='core')
         tn, tc = 'gene', 'biotype'
         expected = set(['protein_coding', 'pseudogene', 'processed_transcript',
@@ -53,7 +53,7 @@ class TestDatabase(TestCase):
         got = set(db.getDistinct(tn, tc))
         self.assertNotEqual(set(got) & expected, set())
 
-        db = Database(account=account, release=Release, db_type='compara')
+        db = Database(account=account, release=release, db_type='compara')
         got = set(db.getDistinct('homology', 'description'))
         expected = set(['gene_split', 'alt_allele', 'other_paralog',
                         'ortholog_one2many', 'ortholog_one2one',
@@ -65,7 +65,7 @@ class TestDatabase(TestCase):
         expect = {'homo_sapiens_core_81_38.analysis': 61,
                   'homo_sapiens_core_81_38.seq_region': 55616,
                   'homo_sapiens_core_81_38.assembly': 102090}
-        human = Database(account=account, release=Release,
+        human = Database(account=account, release=release,
                          species='human', db_type='core')
         table_names = [n.split('.')[1] for n in expect]
         got = dict(human.getTablesRowCount(table_names).tolist())
@@ -74,7 +74,7 @@ class TestDatabase(TestCase):
 
     def test_table_has_column(self):
         """return correct values for whether a Table has a column"""
-        account = get_ensembl_account(release=Release)
+        account = get_ensembl_account(release=release)
         var61 = Database(account=account, release=61, species='human',
                          db_type='variation')
 

@@ -27,7 +27,7 @@ So the first step is to specify what host and account are to be used. On my lab'
 .. doctest::
     
     >>> import os
-    >>> Release = 76
+    >>> release = 76
     >>> from ensembldb import HostAccount
     >>> if 'ENSEMBL_ACCOUNT' in os.environ:
     ...     host, username, password = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -83,9 +83,9 @@ As implied above, Ensembl databases are versioned, hence you must explicitly sta
 .. doctest::
 
     >>> from ensembldb import HostAccount, Genome
-    >>> human = Genome(Species='human', Release=Release, account=account)
+    >>> human = Genome(Species='human', release=release, account=account)
     >>> print human
-    Genome(Species='Homo sapiens'; Release='76')
+    Genome(Species='Homo sapiens'; release='76')
 
 Notice I used the common name rather than full name. The ``Genome`` provides an interface to obtaining different attributes. It's primary role is to allow selection of genomic regions according to some search criteria. The type of region is presently limited to ``Gene``, ``Est``, ``CpGisland``, ``Repeat`` and ``Variation``. There's also a ``GenericRegion``. The specific types are also capable of identifying information related to themselves, as we will demonstrate below.
 
@@ -341,7 +341,7 @@ In Ensembl's databases, each type of feature may be recorded at multiple coordin
 
 .. doctest::
 
-   >>> chicken = Genome(Species='chook', Release=Release, account=account)
+   >>> chicken = Genome(Species='chook', release=release, account=account)
    >>> print chicken.FeatureCoordLevels
    Gallus gallus
    ============================================
@@ -365,9 +365,9 @@ The Ensembl compara database is represented by ``cogent.db.ensembl.compara.Compa
 
     >>> from ensembldb import Compara
     >>> compara = Compara(['human', 'mouse', 'rat'], account=account,
-    ...                  Release=Release)
+    ...                  release=release)
     >>> print compara
-    Compara(Species=('Homo sapiens', 'Mus musculus', 'Rattus norvegicus'); Release=76...
+    Compara(Species=('Homo sapiens', 'Mus musculus', 'Rattus norvegicus'); release=76...
 
 The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to itself as named attributes (use ``Species.getComparaName`` to find out what the attribute will be). The genome instances are named according to their common name in CamelCase, or Scase. For instance, if we had created a ``Compara`` instance with the American pika species included, then that genome would be accessed as ``compara.AmericanPika``. Common names containing a '.' are treated differently. For instance, the common name for *Caenorhabditis remanei* is ``C.remanei`` which becomes ``compara.Cremanei``. We access the human genome in this ``Compara`` instance and conduct a gene search.
 
@@ -480,10 +480,10 @@ We consider a species for which pairwise alignments are available -- the bush ba
 
 .. doctest::
 
-    >>> compara_pair = Compara(['Human', 'Bushbaby'], Release=Release,
+    >>> compara_pair = Compara(['Human', 'Bushbaby'], release=release,
     ...                        account=account)
     >>> print compara_pair
-    Compara(Species=('Homo sapiens', 'Otolemur garnettii'); Release=76; connected=True)
+    Compara(Species=('Homo sapiens', 'Otolemur garnettii'); release=76; connected=True)
 
 
 Printing the ``method_species_links`` table provides all the necessary information for specifying selection conditions.

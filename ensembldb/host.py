@@ -143,7 +143,7 @@ def get_db_name(account=None, species=None, db_type=None, release=None,
             if division is not None and division not in row[0]:
                 continue
             name = EnsemblDbName(row[0])
-            if (release is None or name.Release == str(release)) and\
+            if (release is None or name.release == str(release)) and\
                     (db_type is None or name.Type == db_type):
                 dbs.append(name)
         except (IndexError, RuntimeError):
@@ -158,7 +158,7 @@ def get_latest_release(account=None):
     names = get_db_name(account=account, db_type="compara")
     compara = []
     for name in names:
-        compara += [int(name.Release)]
+        compara += [int(name.release)]
     return str(max(compara))
 
 if __name__ == "__main__":

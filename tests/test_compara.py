@@ -14,7 +14,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 81
+release = 81
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -24,7 +24,7 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=Release)
+    account = get_ensembl_account(release=release)
 
 
 def calc_slope(x1, y1, x2, y2):
@@ -38,7 +38,7 @@ def calc_slope(x1, y1, x2, y2):
 
 
 class ComparaTestBase(TestCase):
-    comp = Compara(['human', 'mouse', 'rat', 'platypus'], Release=Release,
+    comp = Compara(['human', 'mouse', 'rat', 'platypus'], release=release,
                    account=account)
 
 
@@ -102,7 +102,7 @@ class TestCompara(ComparaTestBase):
 
     def test_no_method_clade_data(self):
         """generate a Table with no rows if no alignment data"""
-        compara = Compara(['S.cerevisiae'], Release=Release, account=account)
+        compara = Compara(['S.cerevisiae'], release=release, account=account)
         self.assertEqual(compara.method_species_links.shape[0], 0)
 
     def test_get_syntenic_returns_nothing(self):
@@ -126,13 +126,13 @@ class TestCompara(ComparaTestBase):
 
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
-        dog = Compara(['chimp', 'dog'], Release=Release, account=account,
+        dog = Compara(['chimp', 'dog'], release=release, account=account,
                       pool_recycle=1000)
 
 
 class TestSyntenicRegions(TestCase):
     comp = Compara(['human', 'chimp', 'macaque'], account=account,
-                   Release=Release)
+                   release=release)
 
     def test_correct_alignments(self):
         """should return the correct alignments"""

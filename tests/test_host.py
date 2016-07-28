@@ -16,7 +16,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 81
+release = 81
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -26,7 +26,7 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=Release)
+    account = get_ensembl_account(release=release)
 
 
 class TestEnsemblDbName(TestCase):
@@ -56,11 +56,11 @@ class TestEnsemblDbName(TestCase):
         n = EnsemblDbName('aedes_aegypti_core_5_58_1e')
         self.assertEqual(n.Prefix, 'aedes_aegypti')
         self.assertEqual(n.Type, 'core')
-        self.assertEqual(n.Release, '5')
+        self.assertEqual(n.release, '5')
         self.assertEqual(n.GeneralRelease, '58')
         self.assertEqual(n.Build, '1e')
         n = EnsemblDbName('ensembl_compara_metazoa_6_59')
-        self.assertEqual(n.Release, '6')
+        self.assertEqual(n.release, '6')
         self.assertEqual(n.GeneralRelease, '59')
         self.assertEqual(n.Type, 'compara')
 
@@ -102,7 +102,7 @@ class TestDBconnects(TestCase):
             self.assertEqual(len(result), 1)
             result = result[0]
             self.assertEqual(result.name, db_name)
-            self.assertEqual(result.Release, '49')
+            self.assertEqual(result.release, '49')
 
     def test_latest_release_number(self):
         """should correctly the latest release number"""
@@ -124,7 +124,7 @@ class TestDBconnects(TestCase):
         # that we only receive valid ones back
         available = get_db_name(release="46")
         for db in available:
-            self.assertEqual(db.Release, '46')
+            self.assertEqual(db.release, '46')
 
     def test_active_connections(self):
         """connecting to a database on a specified server should be done once

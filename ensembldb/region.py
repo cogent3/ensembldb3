@@ -1070,7 +1070,7 @@ class Variation(_Region):
         return record
 
     def _get_flanking_seq_data_ge_70(self):
-        """return the flanking sequence data if Release >= 70"""
+        """return the flanking sequence data if release >= 70"""
         # variation_feature.alignment_quality == 1, means flanks match reference
         # genome, 0 means they don't
         aligned_ref = self._table_rows[

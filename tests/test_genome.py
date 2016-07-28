@@ -18,7 +18,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 81
+release = 81
 
 NULL_VALUE = None
 
@@ -33,15 +33,15 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=Release)
+    account = get_ensembl_account(release=release)
 
 
 class GenomeTestBase(TestCase):
-    human = Genome(Species="human", Release=Release, account=account)
-    mouse = Genome(Species="mouse", Release=Release, account=account)
-    rat = Genome(Species="rat", Release=Release, account=account)
-    macaq = Genome(Species="macaque", Release=Release, account=account)
-    gorilla = Genome(Species="gorilla", Release=Release, account=account)
+    human = Genome(Species="human", release=release, account=account)
+    mouse = Genome(Species="mouse", release=release, account=account)
+    rat = Genome(Species="rat", release=release, account=account)
+    macaq = Genome(Species="macaque", release=release, account=account)
+    gorilla = Genome(Species="gorilla", release=release, account=account)
     brca2 = human.getGeneByStableId(StableId="ENSG00000139618")
 
 
@@ -58,7 +58,7 @@ class TestGenome(GenomeTestBase):
 
     def test_genome_comparison(self):
         """different genome instances with same CoreDb connection are equal"""
-        h2 = Genome(Species='human', Release=Release, account=account)
+        h2 = Genome(Species='human', release=release, account=account)
         self.assertEqual(self.human, h2)
 
     def test_make_location(self):
@@ -89,7 +89,7 @@ class TestGenome(GenomeTestBase):
 
     def test_no_assembly(self):
         """return N's for coordinates with no assembly"""
-        krat = Genome('Kangaroo rat', Release=58)
+        krat = Genome('Kangaroo rat', release=58)
         start = 24385
         end = start + 100
         region = krat.getRegion(CoordName='scaffold_13754', start=start,
@@ -120,13 +120,13 @@ class TestGenome(GenomeTestBase):
 
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
-        dog = Genome(Species="dog", Release=Release, account=account,
+        dog = Genome(Species="dog", release=release, account=account,
                      pool_recycle=1000)
 
     def test_gorilla(self):
         """should correctly return a gorilla gene"""
         self.gorilla = Genome(
-            Species="gorilla", Release=Release, account=account)
+            Species="gorilla", release=release, account=account)
         gene = self.gorilla.getGeneByStableId('ENSGGOG00000005730')
         self.assertEqual(str(gene.Seq[:10]), 'TGGGAGTCCA')
 

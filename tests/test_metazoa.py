@@ -12,13 +12,13 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 23
+release = 23
 account = HostAccount('mysql-eg-publicsql.ebi.ac.uk',
                       'anonymous', '', port=4157)
 
 
 class MZ_ComparaTestBase(TestCase):
-    comp = Compara(['D.grimshawi', 'D.melanogaster'], Release=Release,
+    comp = Compara(['D.grimshawi', 'D.melanogaster'], release=release,
                    account=account, division='metazoa')
 
 
@@ -59,12 +59,12 @@ class MZ_Genome(TestCase):
 
     def test_get_general_release(self):
         """should correctly infer the general release"""
-        rel_lt_65 = Genome('D.melanogaster', Release=22, account=account)
+        rel_lt_65 = Genome('D.melanogaster', release=22, account=account)
         self.assertEqual(rel_lt_65.GeneralRelease, 75)
         self.assertEqual(rel_lt_65.CoreDb.db_name,
                          'drosophila_melanogaster_core_22_75_546')
 
-        rel_gt_65 = Genome('D.melanogaster', Release=23, account=account)
+        rel_gt_65 = Genome('D.melanogaster', release=23, account=account)
         self.assertEqual(rel_gt_65.GeneralRelease, 76)
         self.assertEqual(rel_gt_65.CoreDb.db_name,
                          'drosophila_melanogaster_core_23_76_546')

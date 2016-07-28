@@ -17,7 +17,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 81
+release = 81
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -27,13 +27,13 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=Release)
+    account = get_ensembl_account(release=release)
 
 
 class TestFeatureCoordLevels(TestCase):
 
     def setUp(self):
-        self.chicken = Genome(Species='chicken', Release=Release,
+        self.chicken = Genome(Species='chicken', release=release,
                               account=account)
 
     def test_feature_levels(self):

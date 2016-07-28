@@ -24,12 +24,12 @@ __status__ = "alpha"
 class Compara(object):
     """comaparison among genomes"""
 
-    def __init__(self, species, Release, account=None, pool_recycle=None,
+    def __init__(self, species, release, account=None, pool_recycle=None,
                  division=None):
-        assert Release, 'invalid release specified'
-        self.Release = str(Release)
+        assert release, 'invalid release specified'
+        self.release = str(release)
         if account is None:
-            account = get_ensembl_account(release=Release)
+            account = get_ensembl_account(release=release)
         self._account = account
         self._pool_recycle = pool_recycle
         self._compara_db = None
@@ -47,20 +47,20 @@ class Compara(object):
     def _attach_genomes(self):
         for species in self.Species:
             attr_name = _Species.getComparaName(species)
-            genome = Genome(Species=species, Release=self.Release,
+            genome = Genome(Species=species, release=self.release,
                             account=self._account)
             self._genomes[species] = genome
             setattr(self, attr_name, genome)
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species=%s; Release=%s; connected=%s)" % \
-            (my_type, self.Species, self.Release,
+        return "%s(Species=%s; release=%s; connected=%s)" % \
+            (my_type, self.Species, self.release,
              self.ComparaDb is not None)
 
     def _connect_db(self):
         # TODO can the connection be all done in init?
-        connection = dict(account=self._account, release=self.Release,
+        connection = dict(account=self._account, release=self.release,
                           pool_recycle=self._pool_recycle)
         if self._compara_db is None:
             self._compara_db = Database(db_type='compara',
@@ -285,7 +285,7 @@ class Compara(object):
 
         # column renamed between versions
         prefix = coord.genome.Species.lower()
-        if int(self.Release) > 58:
+        if int(self.release) > 58:
             prefix = _Species.getEnsemblDbPrefix(prefix)
 
         query = sql.select([dnafrag_table.c.dnafrag_id,

@@ -70,26 +70,26 @@ class FeatureTypeCache(LazyRecord):
 class Genome(object):
     """An Ensembl Genome"""
 
-    def __init__(self, Species, Release, account=None, pool_recycle=None):
+    def __init__(self, Species, release, account=None, pool_recycle=None):
         super(Genome, self).__init__()
 
-        assert Release, 'invalid release specified'
+        assert release, 'invalid release specified'
         if account is None:
-            account = get_ensembl_account(release=Release)
+            account = get_ensembl_account(release=release)
 
         self._account = account
         self._pool_recycle = pool_recycle
 
-        # TODO: check Release may not be necessary because: assert Release
+        # TODO: check release may not be necessary because: assert release
         # above
-        if Release is None:
-            Release = get_latest_release(account=account)
+        if release is None:
+            release = get_latest_release(account=account)
 
         self._gen_release = None
 
         # TODO make name and release immutable properties
         self.Species = _Species.getSpeciesName(Species)
-        self.Release = str(Release)
+        self.release = str(release)
 
         # the db connections
         self._core_db = None
@@ -100,8 +100,8 @@ class Genome(object):
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species='%s'; Release='%s')" % (my_type, self.Species,
-                                                   self.Release)
+        return "%s(Species='%s'; release='%s')" % (my_type, self.Species,
+                                                   self.release)
 
     def __repr__(self):
         return self.__str__()
@@ -116,7 +116,7 @@ class Genome(object):
         return self.CoreDb != other.CoreDb
 
     def _connect_db(self, db_type):
-        connection = dict(account=self._account, release=self.Release,
+        connection = dict(account=self._account, release=self.release,
                           species=self.Species, pool_recycle=self._pool_recycle)
         if self._core_db is None and db_type == 'core':
             self._core_db = Database(db_type='core', **connection)
@@ -582,10 +582,10 @@ class Genome(object):
             query = var_feature_table.c.variation_name == Symbol
 
         if validated:
-            # in Release 65, the default validated status is now ''
+            # in release 65, the default validated status is now ''
             # why?? thanks Ensembl!
             null = None
-            if int(self.Release) >= 65:
+            if int(self.release) >= 65:
                 null = ''
 
             query = sql.and_(

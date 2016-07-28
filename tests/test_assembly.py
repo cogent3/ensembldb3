@@ -16,7 +16,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-Release = 81
+release = 81
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -26,10 +26,10 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=Release)
+    account = get_ensembl_account(release=release)
 
-human = Genome(Species='human', Release=Release, account=account)
-platypus = Genome(Species='platypus', Release=Release, account=account)
+human = Genome(Species='human', release=release, account=account)
+platypus = Genome(Species='platypus', release=release, account=account)
 
 
 class TestLocation(TestCase):

@@ -90,9 +90,9 @@ We query for the *BRCA2* gene for humans.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> print human
-    Genome(Species='Homo sapiens'; Release='76')
+    Genome(Species='Homo sapiens'; release='76')
     >>> genes = human.getGenesMatching(Symbol='BRCA2')
     >>> for gene in genes:
     ...     if gene.Symbol == 'BRCA2':
@@ -108,7 +108,7 @@ We use the stable ID for *BRCA2*.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> gene = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> print gene
     Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; Symbol='BRCA2')
@@ -121,7 +121,7 @@ We look for breast cancer related genes that are estrogen induced.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> genes = human.getGenesMatching(Description='breast cancer anti-estrogen')
     >>> for gene in genes:
     ...     print gene
@@ -145,7 +145,7 @@ We get the canonical transcripts for *BRCA2*.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript
@@ -157,7 +157,7 @@ Get the CDS for a transcript
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> cds = transcript.Cds
@@ -172,7 +172,7 @@ Look at all transcripts for a gene
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> for transcript in brca2.Transcripts:
     ...     print transcript
@@ -187,7 +187,7 @@ We show just for the canonical transcript.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> print brca2.CanonicalTranscript.Exons[0]
     Exon(StableId=ENSE00001184784, Rank=1)
@@ -200,7 +200,7 @@ We show just for the canonical transcript.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> for intron in brca2.CanonicalTranscript.Introns:
     ...     print intron
@@ -215,7 +215,7 @@ Inspect the genomic coordinate for a feature
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> print brca2.Location.CoordName
     13
@@ -232,7 +232,7 @@ We query the genome for repeats within a specific coordinate range on chromosome
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> repeats = human.getFeatures(CoordName='13', start=32305473, end=32315473, feature_types='repeat')
     >>> for repeat in repeats:
     ...     print repeat.RepeatClass
@@ -249,7 +249,7 @@ We query the genome for CpG islands within a specific coordinate range on chromo
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> islands = human.getFeatures(CoordName='11', start=2129111, end=2149604, feature_types='cpg')
     >>> for island in islands:
     ...     print island
@@ -269,7 +269,7 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
 .. doctest::
 
     >>> from ensembldb import Genome
-    >>> human = Genome('human', Release=76, account=account)
+    >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript.Variants
@@ -306,7 +306,7 @@ We create a ``Compara`` instance for human, chimpanzee and macaque.
 .. doctest::
 
     >>> from ensembldb import Compara
-    >>> compara = Compara(['human', 'chimp', 'macaque'], Release=76,
+    >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> print compara.method_species_links
     Align Methods/Clades
@@ -327,7 +327,7 @@ We first get the syntenic region corresponding to human gene *BRCA2*.
 .. doctest::
 
     >>> from ensembldb import Compara
-    >>> compara = Compara(['human', 'chimp', 'macaque'], Release=76,
+    >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> human_brca2 = compara.Human.getGeneByStableId(StableId='ENSG00000139618')
     >>> regions = compara.getSyntenicRegions(region=human_brca2, align_method='EPO', align_clade='primates')
@@ -356,7 +356,7 @@ alignment method in the vertebrates clade:
 .. doctest::
 
     >>> species = ["mouse", "human"]
-    >>> compara = Compara(species, Release=66)
+    >>> compara = Compara(species, release=66)
     >>> clade = "vertebrates"
     >>> chrom, start, end, strand = "X", 155754928, 155755079, "-"
     >>> regions = compara.getSyntenicRegions(Species="mouse", CoordName=chrom, 
@@ -392,7 +392,7 @@ What gene relationships are available
 .. doctest::
 
     >>> from ensembldb import Compara
-    >>> compara = Compara(['human', 'chimp', 'macaque'], Release=76,
+    >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> print compara.getDistinct('relationship')
     [u'gene_split', u'alt_allele', u'ortholog_one2many', u'ortholog_one2one'...
@@ -405,7 +405,7 @@ We get the one-to-one orthologs for *BRCA2*.
 .. doctest::
 
     >>> from ensembldb import Compara
-    >>> compara = Compara(['human', 'chimp', 'macaque'], Release=76,
+    >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> orthologs = compara.getRelatedGenes(StableId='ENSG00000139618',
     ...                  Relationship='ortholog_one2one')
@@ -446,7 +446,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     >>> common_names = ["mouse", "rat", "human", "opossum"]
     >>> latin_names = set([Species.getSpeciesName(n) for n in common_names])
     >>> latin_to_common = dict(zip(latin_names, common_names))
-    >>> compara = Compara(common_names, Release=76, account=account)
+    >>> compara = Compara(common_names, release=76, account=account)
     >>> for gene in compara.Human.getGenesMatching(BioType='protein_coding'):
     ...     orthologs = compara.getRelatedGenes(gene,
     ...                                  Relationship='ortholog_one2one')
