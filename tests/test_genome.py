@@ -342,12 +342,12 @@ class TestGene(GenomeTestBase):
         """should correctly handle getting transcript by stable_id"""
         # if invalid stable_id, should just return None
         stable_id = 'ENST00000XXXXX'
-        transcript = self.human.getTranscriptByStableId(StableId=stable_id)
+        transcript = self.human.get_transcript_by_stableid(StableId=stable_id)
         self.assertEqual(transcript, None)
 
         # get transcript via gene and check values match
         stable_id = 'ENST00000380152'
-        transcript = self.human.getTranscriptByStableId(StableId=stable_id)
+        transcript = self.human.get_transcript_by_stableid(StableId=stable_id)
         self.assertEqual(transcript.StableId, stable_id)
         gene = transcript.Gene
         brca2 = self.human.get_gene_by_stableid(StableId='ENSG00000139618')
@@ -367,7 +367,7 @@ class TestGene(GenomeTestBase):
     def test_gene_on_transcript(self):
         """Transcript instances Gene attribute should be complete"""
         brca2 = self.human.get_gene_by_stableid(StableId='ENSG00000139618')
-        transcript = self.human.getTranscriptByStableId(
+        transcript = self.human.get_transcript_by_stableid(
             StableId='ENST00000380152')
         self.assertEqual(transcript.Gene.Symbol, brca2.Symbol)
 

@@ -299,7 +299,7 @@ class Genome(object):
             gene = Gene(self, self.CoreDb, data=record)
             yield gene
 
-    def getTranscriptByStableId(self, StableId):
+    def get_transcript_by_stableid(self, StableId):
         """returns the transcript matching StableId, or None if no record found"""
         query = self._get_transcript_query(self.CoreDb, StableId=StableId)
         try:
