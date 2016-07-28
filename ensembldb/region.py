@@ -548,7 +548,7 @@ class Transcript(_StableRegion):
         if strand == -1:
             intron_positions.reverse()
         for s, e in intron_positions:
-            coord = self.genome.makeLocation(coord_name=chrom, start=s, end=e,
+            coord = self.genome.make_location(coord_name=chrom, start=s, end=e,
                                              strand=strand, ensembl_coord=False)
             introns.append(Intron(self.genome, self.db, rank, self.StableId,
                                   coord))

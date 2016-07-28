@@ -245,7 +245,7 @@ class Genome(object):
 
         return query
 
-    def makeLocation(self, coord_name, start=None, end=None, strand=1,
+    def make_location(self, coord_name, start=None, end=None, strand=1,
                      ensembl_coord=False):
         """returns a location in the genome"""
         return Coordinate(self, coord_name=coord_name, start=start, end=end,

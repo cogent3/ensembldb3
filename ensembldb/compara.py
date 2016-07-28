@@ -364,7 +364,7 @@ class Compara(object):
 
         if region is None:
             ref_genome = self._genomes[_Species.getSpeciesName(Species)]
-            region = ref_genome.makeLocation(coord_name=coord_name,
+            region = ref_genome.make_location(coord_name=coord_name,
                                              start=start, end=end, strand=strand,
                                              ensembl_coord=ensembl_coord)
         elif hasattr(region, 'Location'):
@@ -374,7 +374,7 @@ class Compara(object):
         ref_genome = self._genomes[region.genome.Species]
         if ref_genome is not region.genome:
             # recreate region from our instance
-            region = ref_genome.makeLocation(coord_name=region.coord_name,
+            region = ref_genome.make_location(coord_name=region.coord_name,
                                              start=region.start, end=region.end,
                                              strand=region.strand)
 

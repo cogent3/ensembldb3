@@ -63,7 +63,7 @@ class TestGenome(GenomeTestBase):
 
     def test_make_location(self):
         """should correctly make a location for an entire chromosome"""
-        loc = self.human.makeLocation(coord_name=1)
+        loc = self.human.make_location(coord_name=1)
         self.assertEqual(len(loc), 248956422)
 
     def test_get_region(self):
