@@ -139,7 +139,7 @@ Gene's also have a location. The length of a gene is the difference between its 
 
 .. doctest::
 
-    >>> print brca2.Location
+    >>> print brca2.location
     Homo sapiens:chromosome:13:32315473...
     >>> print len(brca2)
     84793
@@ -165,10 +165,10 @@ It is also possible to iterate over a transcript's exons, over their translated 
     
     >>> transcript = brca2.Transcripts[0]
     >>> for exon in transcript.Exons:
-    ...     print exon, exon.Location
+    ...     print exon, exon.location
     Exon(StableId=ENSE00001184784, Rank=1) Homo sapiens:chromosome:13:...
     >>> for exon in transcript.TranslatedExons:
-    ...     print exon, exon.Location
+    ...     print exon, exon.location
     Exon(StableId=ENSE00001484009, Rank=2) Homo sapiens:chromosome:13:...
     >>> print transcript.Cds
     ATGCCTATTGGATCCAAA...
@@ -288,7 +288,7 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
 .. doctest::
 
     >>> assert len(nsyn_variant) == 1
-    >>> print nsyn_variant.Location
+    >>> print nsyn_variant.location
     Homo sapiens:chromosome:1:69967-69968:1
     >>> assert nsyn_variant.NumAlleles == 2
 
@@ -328,7 +328,7 @@ We can also use a slightly more involved query to find all variants within the g
     ...         break
     >>> print snp
     Variation(Symbol='rs80358836'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', 'upstream_gene_variant', 'missense_variant'...
-    >>> print snp.Location
+    >>> print snp.location
     Homo sapiens:chromosome:13:32316464-32316465:1
 
 

@@ -58,7 +58,7 @@ class TestFeatureCoordLevels(TestCase):
                   ("9", 21728169, 21728178)]
         obs = []
         for repeat in repeats:
-            loc = repeat.Location
+            loc = repeat.location
             obs.append((str(loc.coord_name), loc.start, loc.end))
         self.assertEqual(set(obs), set(expect))
 
@@ -70,7 +70,7 @@ class TestFeatureCoordLevels(TestCase):
                ("26", 178899, 180227)]
         obs = []
         for cpg in cpgs1:
-            loc = cpg.Location
+            loc = cpg.location
             obs.append((str(loc.coord_name), loc.start, loc.end))
         self.assertEqual(set(obs), set(exp))
 

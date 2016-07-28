@@ -406,7 +406,7 @@ class Genome(object):
 
             # coord = coord.makeRelativeTo(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
             # coord = coord.makeRelativeTo(target_coord, False)
-            yield klass(self, db, Location=coord, Score=record['score'])
+            yield klass(self, db, location=coord, Score=record['score'])
 
     def _get_repeat_features(self, db, klass, target_coord, query_coord,
                              where_feature):
@@ -431,7 +431,7 @@ class Genome(object):
                     coord, target_coord.CoordType, self.CoreDb))[1]
             # coord = coord.makeRelativeTo(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
             # coord = coord.makeRelativeTo(target_coord, False)
-            yield klass(self, db, Location=coord, Score=record['score'],
+            yield klass(self, db, location=coord, Score=record['score'],
                         data=record)
 
     def _get_gene_features(self, db, klass, target_coord, query_coord,
@@ -462,7 +462,7 @@ class Genome(object):
                              seq_region_id=record['seq_region_id'],
                              ensembl_coord=True)
 
-            gene = klass(self, db, Location=new, data=record)
+            gene = klass(self, db, location=new, data=record)
             yield gene
 
     def _get_variation_features(self, db, klass, target_coord, query_coord,
@@ -514,8 +514,8 @@ class Genome(object):
                                 strand=convert_strand(strand),
                                 seq_region_id=seq_region_id,
                                 ensembl_coord=ensembl_coord)
-        elif hasattr(region, 'Location'):
-            region = region.Location
+        elif hasattr(region, 'location'):
+            region = region.location
 
         coord = region
         # the coordinate system at which locations are to be referenced, and
@@ -621,12 +621,12 @@ class Genome(object):
                                 strand=convert_strand(strand),
                                 seq_region_id=seq_region_id,
                                 ensembl_coord=ensembl_coord)
-        elif hasattr(region, 'Location'):
-            region = region.Location
+        elif hasattr(region, 'location'):
+            region = region.location
 
         return GenericRegion(self, self.CoreDb, coord_name=coord_name,
                              start=start, end=end, strand=strand,
-                             Location=region, ensembl_coord=ensembl_coord)
+                             location=region, ensembl_coord=ensembl_coord)
 
     def get_distinct(self, property_type):
         """returns the Ensembl data-bases distinct values for the named

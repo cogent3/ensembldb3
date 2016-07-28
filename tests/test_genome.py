@@ -73,10 +73,10 @@ class TestGenome(GenomeTestBase):
         end = start + 20
         region = self.human.get_region(coord_name=chrom, start=start, end=end,
                                       ensembl_coord=True)
-        self.assertEqual(region.Location.start, start - 1)
-        self.assertEqual(region.Location.end, end)
-        self.assertEqual(region.Location.coord_name, str(chrom))
-        self.assertEqual(region.Location.CoordType, 'chromosome')
+        self.assertEqual(region.location.start, start - 1)
+        self.assertEqual(region.location.end, end)
+        self.assertEqual(region.location.coord_name, str(chrom))
+        self.assertEqual(region.location.CoordType, 'chromosome')
         self.assertEqual(region.Seq, 'ACCTCAGTAATCCGAAAAGCC')
 
     def test_get_assembly_exception_region(self):
@@ -98,7 +98,7 @@ class TestGenome(GenomeTestBase):
 
     def test_getting_annotated_seq(self):
         """a region should return a sequence with the correct annotation"""
-        new_loc = self.brca2.Location.resized(-100, 100)
+        new_loc = self.brca2.location.resized(-100, 100)
         region = self.human.get_region(region=new_loc)
         annot_seq = region.getAnnotatedSeq(feature_types='gene')
         gene_annots = annot_seq.get_annotations_matching('gene')
@@ -244,7 +244,7 @@ class TestGene(GenomeTestBase):
         # .. and correctly construct the Cds and location
         for transcript in gene.Transcripts:
             self.assertTrue(transcript.getCdsLength() > 0)
-            self.assertEqual(transcript.Location.coord_name, '17')
+            self.assertEqual(transcript.location.coord_name, '17')
 
     def test_get_longest_cds_transcript2(self):
         """should correctly return transcript with longest cds"""
@@ -401,14 +401,14 @@ class TestGene(GenomeTestBase):
             ('IL2', 'ENST00000226730', IL2_exp_introns),
             ('IL13', 'ENST00000304506', IL13_exp_introns)]:
             gene = asserted_one(self.human.get_genes_matching(Symbol=symbol))
-            strand = gene.Location.strand
+            strand = gene.location.strand
             transcript = asserted_one(
                 [t for t in gene.Transcripts if t.StableId == stable_id])
             introns = transcript.Introns
             self.assertEqual(len(introns), len(exp_introns))
             idx = 0
             for intron in introns:
-                loc = intron.Location
+                loc = intron.location
                 start, end = loc.start, loc.end
                 seq = str(intron.Seq)
                 exp_rank, exp_start, exp_end, exp_seq5, \
@@ -599,14 +599,14 @@ class TestFeatures(GenomeTestBase):
 
     def test_repeats(self):
         """should correctly return a repeat"""
-        loc = self.igf2.Location.resized(-1000, 1000)
+        loc = self.igf2.location.resized(-1000, 1000)
         repeats = list(self.human.get_features(
             region=loc, feature_types='repeat'))
         self.assertTrue(len(repeats) >= 4)
 
     def test_genes(self):
         """should correctly identify igf2 within a region"""
-        loc = self.igf2.Location.resized(-1000, 1000)
+        loc = self.igf2.location.resized(-1000, 1000)
         genes = self.human.get_features(region=loc, feature_types='gene')
         symbols = [g.Symbol.lower() for g in genes]
         self.assertContains(symbols, self.igf2.Symbol.lower())
@@ -629,10 +629,10 @@ class TestFeatures(GenomeTestBase):
                                       region=self.brca2)
         # snp coordname, start, end should satsify constraints of brca2 loc
         c = 0
-        loc = self.brca2.Location
+        loc = self.brca2.location
         for snp in snps:
-            self.assertEqual(snp.Location.coord_name, loc.coord_name)
-            self.assertTrue(loc.start < snp.Location.start < loc.end)
+            self.assertEqual(snp.location.coord_name, loc.coord_name)
+            self.assertTrue(loc.start < snp.location.start < loc.end)
             c += 1
             if c == 2:
                 break
@@ -645,7 +645,7 @@ class TestFeatures(GenomeTestBase):
                                            coord_name=13,
                                            start=31787610,
                                            end=31871820))[0]
-        minus = plus.Location.copy()
+        minus = plus.location.copy()
         minus.strand *= -1
         minus = self.human.get_region(region=minus)
         # get Sequence

@@ -271,7 +271,7 @@ class Compara(object):
             gene = list(genome.get_genes_matching(StableId=StableId))
             assert len(gene) == 1, "Error in selecting genes: %s" % gene
             gene = gene[0]
-            gene.Location.strand = record[frag_strand]
+            gene.location.strand = record[frag_strand]
             data += [gene]
 
         if not data:
@@ -367,8 +367,8 @@ class Compara(object):
             region = ref_genome.make_location(coord_name=coord_name,
                                              start=start, end=end, strand=strand,
                                              ensembl_coord=ensembl_coord)
-        elif hasattr(region, 'Location'):
-            region = region.Location
+        elif hasattr(region, 'location'):
+            region = region.location
 
         # make sure the genome instances match
         ref_genome = self._genomes[region.genome.Species]

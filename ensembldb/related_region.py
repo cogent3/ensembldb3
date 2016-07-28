@@ -57,7 +57,7 @@ class _RelatedRegions(LazyRecord):
 
     def getSpeciesSet(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.Location.Species for m in self.Members])
+        return set([m.location.Species for m in self.Members])
 
 
 class RelatedGenes(_RelatedRegions):
@@ -90,7 +90,7 @@ class SyntenicRegion(LazyRecord):
     Aligned sequences for Ensembl multiple alignments"""
 
     def __init__(self, parent, genome, identifiers_values, am_ref_member,
-                 Location=None):
+                 location=None):
         # create with method_link_species_set_id, at least, in
         # identifiers_values
         super(SyntenicRegion, self).__init__()
@@ -103,11 +103,11 @@ class SyntenicRegion(LazyRecord):
         self._make_map_func = [self._make_map_from_ref,
                                self._make_ref_map][am_ref_member]
 
-        if Location is not None:
-            if hasattr(Location, 'Location'):  # likely to be a feature region
-                region = Location
+        if location is not None:
+            if hasattr(location, 'location'):  # likely to be a feature region
+                region = location
             else:
-                region = genome.get_region(region=Location)
+                region = genome.get_region(region=location)
             self._cached['Region'] = region
 
         for identifier, value in list(dict(identifiers_values).items()):
@@ -118,9 +118,9 @@ class SyntenicRegion(LazyRecord):
 
     def _get_location(self):
         region = self._get_cached_value('Region', self._make_map_func)
-        return region.Location
+        return region.location
 
-    Location = property(_get_location)
+    location = property(_get_location)
 
     def _get_region(self):
         region = self._get_cached_value('Region', self._make_map_func)
@@ -256,7 +256,7 @@ class SyntenicRegions(_RelatedRegions):
         for genome, data in Members:
             if genome is ref_location.genome:
                 ref_member = SyntenicRegion(self, genome, dict(data),
-                                            am_ref_member=True, Location=ref_location)
+                                            am_ref_member=True, location=ref_location)
             else:
                 members += [SyntenicRegion(self, genome, dict(data),
                                            am_ref_member=False)]
@@ -272,7 +272,7 @@ class SyntenicRegions(_RelatedRegions):
         my_type = self.__class__.__name__
 
         display = ['%s:' % my_type]
-        display += ['  %r' % m.Location for m in self.Members
+        display += ['  %r' % m.location for m in self.Members
                     if m.Region is not None]
         return '\n'.join(display)
 
@@ -293,7 +293,7 @@ class SyntenicRegions(_RelatedRegions):
         if self._do_rc is not None:
             return self._do_rc
         self._populate_ref()
-        inferred = self.ref_member._cached['Region'].Location.strand
+        inferred = self.ref_member._cached['Region'].location.strand
         self._do_rc = self.ref_location.strand != inferred
         return self._do_rc
 
@@ -331,7 +331,7 @@ class SyntenicRegions(_RelatedRegions):
             name = seq.name
 
             if self._rc:  # names should reflect change to strand
-                loc = member.Location.copy()
+                loc = member.location.copy()
                 loc.strand *= -1
                 name = str(loc)
 

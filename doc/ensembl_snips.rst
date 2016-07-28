@@ -217,11 +217,11 @@ Inspect the genomic coordinate for a feature
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
-    >>> print brca2.Location.coord_name
+    >>> print brca2.location.coord_name
     13
-    >>> print brca2.Location.start
+    >>> print brca2.location.start
     32315473
-    >>> print brca2.Location.strand
+    >>> print brca2.location.strand
     1
 
 Get repeat elements in a genomic interval
@@ -367,9 +367,9 @@ alignment method in the vertebrates clade:
     >>> aligned_regions = [m for m in alignment.Members
     ...                    if m.Region is not None]
     >>> source_region, target_region = aligned_regions
-    >>> print source_region.Location.coord_name, source_region.Location.start, source_region.Location.end
+    >>> print source_region.location.coord_name, source_region.location.start, source_region.location.end
     X 155754928 155755079
-    >>> print target_region.Location.coord_name, target_region.Location.start, target_region.Location.end
+    >>> print target_region.location.coord_name, target_region.location.start, target_region.location.end
     X 20222659 20223163
 
 .. note:: We took the aligned regions from the ``regions`` generator and put them in a list for convenience.
@@ -377,7 +377,7 @@ alignment method in the vertebrates clade:
 If there are no regions returned (i.e. ``num_pairs`` is zero), then no alignment could be found. In the case of 
 the above region, an exon in the *Hccs* gene, there is only one alignment. We then accessed the coordinates of the 
 alignment using the ``Members`` attribute of the region. Each element of ``aligned_regions`` is a ``SyntenicRegion``
-instance, whose coordinates can be pulled from the ``Location`` attribute.
+instance, whose coordinates can be pulled from the ``location`` attribute.
 
 This example shows that mouse region ``X:155754928-155755079`` aligns only to human region ``X:20222659-20223163``.
 
@@ -460,7 +460,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     ...             seq = m.CanonicalTranscript.Cds.without_terminal_stop_sodon()
     ...             # make the sequence name
     ...             seq.name = '%s:%s:%s' % \
-    ...         (latin_to_common[m.genome.Species], m.StableId, m.Location)
+    ...         (latin_to_common[m.genome.Species], m.StableId, m.location)
     ...             aa = seq.getTranslation()
     ...             seqs += [seq]
     ...         except (AlphabetError, AssertionError):
