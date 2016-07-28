@@ -1243,7 +1243,7 @@ class Variation(_Region):
         # TODO can we modify the table on loading? This would give better
         # performance.
 
-        if self.genome.VarDb.tableHasColumn(table_name, 'pep_allele_string'):
+        if self.genome.VarDb.table_has_column(table_name, 'pep_allele_string'):
             pep_allele_string = 'pep_allele_string'
             consequence_type = 'consequence_types'
         else:

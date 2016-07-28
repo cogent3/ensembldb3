@@ -89,7 +89,7 @@ class Database(object):
             records.update(record)
         return records
 
-    def tableHasColumn(self, table_name, column):
+    def table_has_column(self, table_name, column):
         """returns True if table has column"""
         table = self.get_table(table_name)
         return hasattr(table.c, column)

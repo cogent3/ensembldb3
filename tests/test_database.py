@@ -81,14 +81,14 @@ class TestDatabase(TestCase):
         var62 = Database(account=account, release=62, species='human',
                          db_type='variation')
 
-        self.assertTrue(var61.tableHasColumn('transcript_variation',
+        self.assertTrue(var61.table_has_column('transcript_variation',
                                              'peptide_allele_string'))
-        self.assertFalse(var61.tableHasColumn('transcript_variation',
+        self.assertFalse(var61.table_has_column('transcript_variation',
                                               'pep_allele_string'))
 
-        self.assertTrue(var62.tableHasColumn('transcript_variation',
+        self.assertTrue(var62.table_has_column('transcript_variation',
                                              'pep_allele_string'))
-        self.assertFalse(var62.tableHasColumn('transcript_variation',
+        self.assertFalse(var62.table_has_column('transcript_variation',
                                               'peptide_allele_string'))
 
 if __name__ == "__main__":
