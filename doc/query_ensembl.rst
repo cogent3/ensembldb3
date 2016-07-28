@@ -342,7 +342,7 @@ In Ensembl's databases, each type of feature may be recorded at multiple coordin
 .. doctest::
 
    >>> chicken = Genome(Species='chook', release=release, account=account)
-   >>> print chicken.FeatureCoordLevels
+   >>> print chicken.feature_coord_levels
    Gallus gallus
    ============================================
         Type                             Levels

@@ -12,7 +12,7 @@ from .assembly import CoordSystem, Coordinate, \
     get_coord_conversion, location_query
 from .region import Gene, Transcript, Variation, GenericRegion, \
     CpGisland, Repeat, Est
-from .feature_level import FeatureCoordLevels
+from .feature_level import feature_coord_levels
 
 
 __author__ = "Gavin Huttley"
@@ -96,7 +96,7 @@ class Genome(object):
         self._var_db = None
         self._other_db = None
         self._feature_type_ids = FeatureTypeCache(self)
-        self._feature_coord_levels = FeatureCoordLevels(self.Species)
+        self._feature_coord_levels = feature_coord_levels(self.Species)
 
     def __str__(self):
         my_type = self.__class__.__name__
@@ -496,7 +496,7 @@ class Genome(object):
         feature_coord_levels = self._get_feature_coord_levels(feature_types)
         return self._feature_coord_levels
 
-    FeatureCoordLevels = property(_feature_coord_levels)
+    feature_coord_levels = property(_feature_coord_levels)
 
     def get_features(self, region=None, feature_types=None, where_feature=None,
                     coord_name=None, start=None, end=None, strand=None,

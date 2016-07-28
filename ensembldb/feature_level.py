@@ -117,7 +117,7 @@ class FeatureCoordLevelsCache(object):
         return self._species_feature_levels[species]
 
 
-class FeatureCoordLevels(FeatureCoordLevelsCache):
+class feature_coord_levels(FeatureCoordLevelsCache):
 
     def __init__(self, species):
         self.Species = _Species.getSpeciesName(species)
