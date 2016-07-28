@@ -49,7 +49,7 @@ class TestGenome(GenomeTestBase):
 
     def test_other_features(self):
         """should correctly return record for ENSESTG00000000010"""
-        est = self.human.getEstMatching(StableId='ENSESTG00000000010')
+        est = self.human.get_est_matching(StableId='ENSESTG00000000010')
         direct = list(est)[0]
         ests = self.human.getFeatures(feature_types='est', coord_name=6,
                                       start=99994000, end=100076519)

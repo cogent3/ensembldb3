@@ -357,7 +357,7 @@ class Genome(object):
                            join_obj], whereclause=condition)
         return query
 
-    def getEstMatching(self, StableId):
+    def get_est_matching(self, StableId):
         """returns an Est object from the otherfeatures db with the StableId"""
         query = self._get_gene_query(self.OtherFeaturesDb, StableId=StableId)
         records = query.execute()
