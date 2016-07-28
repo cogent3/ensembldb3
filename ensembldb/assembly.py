@@ -1,9 +1,9 @@
 import sqlalchemy as sql
-
 from cogent3.core.location import Map
-from cogent3.db.ensembl.species import Species as _Species
-from cogent3.db.ensembl.util import asserted_one, convert_strand, DisplayString
-from cogent3.db.ensembl.host import DbConnection
+
+from .species import Species as _Species
+from .util import asserted_one, convert_strand, DisplayString
+from .host import DbConnection
 
 __author__ = "Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -70,67 +70,67 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
 
 class Coordinate(object):
 
-    def __init__(self, genome, CoordName, Start, End, Strand=1,
+    def __init__(self, genome, CoordName, start, end, Strand=1,
                  CoordType=None, seq_region_id=None, ensembl_coord=False):
-        if not CoordType or not (seq_region_id or Start or End):
+        if not CoordType or not (seq_region_id or start or end):
             seq_region_data, CoordType = \
                 _get_coord_type_and_seq_region_id(CoordName, genome.CoreDb)
             seq_region_id = seq_region_data['seq_region_id']
-            Start = Start or 0
-            End = End or seq_region_data['length']
+            start = start or 0
+            end = end or seq_region_data['length']
         # TODO allow creation with just seq_region_id
         self.Species = genome.Species
         self.CoordType = DisplayString(CoordType, repr_length=4,
                                        with_quotes=False)
         self.CoordName = DisplayString(CoordName, repr_length=4,
                                        with_quotes=False)
-        # if Start == End, we +1 to End, unless these are ensembl_coord's
+        # if start == end, we +1 to end, unless these are ensembl_coord's
         if ensembl_coord:
-            Start -= 1
-        elif Start == End:
-            End += 1
+            start -= 1
+        elif start == end:
+            end += 1
 
-        if Start > End:
+        if start > end:
             assert Strand == -1,\
-                "strand incorrect for start[%s] > end[%s]" % (Start, End)
-            Start, End = End, Start
+                "strand incorrect for start[%s] > end[%s]" % (start, end)
+            start, end = end, start
 
-        self.Start = Start
-        self.End = End
+        self.start = start
+        self.end = end
         self.Strand = convert_strand(Strand)
         self.seq_region_id = seq_region_id
         self.genome = genome
 
     def __len__(self):
-        return self.End - self.Start
+        return self.end - self.start
 
     def __lt__(self, other):
-        return (self.CoordName, self.Start) < (other.CoordName, other.Start)
+        return (self.CoordName, self.start) < (other.CoordName, other.start)
 
     def __eq__(self, other):
-        return (self.CoordName, self.Start) == (other.CoordName, other.Start)
+        return (self.CoordName, self.start) == (other.CoordName, other.start)
 
     def _get_ensembl_start(self):
         # ensembl counting starts from 1
-        return self.Start + 1
+        return self.start + 1
 
     EnsemblStart = property(_get_ensembl_start)
 
     def _get_ensembl_end(self):
-        return self.End
+        return self.end
 
     EnsemblEnd = property(_get_ensembl_end)
 
     def __str__(self):
         return '%s:%s:%s:%d-%d:%d' % (self.Species, self.CoordType,
-                                      self.CoordName, self.Start, self.End, self.Strand)
+                                      self.CoordName, self.start, self.end, self.Strand)
 
     def __repr__(self):
         my_type = self.__class__.__name__
         name = _Species.getCommonName(self.Species)
         coord_type = self.CoordType
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
-                                       self.CoordName, self.Start, self.End, self.Strand)
+                                       self.CoordName, self.start, self.end, self.Strand)
         return c.replace("'", "")
 
     def adopted(self, other, shift=False):
@@ -138,37 +138,37 @@ class Coordinate(object):
         another coordinate.
 
         Arguments:
-            - shift: an int or True/False. If int, it's added to Start/End.
-              If bool, other.Start is added to Start/End"""
+            - shift: an int or True/False. If int, it's added to start/end.
+              If bool, other.start is added to start/end"""
         if type(shift) == bool:
-            shift = [0, other.Start][shift]
+            shift = [0, other.start][shift]
         return self.__class__(other.genome, CoordName=other.CoordName,
-                              Start=self.Start + shift, End=self.End + shift,
+                              start=self.start + shift, end=self.end + shift,
                               Strand=other.Strand,
                               seq_region_id=other.seq_region_id)
 
     def shifted(self, value):
-        """adds value to Start/End coords, returning a new instance."""
+        """adds value to start/end coords, returning a new instance."""
         new = self.copy()
-        new.Start += value
-        new.End += value
+        new.start += value
+        new.end += value
         assert len(new) > 0, 'shift generated a negative length'
         return new
 
     def copy(self):
         """returns a copy"""
         return self.__class__(genome=self.genome, CoordName=self.CoordName,
-                              Start=self.Start, End=self.End, Strand=self.Strand,
+                              start=self.start, end=self.end, Strand=self.Strand,
                               CoordType=self.CoordType, seq_region_id=self.seq_region_id)
 
     def resized(self, from_start, from_end):
         """returns a new resized Coordinate with the
-        Start=self.Start+from_start and End = self.End+from_end.
+        start=self.start+from_start and end = self.end+from_end.
 
-        If you want to shift Start upstream, add a -ve number"""
+        If you want to shift start upstream, add a -ve number"""
         new = self.copy()
-        new.Start += from_start
-        new.End += from_end
+        new.start += from_start
+        new.end += from_end
         try:
             assert len(
                 new) >= 0, 'resized generated a negative length: %s' % new
@@ -181,16 +181,16 @@ class Coordinate(object):
         positioned relative to other."""
 
         if other.Strand != self.Strand:
-            Start = other.End - self.End
+            start = other.end - self.end
         elif make_relative:
-            Start = self.Start - other.Start
+            start = self.start - other.start
         else:
-            Start = self.Start + other.Start
+            start = self.start + other.start
 
-        End = Start + len(self)
+        end = start + len(self)
 
         return self.__class__(other.genome, CoordName=other.CoordName,
-                              Start=Start, End=End, Strand=other.Strand,
+                              start=start, end=end, Strand=other.Strand,
                               seq_region_id=other.seq_region_id)
 
 
@@ -341,13 +341,13 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
     t_start = int(assembly_row['%s_start' % target_prefix]) + d_start
     t_end = int(assembly_row['%s_end' % target_prefix]) - d_end
 
-    q_location = Coordinate(CoordName=query_coord.CoordName, Start=q_start,
-                            End=q_end, Strand=q_strand,
+    q_location = Coordinate(CoordName=query_coord.CoordName, start=q_start,
+                            end=q_end, Strand=q_strand,
                             CoordType=query_coord.CoordType,
                             seq_region_id=q_seq_region_id,
                             genome=query_coord.genome, ensembl_coord=True)
-    t_location = Coordinate(CoordName=assembly_row['name'], Start=t_start,
-                            End=t_end, Strand=t_strand, CoordType=target_coord_type,
+    t_location = Coordinate(CoordName=assembly_row['name'], start=t_start,
+                            end=t_end, Strand=t_strand, CoordType=target_coord_type,
                             seq_region_id=t_seq_region_id,
                             genome=query_coord.genome,
                             ensembl_coord=True)
@@ -367,7 +367,7 @@ def assembly_exception_coordinate(loc):
         assemb_except_table.c.exc_seq_region_id ==
         seq_region_table.c.seq_region_id))
     query = location_query(assemb_except_table,
-                           loc.Start, loc.End, query=query)
+                           loc.start, loc.end, query=query)
     record = asserted_one(query.execute().fetchall())
     s, conv_loc = _get_equivalent_coords(loc, record, "seq_region",
                                          "exc_seq_region", loc.CoordType)

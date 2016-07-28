@@ -153,13 +153,13 @@ class SyntenicRegion(LazyRecord):
         record_strand = ref_record['dnafrag_strand']
 
         block_loc = self.genome.makeLocation(CoordName=ref_record['name'],
-                                             Start=record_start,
-                                             End=record_end,
+                                             start=record_start,
+                                             end=record_end,
                                              Strand=record_strand,
                                              ensembl_coord=True)
 
         ref_location = self.parent.ref_location
-        relative_start = ref_location.Start - block_loc.Start
+        relative_start = ref_location.start - block_loc.start
         relative_end = relative_start + len(ref_location)
         if block_loc.Strand != 1:
             relative_start = len(block_loc) - relative_end
@@ -190,8 +190,8 @@ class SyntenicRegion(LazyRecord):
 
             # we make a loc for the aligned region
             block_loc = self.genome.makeLocation(CoordName=record['name'],
-                                                 Start=record['dnafrag_start'],
-                                                 End=record['dnafrag_end'],
+                                                 start=record['dnafrag_start'],
+                                                 end=record['dnafrag_end'],
                                                  Strand=record[
                                                      'dnafrag_strand'],
                                                  ensembl_coord=True)
@@ -199,7 +199,7 @@ class SyntenicRegion(LazyRecord):
             relative_end = aln_loc[1]
             # new location with correct length
             loc = block_loc.copy()
-            loc.End = loc.Start + (relative_end - relative_start)
+            loc.end = loc.start + (relative_end - relative_start)
 
             if block_loc.Strand != 1:
                 shift = len(block_loc) - relative_end

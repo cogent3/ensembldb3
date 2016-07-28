@@ -50,7 +50,7 @@ class TestFeatureCoordLevels(TestCase):
     def test_repeat(self):
         # use chicken genome as it need to do conversion
         # chicken coordinate correspondent toRefSeq human IL2A region
-        coord = dict(CoordName=9, Start=21727352, End=21729141)
+        coord = dict(CoordName=9, start=21727352, end=21729141)
         region = self.chicken.getRegion(**coord)
         # repeat is recorded at contig level, strand is 0
         repeats = region.getFeatures(feature_types='repeat')
@@ -59,23 +59,23 @@ class TestFeatureCoordLevels(TestCase):
         obs = []
         for repeat in repeats:
             loc = repeat.Location
-            obs.append((str(loc.CoordName), loc.Start, loc.End))
+            obs.append((str(loc.CoordName), loc.start, loc.end))
         self.assertEqual(set(obs), set(expect))
 
     def test_cpg(self):
         # contain 3 CpG island recorded at chromosome level
-        coord1 = dict(CoordName=26, Start=105184, End=184346)
+        coord1 = dict(CoordName=26, start=105184, end=184346)
         cpgs1 = self.chicken.getFeatures(feature_types='cpg', **coord1)
         exp = [("26", 112153, 113139), ("26", 134125, 135050),
                ("26", 178899, 180227)]
         obs = []
         for cpg in cpgs1:
             loc = cpg.Location
-            obs.append((str(loc.CoordName), loc.Start, loc.End))
+            obs.append((str(loc.CoordName), loc.start, loc.end))
         self.assertEqual(set(obs), set(exp))
 
         # test cpg features record at scaffold level:
-        coord2 = dict(CoordName='JH376196.1', Start=1, End=14640)
+        coord2 = dict(CoordName='JH376196.1', start=1, end=14640)
         cpgs2 = self.chicken.getFeatures(feature_types='cpg', **coord2)
         self.assertEqual(len(list(cpgs2)), 3)
 

@@ -333,14 +333,14 @@ class Compara(object):
                                     dnafrag_table.c.genome_db_id.in_(list(self.genome_taxon.keys()))))
         return query.execute().fetchall()
 
-    def getSyntenicRegions(self, Species=None, CoordName=None, Start=None,
-                           End=None, Strand=1, ensembl_coord=False, region=None,
+    def getSyntenicRegions(self, Species=None, CoordName=None, start=None,
+                           end=None, Strand=1, ensembl_coord=False, region=None,
                            align_method=None, align_clade=None, method_clade_id=None):
         """returns a SyntenicRegions instance
 
         Arguments:
             - Species: the species name
-            - CoordName, Start, End, Strand: the coordinates for the region
+            - CoordName, start, end, Strand: the coordinates for the region
             - ensembl_coord: whether the coordinates are in Ensembl form
             - region: a region instance or a location, in which case the
               CoordName etc .. arguments are ignored
@@ -365,7 +365,7 @@ class Compara(object):
         if region is None:
             ref_genome = self._genomes[_Species.getSpeciesName(Species)]
             region = ref_genome.makeLocation(CoordName=CoordName,
-                                             Start=Start, End=End, Strand=Strand,
+                                             start=start, end=end, Strand=Strand,
                                              ensembl_coord=ensembl_coord)
         elif hasattr(region, 'Location'):
             region = region.Location
@@ -375,7 +375,7 @@ class Compara(object):
         if ref_genome is not region.genome:
             # recreate region from our instance
             region = ref_genome.makeLocation(CoordName=region.CoordName,
-                                             Start=region.Start, End=region.End,
+                                             start=region.start, end=region.end,
                                              Strand=region.Strand)
 
         ref_dnafrag_id = self._get_dnafrag_id_for_coord(region)

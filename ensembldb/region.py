@@ -64,7 +64,7 @@ class _Region(LazyRecord):
         coord_name = result['name']
 
         coord = Coordinate(genome=self.genome, CoordName=coord_name,
-                           Start=start, End=end, Strand=strand,
+                           start=start, end=end, Strand=strand,
                            seq_region_id=seq_region_id,
                            ensembl_coord=True)
         self._cached['Location'] = coord
@@ -129,8 +129,8 @@ class _Region(LazyRecord):
 
     def featureData(self, parent_map):
         symbol = self.Symbol or getattr(self, 'StableId', '')
-        assert not parent_map.Reverse
-        feat_map = parent_map[self.Location.Start:self.Location.End]
+        assert not parent_map.reverse
+        feat_map = parent_map[self.Location.start:self.Location.end]
         if feat_map.useful:
             if self.Location.Strand == -1:
                 # this map is relative to + strand
@@ -144,7 +144,7 @@ class _Region(LazyRecord):
         regions = list(self.getFeatures(feature_types=feature_types,
                                         where_feature=where_feature))
         # seq_map is on the + strand, regardless the actual strand of sequence
-        seq_map = Map(locations=[(self.Location.Start, self.Location.End)],
+        seq_map = Map(locations=[(self.Location.start, self.Location.end)],
                       parent_length=DEFAULT_PARENT_LENGTH)
         seq_map = seq_map.inverse()
 
@@ -175,20 +175,20 @@ class GenericRegion(_Region):
 
     Type = 'generic_region'
 
-    def __init__(self, genome, db, Location=None, CoordName=None, Start=None,
-                 End=None, Strand=1, ensembl_coord=False):
+    def __init__(self, genome, db, Location=None, CoordName=None, start=None,
+                 end=None, Strand=1, ensembl_coord=False):
         super(GenericRegion, self).__init__()
         self.genome = genome
         self.db = db
 
         if Location is None and CoordName:
             self._get_seq_region_record(str(CoordName))
-            if End is not None:
-                assert self._table_rows['seq_region']['length'] > End, \
-                    'Requested End[%s] too large' % End
+            if end is not None:
+                assert self._table_rows['seq_region']['length'] > end, \
+                    'Requested end[%s] too large' % end
             seq_region_id = self._table_rows['seq_region']['seq_region_id']
             Location = Coordinate(genome=genome, CoordName=str(CoordName),
-                                  Start=Start, End=End, Strand=Strand,
+                                  start=start, end=end, Strand=Strand,
                                   seq_region_id=seq_region_id,
                                   ensembl_coord=ensembl_coord)
 
@@ -197,14 +197,14 @@ class GenericRegion(_Region):
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species='%s'; CoordName='%s'; Start=%s; End=%s;"\
+        return "%s(Species='%s'; CoordName='%s'; start=%s; end=%s;"\
                " length=%s; Strand='%s')" % (my_type,
                                              self.genome.Species,
-                                             self.Location.CoordName, self.Location.Start,
-                                             self.Location.End, len(self), '-+'[self.Location.Strand > 0])
+                                             self.Location.CoordName, self.Location.start,
+                                             self.Location.end, len(self), '-+'[self.Location.Strand > 0])
 
     def _get_seq_region_record(self, CoordName):
-        # override the _Region class method, since, we take the provided Start
+        # override the _Region class method, since, we take the provided start
         # etc .. attributes
         # CoordName comes from seq_region_table.c.name
         # matched, by coord_system_id, to default coord system
@@ -531,15 +531,15 @@ class Transcript(_StableRegion):
             self._set_null_values(["Introns"])
             return
 
-        exon_positions = [(exon.Location.Start, exon.Location.End)
+        exon_positions = [(exon.Location.start, exon.Location.end)
                           for exon in self.Exons]
         exon_positions.sort()
         end = exon_positions[-1][-1]
         exon_map = Map(locations=exon_positions, parent_length=end)
         intron_map = exon_map.shadow()
 
-        intron_positions = [(span.Start, span.End)
-                            for span in intron_map.spans if span.Start != 0]
+        intron_positions = [(span.start, span.end)
+                            for span in intron_map.spans if span.start != 0]
 
         chrom = self.Location.CoordName
         strand = self.Location.Strand
@@ -548,7 +548,7 @@ class Transcript(_StableRegion):
         if strand == -1:
             intron_positions.reverse()
         for s, e in intron_positions:
-            coord = self.genome.makeLocation(CoordName=chrom, Start=s, End=e,
+            coord = self.genome.makeLocation(CoordName=chrom, start=s, end=e,
                                              Strand=strand, ensembl_coord=False)
             introns.append(Intron(self.genome, self.db, rank, self.StableId,
                                   coord))
@@ -653,17 +653,17 @@ class Transcript(_StableRegion):
         for exon in exons[0:start_exon.Rank]:   # get 5'UTR
             coord = exon.Location.copy()
             if exon.StableId == start_exon.StableId:
-                coord.Start = [coord.Start,
-                               start_exon.Location.End][flip_coords]
-                coord.End = [start_exon.Location.Start, coord.End][flip_coords]
+                coord.start = [coord.start,
+                               start_exon.Location.end][flip_coords]
+                coord.end = [start_exon.Location.start, coord.end][flip_coords]
             if len(coord) != 0:
                 untranslated_5exons.append(Exon(self.genome, self.db,
                                                 exon.exon_id, exon.Rank, Location=coord))
         for exon in exons[end_exon.Rank - 1: num_exons]:  # get 3'UTR
             coord = exon.Location.copy()
             if exon.StableId == end_exon.StableId:
-                coord.Start = [end_exon.Location.End, coord.Start][flip_coords]
-                coord.End = [coord.End, end_exon.Location.Start][flip_coords]
+                coord.start = [end_exon.Location.end, coord.start][flip_coords]
+                coord.end = [coord.end, end_exon.Location.start][flip_coords]
             if len(coord) != 0:
                 untranslated_3exons.append(Exon(self.genome, self.db,
                                                 exon.exon_id, exon.Rank, Location=coord))
@@ -1330,11 +1330,11 @@ class CpGisland(GenericRegion):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(CoordName='%s'; Start=%s; End=%s; length=%s;"\
+        return "%s(CoordName='%s'; start=%s; end=%s; length=%s;"\
                " Strand='%s', Score=%.1f)" % (my_type,
                                               self.Location.CoordName,
-                                              self.Location.Start,
-                                              self.Location.End,
+                                              self.Location.start,
+                                              self.Location.end,
                                               len(self),
                                               '-+'[self.Location.Strand > 0], self.Score)
 
@@ -1356,10 +1356,10 @@ class Repeat(GenericRegion):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(CoordName='%s'; Start=%s; End=%s; length=%s;"\
+        return "%s(CoordName='%s'; start=%s; end=%s; length=%s;"\
                " Strand='%s', Score=%.1f)" % (my_type,
                                               self.Location.CoordName,
-                                              self.Location.Start, self.Location.End, len(
+                                              self.Location.start, self.Location.end, len(
                                                   self),
                                               '-+'[self.Location.Strand > 0], self.Score)
 

@@ -52,7 +52,7 @@ class TestGenome(GenomeTestBase):
         est = self.human.getEstMatching(StableId='ENSESTG00000000010')
         direct = list(est)[0]
         ests = self.human.getFeatures(feature_types='est', CoordName=6,
-                                      Start=99994000, End=100076519)
+                                      start=99994000, end=100076519)
         stable_ids = [est.StableId for est in ests]
         self.assertContains(stable_ids, direct.StableId)
 
@@ -69,12 +69,12 @@ class TestGenome(GenomeTestBase):
     def test_get_region(self):
         """should return a generic region that extracts correct sequence"""
         chrom = 1
-        Start = 11137
-        End = Start + 20
-        region = self.human.getRegion(CoordName=chrom, Start=Start, End=End,
+        start = 11137
+        end = start + 20
+        region = self.human.getRegion(CoordName=chrom, start=start, end=end,
                                       ensembl_coord=True)
-        self.assertEqual(region.Location.Start, Start - 1)
-        self.assertEqual(region.Location.End, End)
+        self.assertEqual(region.Location.start, start - 1)
+        self.assertEqual(region.Location.end, end)
         self.assertEqual(region.Location.CoordName, str(chrom))
         self.assertEqual(region.Location.CoordType, 'chromosome')
         self.assertEqual(region.Seq, 'ACCTCAGTAATCCGAAAAGCC')
@@ -82,19 +82,19 @@ class TestGenome(GenomeTestBase):
     def test_get_assembly_exception_region(self):
         """should return correct sequence for region with an assembly
         exception"""
-        region = self.human.getRegion(CoordName="Y", Start=57211873,
-                                      End=57211894, Strand=1, ensembl_coord=True)
+        region = self.human.getRegion(CoordName="Y", start=57211873,
+                                      end=57211894, Strand=1, ensembl_coord=True)
 
         self.assertEqual(str(region.Seq), 'CGAGGACGACTGGGAATCCTAG')
 
     def test_no_assembly(self):
         """return N's for coordinates with no assembly"""
         krat = Genome('Kangaroo rat', Release=58)
-        Start = 24385
-        End = Start + 100
-        region = krat.getRegion(CoordName='scaffold_13754', Start=Start,
-                                End=End)
-        self.assertEqual(str(region.Seq), 'N' * (End - Start))
+        start = 24385
+        end = start + 100
+        region = krat.getRegion(CoordName='scaffold_13754', start=start,
+                                end=end)
+        self.assertEqual(str(region.Seq), 'N' * (end - start))
 
     def test_getting_annotated_seq(self):
         """a region should return a sequence with the correct annotation"""
@@ -409,7 +409,7 @@ class TestGene(GenomeTestBase):
             idx = 0
             for intron in introns:
                 loc = intron.Location
-                start, end = loc.Start, loc.End
+                start, end = loc.start, loc.end
                 seq = str(intron.Seq)
                 exp_rank, exp_start, exp_end, exp_seq5, \
                 exp_seq3 = exp_introns[idx]
@@ -593,7 +593,7 @@ class TestFeatures(GenomeTestBase):
         """should not fail to get multiple feature types"""
         regions =\
             self.human.getFeatures(feature_types=['repeat', 'gene', 'cpg'],
-                                   CoordName=1, Start=869936, End=901867)
+                                   CoordName=1, start=869936, end=901867)
         for region in regions:
             pass
 
@@ -613,9 +613,9 @@ class TestFeatures(GenomeTestBase):
 
     def test_other_genes(self):
         """docstring for est_other_genes"""
-        mouse = self.mouse.getRegion(CoordName='5', Start=150791005,
-                                     End=150838512, Strand='-')
-        rat = self.rat.getRegion(CoordName='12', Start=4282534, End=4324019,
+        mouse = self.mouse.getRegion(CoordName='5', start=150791005,
+                                     end=150838512, Strand='-')
+        rat = self.rat.getRegion(CoordName='12', start=4282534, end=4324019,
                                  Strand='+')
         for region in [mouse, rat]:
             features = region.getFeatures(feature_types=['gene'])
@@ -632,7 +632,7 @@ class TestFeatures(GenomeTestBase):
         loc = self.brca2.Location
         for snp in snps:
             self.assertEqual(snp.Location.CoordName, loc.CoordName)
-            self.assertTrue(loc.Start < snp.Location.Start < loc.End)
+            self.assertTrue(loc.start < snp.Location.start < loc.end)
             c += 1
             if c == 2:
                 break
@@ -643,8 +643,8 @@ class TestFeatures(GenomeTestBase):
         result"""
         plus = list(self.human.getFeatures(feature_types='gene',
                                            CoordName=13,
-                                           Start=31787610,
-                                           End=31871820))[0]
+                                           start=31787610,
+                                           end=31871820))[0]
         minus = plus.Location.copy()
         minus.Strand *= -1
         minus = self.human.getRegion(region=minus)
@@ -661,8 +661,8 @@ class TestFeatures(GenomeTestBase):
     def test_other_feature_data_correct(self):
         """should apply CpG feature data in a manner consistent with strand"""
         human = self.human
-        coord = dict(CoordName=11, Start=2143894, End=2144494)
-        exp_coord = dict(CoordName=11, Start=2143906, End=2144442)
+        coord = dict(CoordName=11, start=2143894, end=2144494)
+        exp_coord = dict(CoordName=11, start=2143906, end=2144442)
         exp_loc = human.getRegion(Strand=1, ensembl_coord=True, **exp_coord)
         exp = exp_loc.Seq
 
@@ -682,7 +682,7 @@ class TestFeatures(GenomeTestBase):
 
     def test_other_repeat(self):
         """should apply repeat feature data in a manner consistent with strand"""
-        coord = dict(CoordName=13, Start=32316063, End=32316363)
+        coord = dict(CoordName=13, start=32316063, end=32316363)
         # 13:32316063 -32316363
         ps_repeat = self.human.getRegion(Strand=1, **coord)
         ms_repeat = self.human.getRegion(Strand=-1, **coord)
