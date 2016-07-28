@@ -77,7 +77,7 @@ class Compara(object):
         if self._species_id_map is not None:
             return self._species_id_map
 
-        genome_db_table = self.ComparaDb.getTable('genome_db')
+        genome_db_table = self.ComparaDb.get_table('genome_db')
         condition = sql.select(
             [genome_db_table.c.taxon_id, genome_db_table.c.name],
             genome_db_table.c.name.in_([sp.replace(' ', '_')
@@ -97,7 +97,7 @@ class Compara(object):
     def _get_genome_db_ids(self):
         if self._species_db_map is not None:
             return self._species_db_map
-        genome_db_table = self.ComparaDb.getTable('genome_db')
+        genome_db_table = self.ComparaDb.get_table('genome_db')
         query = sql.select([genome_db_table.c.genome_db_id,
                             genome_db_table.c.taxon_id],
                            genome_db_table.c.taxon_id.in_(list(self.taxon_id_species.keys())))
@@ -112,7 +112,7 @@ class Compara(object):
         if self._species_set is not None:
             return self._species_set
         # we make sure the species set contains all species
-        species_set_table = self.ComparaDb.getTable('species_set')
+        species_set_table = self.ComparaDb.get_table('species_set')
         query = sql.select([species_set_table],
                            species_set_table.c.genome_db_id.in_(list(self.genome_taxon.keys())))
         species_sets = {}
@@ -138,13 +138,13 @@ class Compara(object):
         if self._method_species_link is not None:
             return self._method_species_link
 
-        method_link_table = self.ComparaDb.getTable('method_link')
+        method_link_table = self.ComparaDb.get_table('method_link')
         query = sql.select([method_link_table],
                            method_link_table.c['class'].like('%' + 'alignment' + '%'))
         methods = query.execute().fetchall()
         method_link_ids = dict([(r['method_link_id'], r) for r in methods])
         method_link_species_table = \
-            self.ComparaDb.getTable('method_link_species_set')
+            self.ComparaDb.get_table('method_link_species_set')
         query = sql.select([method_link_species_table],
                            sql.and_(
             method_link_species_table.c.species_set_id.in_(self.species_set),
@@ -201,9 +201,9 @@ class Compara(object):
             mem_id = 'member_id'
             frag_strand = 'chr_strand'
 
-        member_table = self.ComparaDb.getTable(mem_name)
-        homology_member_table = self.ComparaDb.getTable('homology_member')
-        homology_table = self.ComparaDb.getTable('homology')
+        member_table = self.ComparaDb.get_table(mem_name)
+        homology_member_table = self.ComparaDb.get_table('homology_member')
+        homology_table = self.ComparaDb.get_table('homology')
 
         member_ids = sql.select([member_table.c[mem_id]],
                                 member_table.c.stable_id == str(StableId))
@@ -280,8 +280,8 @@ class Compara(object):
 
     def _get_dnafrag_id_for_coord(self, coord):
         """returns the dnafrag_id for the coordnate"""
-        dnafrag_table = self.ComparaDb.getTable('dnafrag')
-        genome_db_table = self.ComparaDb.getTable('genome_db')
+        dnafrag_table = self.ComparaDb.get_table('dnafrag')
+        genome_db_table = self.ComparaDb.get_table('genome_db')
 
         # column renamed between versions
         prefix = coord.genome.Species.lower()
@@ -303,7 +303,7 @@ class Compara(object):
 
     def _get_genomic_align_blocks_for_dna_frag_id(self, method_clade_id,
                                                   dnafrag_id, coord):
-        genomic_align_table = self.ComparaDb.getTable('genomic_align')
+        genomic_align_table = self.ComparaDb.get_table('genomic_align')
         query = sql.select([genomic_align_table.c.genomic_align_id,
                             genomic_align_table.c.genomic_align_block_id],
                            sql.and_(genomic_align_table.c.method_link_species_set_id ==
@@ -319,8 +319,8 @@ class Compara(object):
         return query.execute().fetchall()
 
     def _get_joint_genomic_align_dnafrag(self, genomic_align_block_id):
-        genomic_align_table = self.ComparaDb.getTable('genomic_align')
-        dnafrag_table = self.ComparaDb.getTable('dnafrag')
+        genomic_align_table = self.ComparaDb.get_table('genomic_align')
+        dnafrag_table = self.ComparaDb.get_table('dnafrag')
         query = sql.select([genomic_align_table.c.genomic_align_id,
                             genomic_align_table.c.genomic_align_block_id,
                             genomic_align_table.c.dnafrag_start,

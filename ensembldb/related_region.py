@@ -130,7 +130,7 @@ class SyntenicRegion(LazyRecord):
 
     def _get_cigar_record(self):
         genomic_align_table = \
-            self.parent.compara.ComparaDb.getTable('genomic_align')
+            self.parent.compara.ComparaDb.get_table('genomic_align')
         query = sql.select([genomic_align_table.c.cigar_line],
                            genomic_align_table.c.genomic_align_id ==
                            self._cached['genomic_align_id'])

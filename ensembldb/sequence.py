@@ -87,7 +87,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
     if not assemblies:
         raise NoItemError('no assembly for %s' % coord)
 
-    dna = genome.CoreDb.getTable('dna')
+    dna = genome.CoreDb.get_table('dna')
     seqs, positions = [], []
     for q_loc, t_loc in assemblies:
         assert q_loc.strand == 1

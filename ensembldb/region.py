@@ -57,7 +57,7 @@ class _Region(LazyRecord):
         start = row['%sstart' % self._location_column_prefix]
         end = row['%send' % self._location_column_prefix]
         strand = row['%sstrand' % self._location_column_prefix]
-        seq_region_table = self.db.getTable('seq_region')
+        seq_region_table = self.db.get_table('seq_region')
         query = sql.select([seq_region_table.c.name],
                            seq_region_table.c.seq_region_id == seq_region_id)
         result = asserted_one(query.execute().fetchall())
@@ -208,7 +208,7 @@ class GenericRegion(_Region):
         # etc .. attributes
         # coord_name comes from seq_region_table.c.name
         # matched, by coord_system_id, to default coord system
-        seq_region_table = self.genome.db.getTable('seq_region')
+        seq_region_table = self.genome.db.get_table('seq_region')
         coord_systems = CoordSystem(core_db=self.genome.CoreDb)
         coord_system_ids = [k for k in coord_systems if not isinstance(k, str)]
         record = sql.select([seq_region_table],
@@ -375,7 +375,7 @@ class Gene(_StableRegion):
         if 'gene' not in self._table_rows:
             self._get_gene_record()
         canonical_id = self._table_rows['gene']['canonical_transcript_id']
-        transcript_table = self.db.getTable('transcript')
+        transcript_table = self.db.get_table('transcript')
         query = sql.select([transcript_table],
                            transcript_table.c.transcript_id == canonical_id)
         records = query.execute().fetchall()
@@ -396,7 +396,7 @@ class Gene(_StableRegion):
         if 'gene' not in self._table_rows:
             self._get_gene_record()
         gene_id = self._table_rows['gene']['gene_id']
-        transcript_table = self.db.getTable('transcript')
+        transcript_table = self.db.get_table('transcript')
         query = sql.select([transcript_table],
                            transcript_table.c.gene_id == gene_id)
         records = query.execute().fetchall()
@@ -488,7 +488,7 @@ class Transcript(_StableRegion):
 
     def _get_gene(self):
         gene_id = self.gene_id
-        gene_table = self.db.getTable('gene')
+        gene_table = self.db.get_table('gene')
         query = sql.select([gene_table.c.stable_id],
                            gene_table.c.gene_id == gene_id)
         record = asserted_one(query.execute())
@@ -502,14 +502,14 @@ class Transcript(_StableRegion):
         if table_name in self._table_rows:
             return
         transcript_id = self.transcript_id
-        table = self.db.getTable(table_name)
+        table = self.db.get_table(table_name)
         query = sql.select([table], table.c.transcript_id == transcript_id)
         record = asserted_one(query.execute())
         self._table_rows[table_name] = record
 
     def _get_exon_transcript_records(self):
         transcript_id = self.transcript_id
-        exon_transcript_table = self.db.getTable('exon_transcript')
+        exon_transcript_table = self.db.get_table('exon_transcript')
         query = sql.select([exon_transcript_table],
                            exon_transcript_table.c.transcript_id == transcript_id)
         records = query.execute()
@@ -564,7 +564,7 @@ class Transcript(_StableRegion):
 
     def _get_translation_record(self):
         transcript_id = self.transcript_id
-        translation_table = self.db.getTable('translation')
+        translation_table = self.db.get_table('translation')
         query = sql.select([translation_table],
                            translation_table.c.transcript_id == transcript_id)
         try:
@@ -891,7 +891,7 @@ class Exon(_StableRegion):
             return
 
         table_name = self._attr_ensembl_table_map['StableId']
-        exon_stable_id_table = self.db.getTable(table_name)
+        exon_stable_id_table = self.db.get_table(table_name)
         query = sql.select([exon_stable_id_table.c.stable_id],
                            exon_stable_id_table.c.exon_id == self.exon_id)
         records = query.execute()
@@ -900,7 +900,7 @@ class Exon(_StableRegion):
 
     def _get_exon_record(self):
         # this will be called by _Region parent class to make the location
-        exon_table = self.db.getTable('exon')
+        exon_table = self.db.get_table('exon')
         query = sql.select([exon_table], exon_table.c.exon_id == self.exon_id)
         records = query.execute()
         record = asserted_one(records.fetchall())
@@ -980,7 +980,7 @@ class Variation(_Region):
     def __init__(self, genome, db=None, Effect=None, Symbol=None, data=None):
         self.genome = genome
 
-        get_table = genome.VarDb.getTable
+        get_table = genome.VarDb.get_table
         self.variation_feature_table = get_table('variation_feature')
         self.transcript_variation_table = get_table('transcript_variation')
         self.allele_table = get_table('allele')
@@ -1063,7 +1063,7 @@ class Variation(_Region):
 
     def _get_seq_region_record(self, seq_region_id):
         # should this be on a parent class? or a generic function in assembly?
-        seq_region_table = self.db.getTable('seq_region')
+        seq_region_table = self.db.get_table('seq_region')
         query = sql.select([seq_region_table],
                            seq_region_table.c.seq_region_id == seq_region_id)
         record = asserted_one(query.execute())
@@ -1260,7 +1260,7 @@ class Variation(_Region):
 
         var_feature_record = self._table_rows['variation_feature']
         var_feature_id = var_feature_record['variation_feature_id']
-        table = self.genome.VarDb.getTable(table_name)
+        table = self.genome.VarDb.get_table(table_name)
         self_effect = set([self.Effect, [self.Effect]]
                           [type(self.Effect) == str])
         query = sql.select([table.c.variation_feature_id,
@@ -1364,7 +1364,7 @@ class Repeat(GenericRegion):
                                               '-+'[self.Location.strand > 0], self.Score)
 
     def _get_repeat_consensus_record(self):
-        repeat_consensus_table = self.db.getTable('repeat_consensus')
+        repeat_consensus_table = self.db.get_table('repeat_consensus')
         repeat_consensus_id = self._table_rows[
             'repeat_feature']['repeat_consensus_id']
         record = sql.select([repeat_consensus_table],

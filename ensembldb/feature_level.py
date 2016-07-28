@@ -48,7 +48,7 @@ class FeatureCoordLevelsCache(object):
         return result
 
     def _get_meta_coord_records(self, db):
-        meta_coord = db.getTable('meta_coord')
+        meta_coord = db.get_table('meta_coord')
         if 'core' in str(db.db_name):
             query = sql.select([meta_coord]).where(meta_coord.c.table_name.
                                                    in_(['gene', 'simple_feature', 'repeat_feature']))

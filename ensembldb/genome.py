@@ -36,7 +36,7 @@ class FeatureTypeCache(LazyRecord):
 
     def _get_cpg_island_analysis_id(self):
         analysis_description_table = \
-            self.genome.CoreDb.getTable('analysis_description')
+            self.genome.CoreDb.get_table('analysis_description')
         query = sql.select([analysis_description_table.c.analysis_id],
                            analysis_description_table.c.display_label.like('%CpG%'))
         record = asserted_one(query.execute())
@@ -199,8 +199,8 @@ class Genome(object):
 
     def _get_symbol_from_synonym(self, db, synonym):
         """returns the gene symbol for a synonym"""
-        synonym_table = db.getTable('external_synonym')
-        xref_table = db.getTable('xref')
+        synonym_table = db.get_table('external_synonym')
+        xref_table = db.get_table('xref')
         joinclause = xref_table.join(synonym_table,
                                      xref_table.c.xref_id == synonym_table.c.xref_id)
         whereclause = synonym_table.c.synonym == synonym
@@ -218,8 +218,8 @@ class Genome(object):
 
     def _get_gene_query(self, db, Symbol=None, Description=None, StableId=None,
                         BioType=None, synonym=None, like=True):
-        xref_table = [None, db.getTable('xref')][db.Type == 'core']
-        gene_table = db.getTable('gene')
+        xref_table = [None, db.get_table('xref')][db.Type == 'core']
+        gene_table = db.get_table('gene')
 
         # after release 65, the gene_id_table is removed. The following is to maintain
         # support for earlier releases
@@ -227,7 +227,7 @@ class Genome(object):
         if release_ge_65:
             gene_id_table = None
         else:
-            gene_id_table = db.getTable('gene_stable_id')
+            gene_id_table = db.get_table('gene_stable_id')
 
         assert Symbol or Description or StableId or BioType, "no valid argument provided"
         if Symbol:
@@ -313,8 +313,8 @@ class Genome(object):
 
     def _get_transcript_query(self, db, Symbol=None, Description=None, StableId=None,
                               BioType=None, synonym=None, like=True):
-        xref_table = [None, db.getTable('xref')][db.Type == 'core']
-        transcript_table = db.getTable('transcript')
+        xref_table = [None, db.get_table('xref')][db.Type == 'core']
+        transcript_table = db.get_table('transcript')
 
         # after release 65, the transcript_id_table is removed. The following is to maintain
         # support for earlier releases
@@ -322,7 +322,7 @@ class Genome(object):
         if release_ge_65:
             transcript_id_table = None
         else:
-            transcript_id_table = db.getTable('transcript_stable_id')
+            transcript_id_table = db.get_table('transcript_stable_id')
 
         assert Symbol or Description or StableId or BioType, "no valid argument provided"
         if Symbol:
@@ -366,7 +366,7 @@ class Genome(object):
 
     def _get_seq_region_id(self, coord_name):
         """returns the seq_region_id for the provided coord_name"""
-        seq_region_table = self.CoreDb.getTable('seq_region')
+        seq_region_table = self.CoreDb.get_table('seq_region')
         coord_systems = CoordSystem(core_db=self.CoreDb)
         coord_system_ids = [
             k for k in coord_systems if type(k) not in (str, str)]
@@ -381,7 +381,7 @@ class Genome(object):
         """returns feature_type records for the query_coord from the
         simple_feature table. The returned coord is referenced to
         target_coord. At present, only CpG islands being queried."""
-        simple_feature_table = db.getTable('simple_feature')
+        simple_feature_table = db.get_table('simple_feature')
         feature_types = ['CpGisland']
         feature_type_ids = [str(self._feature_type_ids.get(f))
                             for f in feature_types]
@@ -414,7 +414,7 @@ class Genome(object):
         # we build repeats using coordinates from repeat_feature table
         # the repeat_consensus_id is required to get the repeat name, class
         # and type
-        repeat_feature_table = db.getTable('repeat_feature')
+        repeat_feature_table = db.get_table('repeat_feature')
         query = sql.select([repeat_feature_table],
                            repeat_feature_table.c.seq_region_id == query_coord.seq_region_id)
         query = location_query(repeat_feature_table, query_coord.EnsemblStart,
@@ -437,15 +437,15 @@ class Genome(object):
     def _get_gene_features(self, db, klass, target_coord, query_coord,
                            where_feature):
         """returns all genes"""
-        xref_table = [None, db.getTable('xref')][db.Type == 'core']
-        gene_table = db.getTable('gene')
+        xref_table = [None, db.get_table('xref')][db.Type == 'core']
+        gene_table = db.get_table('gene')
 
         # after release 65, the gene_id_table is removed. The following is to maintain
         # support for earlier releases.
         if self.GeneralRelease >= 65:
             gene_id_table = None
         else:
-            gene_id_table = db.getTable('gene_stable_id')
+            gene_id_table = db.get_table('gene_stable_id')
 
         # note gene records are at chromosome, not contig, level
         condition = gene_table.c.seq_region_id == query_coord.seq_region_id
@@ -469,7 +469,7 @@ class Genome(object):
                                 where_feature):
         """returns variation instances within the specified region"""
         # variation features at supercontig level
-        var_feature_table = self.VarDb.getTable('variation_feature')
+        var_feature_table = self.VarDb.get_table('variation_feature')
         # note gene records are at chromosome, not contig, level
         query = sql.select([var_feature_table],
                            var_feature_table.c.seq_region_id == query_coord.seq_region_id)
@@ -562,7 +562,7 @@ class Genome(object):
             - somatic: exclude somatic mutations
             - flanks_match_ref: flanking sequence matches the reference
             - limit: only return this number of hits"""
-        var_feature_table = self.VarDb.getTable('variation_feature')
+        var_feature_table = self.VarDb.get_table('variation_feature')
 
         assert Effect or Symbol, "No arguments provided"
         #  if we don't have Symbol, then we deal with Effect

@@ -46,7 +46,7 @@ def location_query(table, query_start, query_end,
 
 
 def _get_coord_type_and_seq_region_id(coord_name, core_db):
-    seq_region_table = core_db.getTable('seq_region')
+    seq_region_table = core_db.get_table('seq_region')
     rows = sql.select([seq_region_table]).\
         where(seq_region_table.c.name == str(coord_name)).execute().fetchall()
     species_coord_sys = CoordSystem(species=core_db.db_name.Species,
@@ -234,7 +234,7 @@ class CoordSystemCache(object):
         if species in self._species_coord_systems:
             return
         self._species_coord_systems[species] = {}
-        coord_table = core_db.getTable('coord_system')
+        coord_table = core_db.get_table('coord_system')
         records = sql.select([coord_table]).where(coord_table.c.attrib.like('default%')).\
             execute().fetchall()    # only select default version
         for record in records:
@@ -357,8 +357,8 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
 def assembly_exception_coordinate(loc):
     """returns a coordinate conversion for one with an assembly exception"""
     genome = loc.genome
-    assemb_except_table = genome.CoreDb.getTable('assembly_exception')
-    seq_region_table = genome.CoreDb.getTable('seq_region')
+    assemb_except_table = genome.CoreDb.get_table('assembly_exception')
+    seq_region_table = genome.CoreDb.get_table('seq_region')
 
     query = sql.select([assemb_except_table, seq_region_table.c.name],
                        sql.and_(
@@ -380,8 +380,8 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
     # TODO better function name
     species = core_db.db_name.Species
     assert query_location.Species == species
-    assembly = core_db.getTable('assembly')
-    seq_region = core_db.getTable('seq_region')
+    assembly = core_db.get_table('assembly')
+    seq_region = core_db.get_table('seq_region')
     target_coord_system_id = CoordSystem(target_coord_type, core_db=core_db,
                                          species=species).coord_system_id
 

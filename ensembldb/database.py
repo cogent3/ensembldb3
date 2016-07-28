@@ -41,7 +41,7 @@ class Database(object):
     def __ne__(self, other):
         return self._db != other._db
 
-    def getTable(self, name):
+    def get_table(self, name):
         """returns the SQLalchemy table instance"""
         table = self._tables.get(name, None)
         if table is None:
@@ -70,7 +70,7 @@ class Database(object):
         Arguments:
             - table_name: the data base table name
             - column: valid values are biotype, status"""
-        table = self.getTable(table_name)
+        table = self.get_table(table_name)
         query = sql.select([table.c[column]], distinct=True)
         records = set()
         string_types = str, str
@@ -91,7 +91,7 @@ class Database(object):
 
     def tableHasColumn(self, table_name, column):
         """returns True if table has column"""
-        table = self.getTable(table_name)
+        table = self.get_table(table_name)
         return hasattr(table.c, column)
 
     def getTablesRowCount(self, table_name=None):
@@ -108,7 +108,7 @@ class Database(object):
             table_name = list(self._meta.tables.keys())
         rows = []
         for name in table_name:
-            table = self.getTable(name)
+            table = self.get_table(name)
             count = table.count().execute().fetchone()[0]
             rows.append(['%s.%s' % (self.db_name, name), count])
 

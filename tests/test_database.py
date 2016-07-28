@@ -32,7 +32,7 @@ class TestDatabase(TestCase):
     def test_connect(self):
         human = Database(account=account, release=release,
                          species='human', db_type='core')
-        gene = human.getTable('gene')
+        gene = human.get_table('gene')
 
     def test_get_distinct(self):
         """should return list of strings"""
