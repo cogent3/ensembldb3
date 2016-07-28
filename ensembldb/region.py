@@ -127,7 +127,7 @@ class _Region(LazyRecord):
 
     Variants = property(_get_variants)
 
-    def featureData(self, parent_map):
+    def feature_data(self, parent_map):
         symbol = self.Symbol or getattr(self, 'StableId', '')
         assert not parent_map.reverse
         feat_map = parent_map[self.location.start:self.location.end]
@@ -149,7 +149,7 @@ class _Region(LazyRecord):
         seq_map = seq_map.inverse()
 
         for region in regions:
-            data = region.featureData(seq_map)
+            data = region.feature_data(seq_map)
             if data is None:
                 continue
             # this will consider the strand information of actual sequence
@@ -422,7 +422,7 @@ class Gene(_StableRegion):
         """
         features = []
         for transcript in self.Transcripts:
-            transcript_data = transcript.featureData(parent_map)
+            transcript_data = transcript.feature_data(parent_map)
             if transcript_data:
                 features.append(transcript_data)
                 data = transcript.subFeatureData(parent_map)
@@ -781,7 +781,7 @@ class Transcript(_StableRegion):
         if self.Exons is self.NULL_VALUE:
             return features
         for exon in self.Exons:
-            feature_data = exon.featureData(parent_map)
+            feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
             features.append(feature_data)
@@ -793,7 +793,7 @@ class Transcript(_StableRegion):
         if self.Introns is self.NULL_VALUE:
             return features
         for intron in self.Introns:
-            feature_data = intron.featureData(parent_map)
+            feature_data = intron.feature_data(parent_map)
             if feature_data is None:
                 continue
             features.append(feature_data)
@@ -806,7 +806,7 @@ class Transcript(_StableRegion):
             return features
         cds_spans = []
         for exon in self.TranslatedExons:
-            feature_data = exon.featureData(parent_map)
+            feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
             cds_spans.extend(feature_data[-1].spans)
@@ -822,12 +822,12 @@ class Transcript(_StableRegion):
         features = []
         utr5_spans, utr3_spans = [], []
         for exon in self.UntranslatedExons5:
-            feature_data = exon.featureData(parent_map)
+            feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
             utr5_spans.extend(feature_data[-1].spans)
         for exon in self.UntranslatedExons3:
-            feature_data = exon.featureData(parent_map)
+            feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
             utr3_spans.extend(feature_data[-1].spans)
