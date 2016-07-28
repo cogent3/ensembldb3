@@ -51,7 +51,7 @@ class TestFeatureCoordLevels(TestCase):
         # use chicken genome as it need to do conversion
         # chicken coordinate correspondent toRefSeq human IL2A region
         coord = dict(coord_name=9, start=21727352, end=21729141)
-        region = self.chicken.getRegion(**coord)
+        region = self.chicken.get_region(**coord)
         # repeat is recorded at contig level, strand is 0
         repeats = region.get_features(feature_types='repeat')
         expect = [("9", 21727499, 21727527), ("9", 21728009, 21728018),

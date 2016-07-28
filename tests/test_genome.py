@@ -71,7 +71,7 @@ class TestGenome(GenomeTestBase):
         chrom = 1
         start = 11137
         end = start + 20
-        region = self.human.getRegion(coord_name=chrom, start=start, end=end,
+        region = self.human.get_region(coord_name=chrom, start=start, end=end,
                                       ensembl_coord=True)
         self.assertEqual(region.Location.start, start - 1)
         self.assertEqual(region.Location.end, end)
@@ -82,7 +82,7 @@ class TestGenome(GenomeTestBase):
     def test_get_assembly_exception_region(self):
         """should return correct sequence for region with an assembly
         exception"""
-        region = self.human.getRegion(coord_name="Y", start=57211873,
+        region = self.human.get_region(coord_name="Y", start=57211873,
                                       end=57211894, strand=1, ensembl_coord=True)
 
         self.assertEqual(str(region.Seq), 'CGAGGACGACTGGGAATCCTAG')
@@ -92,14 +92,14 @@ class TestGenome(GenomeTestBase):
         krat = Genome('Kangaroo rat', release=58)
         start = 24385
         end = start + 100
-        region = krat.getRegion(coord_name='scaffold_13754', start=start,
+        region = krat.get_region(coord_name='scaffold_13754', start=start,
                                 end=end)
         self.assertEqual(str(region.Seq), 'N' * (end - start))
 
     def test_getting_annotated_seq(self):
         """a region should return a sequence with the correct annotation"""
         new_loc = self.brca2.Location.resized(-100, 100)
-        region = self.human.getRegion(region=new_loc)
+        region = self.human.get_region(region=new_loc)
         annot_seq = region.getAnnotatedSeq(feature_types='gene')
         gene_annots = annot_seq.get_annotations_matching('gene')
         self.assertEqual(gene_annots[0].name, self.brca2.Symbol)
@@ -613,9 +613,9 @@ class TestFeatures(GenomeTestBase):
 
     def test_other_genes(self):
         """docstring for est_other_genes"""
-        mouse = self.mouse.getRegion(coord_name='5', start=150791005,
+        mouse = self.mouse.get_region(coord_name='5', start=150791005,
                                      end=150838512, strand='-')
-        rat = self.rat.getRegion(coord_name='12', start=4282534, end=4324019,
+        rat = self.rat.get_region(coord_name='12', start=4282534, end=4324019,
                                  strand='+')
         for region in [mouse, rat]:
             features = region.get_features(feature_types=['gene'])
@@ -647,7 +647,7 @@ class TestFeatures(GenomeTestBase):
                                            end=31871820))[0]
         minus = plus.Location.copy()
         minus.strand *= -1
-        minus = self.human.getRegion(region=minus)
+        minus = self.human.get_region(region=minus)
         # get Sequence
         plus_seq = plus.getAnnotatedSeq(feature_types='gene')
         minus_seq = minus.getAnnotatedSeq(feature_types='gene')
@@ -663,11 +663,11 @@ class TestFeatures(GenomeTestBase):
         human = self.human
         coord = dict(coord_name=11, start=2143894, end=2144494)
         exp_coord = dict(coord_name=11, start=2143906, end=2144442)
-        exp_loc = human.getRegion(strand=1, ensembl_coord=True, **exp_coord)
+        exp_loc = human.get_region(strand=1, ensembl_coord=True, **exp_coord)
         exp = exp_loc.Seq
 
-        ps_feat = human.getRegion(strand=1, **coord)
-        ms_feat = human.getRegion(strand=-1, **coord)
+        ps_feat = human.get_region(strand=1, **coord)
+        ms_feat = human.get_region(strand=-1, **coord)
 
         ps_seq = ps_feat.getAnnotatedSeq(feature_types='CpG')
         ps_cgi = ps_seq.get_annotations_matching('CpGisland')[0]
@@ -684,8 +684,8 @@ class TestFeatures(GenomeTestBase):
         """should apply repeat feature data in a manner consistent with strand"""
         coord = dict(coord_name=13, start=32316063, end=32316363)
         # 13:32316063 -32316363
-        ps_repeat = self.human.getRegion(strand=1, **coord)
-        ms_repeat = self.human.getRegion(strand=-1, **coord)
+        ps_repeat = self.human.get_region(strand=1, **coord)
+        ms_repeat = self.human.get_region(strand=-1, **coord)
         # note this MER3 repeat is annotated on the -1 strand
         exp = DNA.make_sequence('AGCTTACTGTGAGGATGGGAACATTTTACAGCTGTGCTGTCCAAA'
                                'CCGGTGCCACTAGCCACATTAAGCACTCGAAACGTGGCTAGTGCGACTAGAGAAGAGGAT'

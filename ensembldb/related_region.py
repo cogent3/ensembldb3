@@ -107,7 +107,7 @@ class SyntenicRegion(LazyRecord):
             if hasattr(Location, 'Location'):  # likely to be a feature region
                 region = Location
             else:
-                region = genome.getRegion(region=Location)
+                region = genome.get_region(region=Location)
             self._cached['Region'] = region
 
         for identifier, value in list(dict(identifiers_values).items()):
@@ -172,7 +172,7 @@ class SyntenicRegion(LazyRecord):
         self.aln_loc = aln_loc
         region_loc = ref_location.copy()
         region_loc.strand = block_loc.strand
-        region = self.genome.getRegion(region=region_loc)
+        region = self.genome.get_region(region=region_loc)
         self._cached['Region'] = region
 
     def _make_map_from_ref(self):
@@ -206,7 +206,7 @@ class SyntenicRegion(LazyRecord):
             else:
                 shift = relative_start
             loc = loc.shifted(shift)
-            region = self.genome.getRegion(region=loc)
+            region = self.genome.get_region(region=loc)
         except IndexError:  # TODO ask Hua where these index errors occur
             region = None
         self._cached['Region'] = region

@@ -1085,7 +1085,7 @@ class Variation(_Region):
             if self.Location.strand == -1:
                 resized = [(1, 301), (-301, -1)][name == 'down']
             flank = self.Location.resized(*resized)
-            flanking = self.genome.getRegion(region=flank)
+            flanking = self.genome.get_region(region=flank)
             seq = flanking.Seq
             seqs[name] = seq
 
@@ -1115,7 +1115,7 @@ class Variation(_Region):
                 if self.Location.strand == -1:
                     resized = [(1, 301), (-301, -1)][name == 'down']
                 flank = self.Location.resized(*resized)
-                flanking = self.genome.getRegion(region=flank)
+                flanking = self.genome.get_region(region=flank)
                 seq = flanking.Seq
             seqs[name] = seq
 

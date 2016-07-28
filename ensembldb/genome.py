@@ -607,7 +607,7 @@ class Genome(object):
             yield Variation(self, self.CoreDb, Effect=Effect, Symbol=Symbol,
                             data=record)
 
-    def getRegion(self, region=None, coord_name=None, start=None, end=None,
+    def get_region(self, region=None, coord_name=None, start=None, end=None,
                   strand=None, ensembl_coord=False):
         """returns a single generic region for the specified coordinates
         Arguments:
