@@ -54,23 +54,23 @@ In Australia, the common name for *Gallus gallus* is chook, so I'll modify that.
 
 .. doctest::
 
-    >>> Species.amendSpecies('Gallus gallus', 'chook')
-    >>> assert Species.getCommonName('Gallus gallus') == 'chook'
+    >>> Species.amend_species('Gallus gallus', 'chook')
+    >>> assert Species.get_common_name('Gallus gallus') == 'chook'
 
-You can also add new species for when they become available using ``Species.amendSpecies``.
+You can also add new species for when they become available using ``Species.amend_species``.
 
-Species common names are used to construct attributes on PyCogent ``Compara`` instances). You can get the name that will be using the ``getComparaName`` method. For species with a real common name
+Species common names are used to construct attributes on PyCogent ``Compara`` instances). You can get the name that will be using the ``get_compara_name`` method. For species with a real common name
 
 .. doctest::
     
-    >>> Species.getComparaName('Procavia capensis')
+    >>> Species.get_compara_name('Procavia capensis')
     'RockHyrax'
 
 or with a shortened species name
 
 .. doctest::
     
-    >>> Species.getComparaName('Caenorhabditis remanei')
+    >>> Species.get_compara_name('Caenorhabditis remanei')
     'Cremanei'
 
 The ``Species`` class is basically used to translate between latin names and ensembl's database naming scheme. It also serves to allow the user to simply enter the common name for a species in order to reference it's genome databases. The queries are case-insensitive.
@@ -190,9 +190,9 @@ The ``Gene`` region also has convenience methods for examining properties of it'
 
 .. doctest::
 
-    >>> print brca2.getCdsLengths()
+    >>> print brca2.get_cds_lengths()
     [10257, 10257]
-    >>> longest = brca2.getLongestCdsTranscript()
+    >>> longest = brca2.get_longest_cds_transcript()
     >>> print longest.Cds
     ATGCCTATTGGATCCAAA...
 
@@ -200,7 +200,7 @@ All Regions have a ``get_features`` method which differs from that on genome onl
 
 .. doctest::
 
-    >>> annot_brca2 = brca2.getAnnotatedSeq(feature_types='gene')
+    >>> annot_brca2 = brca2.get_annotated_seq(feature_types='gene')
     >>> cds = annot_brca2.get_annotations_matching('CDS')[0].get_slice()
     >>> print cds
     ATGCCTATTGGATCCAAA...
@@ -369,7 +369,7 @@ The Ensembl compara database is represented by ``cogent.db.ensembl.compara.Compa
     >>> print compara
     Compara(Species=('Homo sapiens', 'Mus musculus', 'Rattus norvegicus'); release=76...
 
-The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to itself as named attributes (use ``Species.getComparaName`` to find out what the attribute will be). The genome instances are named according to their common name in CamelCase, or Scase. For instance, if we had created a ``Compara`` instance with the American pika species included, then that genome would be accessed as ``compara.AmericanPika``. Common names containing a '.' are treated differently. For instance, the common name for *Caenorhabditis remanei* is ``C.remanei`` which becomes ``compara.Cremanei``. We access the human genome in this ``Compara`` instance and conduct a gene search.
+The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to itself as named attributes (use ``Species.get_compara_name`` to find out what the attribute will be). The genome instances are named according to their common name in CamelCase, or Scase. For instance, if we had created a ``Compara`` instance with the American pika species included, then that genome would be accessed as ``compara.AmericanPika``. Common names containing a '.' are treated differently. For instance, the common name for *Caenorhabditis remanei* is ``C.remanei`` which becomes ``compara.Cremanei``. We access the human genome in this ``Compara`` instance and conduct a gene search.
 
 .. doctest::
 
@@ -416,11 +416,11 @@ The ``RelatedGenes`` object has a number of properties allowing you to get acces
     >>> print orthologs.get_seqLengths()
     [40748, 84793, 47117]
 
-In addition there's a ``getMaxCdsLengths`` method for returning the lengths of the longest ``Cds`` from each member.
+In addition there's a ``get_max_cds_lengths`` method for returning the lengths of the longest ``Cds`` from each member.
 
 .. doctest::
 
-    >>> print orthologs.getMaxCdsLengths()
+    >>> print orthologs.get_max_cds_lengths()
     [10032, 10257, 9990]
 
 You can also obtain the sequences as a ``cogent`` ``SequenceCollection`` (unaligned), with the ability to have those sequences annotated as described above. The sequences are named in accordance with their genomic coordinates.

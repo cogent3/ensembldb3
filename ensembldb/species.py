@@ -144,7 +144,7 @@ class SpeciesNameMap(dict):
         self._species_ensembl = {}
         self._ensembl_species = {}
         for species_name, common_name in species_common:
-            self.amendSpecies(CaseInsensitiveString(species_name),
+            self.amend_species(CaseInsensitiveString(species_name),
                               CaseInsensitiveString(common_name))
 
     def __str__(self):
@@ -160,7 +160,7 @@ class SpeciesNameMap(dict):
         return 'Available species: %s' % ("'" +
                                           "'; '".join(list(self._common_species.keys())) + "'")
 
-    def getCommonName(self, name, level='raise'):
+    def get_common_name(self, name, level='raise'):
         """returns the common name for the given name (which can be either a
         species name or the ensembl version)"""
         name = CaseInsensitiveString(name)
@@ -183,7 +183,7 @@ class SpeciesNameMap(dict):
 
         return str(common_name)
 
-    def getSpeciesName(self, name, level='ignore'):
+    def get_species_name(self, name, level='ignore'):
         """returns the species name for the given common name"""
         name = CaseInsensitiveString(name)
         if name in self._species_common:
@@ -202,20 +202,20 @@ class SpeciesNameMap(dict):
                 print("WARN: %s" % msg)
         return str(species_name)
 
-    def getSpeciesNames(self):
+    def get_species_names(self):
         """returns the list of species names"""
         names = list(self._species_common.keys())
         names.sort()
         return [str(n) for n in names]
 
-    def getEnsemblDbPrefix(self, name):
+    def get_ensembl_db_prefix(self, name):
         """returns a string of the species name in the format used by
         ensembl"""
         name = CaseInsensitiveString(name)
         if name in self._common_species:
             name = self._common_species[name]
         try:
-            species_name = self.getSpeciesName(name, level='raise')
+            species_name = self.get_species_name(name, level='raise')
         except RuntimeError:
             if name not in self._species_common:
                 raise RuntimeError("Unknown name %s" % name)
@@ -223,10 +223,10 @@ class SpeciesNameMap(dict):
 
         return str(species_name.lower().replace(" ", "_"))
 
-    def getComparaName(self, name):
+    def get_compara_name(self, name):
         """returns string matching a compara instance attribute name for a
         species"""
-        name = self.getCommonName(name)
+        name = self.get_common_name(name)
         if '.' in name:
             name = name.replace('.', '')
         else:
@@ -245,7 +245,7 @@ class SpeciesNameMap(dict):
         self._ensembl_species.pop(ensembl_name)
         self._common_species.pop(common_name)
 
-    def amendSpecies(self, species_name, common_name):
+    def amend_species(self, species_name, common_name):
         """add a new species, and common name"""
         species_name = CaseInsensitiveString(species_name)
         common_name = CaseInsensitiveString(common_name)

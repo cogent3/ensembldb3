@@ -68,7 +68,7 @@ class TestCompara(ComparaTestBase):
         brca2 = self.comp.Human.get_gene_by_stableid(StableId="ENSG00000139618")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship="ortholog_one2one")
-        collection = Orthologs.getSeqCollection()
+        collection = Orthologs.get_seq_collection()
         self.assertTrue(len(collection.Seqs[0]) > 1000)
 
     def test_getting_alignment(self):
@@ -122,7 +122,7 @@ class TestCompara(ComparaTestBase):
         brca1 = self.comp.Human.get_gene_by_stableid(StableId="ENSG00000012048")
         Orthologs = self.comp.get_related_genes(gene_region=brca1,
                                               Relationship="ortholog_one2one")
-        self.assertEqual(Orthologs.getSpeciesSet(), expect)
+        self.assertEqual(Orthologs.get_species_set(), expect)
 
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""

@@ -106,7 +106,7 @@ def make_db_name_pattern(species=None, db_type=None, release=None):
     sep = r"%"
     pattern = ""
     if species:
-        species = Species.getEnsemblDbPrefix(species)
+        species = Species.get_ensembl_db_prefix(species)
         pattern = "%s%s" % (sep, species)
     if db_type:
         pattern = "%s%s%s" % (pattern, sep, db_type)

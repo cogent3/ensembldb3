@@ -12,7 +12,7 @@ from .assembly import CoordSystem, Coordinate, \
     get_coord_conversion, location_query
 from .region import Gene, Transcript, Variation, GenericRegion, \
     CpGisland, Repeat, Est
-from .feature_level import feature_coord_levels
+from .feature_level import FeatureCoordLevels
 
 
 __author__ = "Gavin Huttley"
@@ -88,7 +88,7 @@ class Genome(object):
         self._gen_release = None
 
         # TODO make name and release immutable properties
-        self.Species = _Species.getSpeciesName(Species)
+        self.Species = _Species.get_species_name(Species)
         self.release = str(release)
 
         # the db connections
@@ -96,7 +96,7 @@ class Genome(object):
         self._var_db = None
         self._other_db = None
         self._feature_type_ids = FeatureTypeCache(self)
-        self._feature_coord_levels = feature_coord_levels(self.Species)
+        self._feature_coord_levels = FeatureCoordLevels(self.Species)
 
     def __str__(self):
         my_type = self.__class__.__name__
@@ -389,8 +389,8 @@ class Genome(object):
         query = sql.select([simple_feature_table],
                            sql.and_(simple_feature_table.c.analysis_id.in_(feature_type_ids),
                                     simple_feature_table.c.seq_region_id == query_coord.seq_region_id))
-        query = location_query(simple_feature_table, query_coord.EnsemblStart,
-                               query_coord.EnsemblEnd, query=query,
+        query = location_query(simple_feature_table, query_coord.ensembl_start,
+                               query_coord.ensembl_end, query=query,
                                where=where_feature)
         records = query.execute()
         for record in records:
@@ -404,8 +404,8 @@ class Genome(object):
                 coord = asserted_one(get_coord_conversion(
                     coord, target_coord.CoordType, self.CoreDb))[1]
 
-            # coord = coord.makeRelativeTo(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
-            # coord = coord.makeRelativeTo(target_coord, False)
+            # coord = coord.make_relative_to(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
+            # coord = coord.make_relative_to(target_coord, False)
             yield klass(self, db, location=coord, Score=record['score'])
 
     def _get_repeat_features(self, db, klass, target_coord, query_coord,
@@ -417,8 +417,8 @@ class Genome(object):
         repeat_feature_table = db.get_table('repeat_feature')
         query = sql.select([repeat_feature_table],
                            repeat_feature_table.c.seq_region_id == query_coord.seq_region_id)
-        query = location_query(repeat_feature_table, query_coord.EnsemblStart,
-                               query_coord.EnsemblEnd, query=query, where=where_feature)
+        query = location_query(repeat_feature_table, query_coord.ensembl_start,
+                               query_coord.ensembl_end, query=query, where=where_feature)
         for record in query.execute():
             coord = Coordinate(self, coord_name=query_coord.coord_name,
                                start=record['seq_region_start'],
@@ -429,8 +429,8 @@ class Genome(object):
             if query_coord.coord_name != target_coord.coord_name:
                 coord = asserted_one(get_coord_conversion(
                     coord, target_coord.CoordType, self.CoreDb))[1]
-            # coord = coord.makeRelativeTo(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
-            # coord = coord.makeRelativeTo(target_coord, False)
+            # coord = coord.make_relative_to(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
+            # coord = coord.make_relative_to(target_coord, False)
             yield klass(self, db, location=coord, Score=record['score'],
                         data=record)
 
@@ -451,8 +451,8 @@ class Genome(object):
         condition = gene_table.c.seq_region_id == query_coord.seq_region_id
         query = self._build_gene_query(
             db, condition, gene_table, gene_id_table, xref_table)
-        query = location_query(gene_table, query_coord.EnsemblStart,
-                               query_coord.EnsemblEnd, query=query, where=where_feature)
+        query = location_query(gene_table, query_coord.ensembl_start,
+                               query_coord.ensembl_end, query=query, where=where_feature)
 
         for record in query.execute():
             new = Coordinate(self, coord_name=query_coord.coord_name,
@@ -473,8 +473,8 @@ class Genome(object):
         # note gene records are at chromosome, not contig, level
         query = sql.select([var_feature_table],
                            var_feature_table.c.seq_region_id == query_coord.seq_region_id)
-        query = location_query(var_feature_table, query_coord.EnsemblStart,
-                               query_coord.EnsemblEnd, query=query, where=where_feature)
+        query = location_query(var_feature_table, query_coord.ensembl_start,
+                               query_coord.ensembl_end, query=query, where=where_feature)
         for record in query.execute():
             yield klass(self, self.CoreDb, Symbol=record['variation_name'],
                         data=record)

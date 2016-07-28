@@ -90,7 +90,7 @@ class EnsemblDbName(object):
             self.Build = None
 
         self.Species = None
-        self.Species = Species.getSpeciesName(self.Prefix)
+        self.Species = Species.get_species_name(self.Prefix)
 
     def __repr__(self):
         build = ['', "; Build='%s'" % self.Build][self.Build is not None]

@@ -79,7 +79,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
 
     if DEBUG:
         print('Created Coordinate:', coord,
-              coord.EnsemblStart, coord.EnsemblEnd)
+              coord.ensembl_start, coord.ensembl_end)
         print(coord.CoordType, coord_type)
 
     assemblies = get_coord_conversion(coord, coord_type, genome.CoreDb)
@@ -94,7 +94,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
         length = len(t_loc)
         # get MySQL to do the string slicing via substr function
         query = sql.select([substr(dna.c.sequence,
-                                   t_loc.EnsemblStart,
+                                   t_loc.ensembl_start,
                                    length).label('sequence')],
                            dna.c.seq_region_id == t_loc.seq_region_id)
         record = asserted_one(query.execute().fetchall())

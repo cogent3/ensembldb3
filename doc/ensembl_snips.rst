@@ -49,34 +49,34 @@ If Ensembl has added a new species which is not yet included in ``Species``, you
 
 .. doctest::
 
-    >>> Species.amendSpecies('A latinname', 'a common name')
+    >>> Species.amend_species('A latinname', 'a common name')
 
 You can get the common name for a species
 
 .. doctest::
 
-    >>> Species.getCommonName('Procavia capensis')
+    >>> Species.get_common_name('Procavia capensis')
     'Rock hyrax'
 
 and the Ensembl database name prefix which will be used for all databases for this species.
 
 .. doctest::
 
-    >>> Species.getEnsemblDbPrefix('Procavia capensis')
+    >>> Species.get_ensembl_db_prefix('Procavia capensis')
     'procavia_capensis'
 
-Species common names are used to construct attributes on PyCogent ``Compara`` instances). You can get the name that will be using the ``getComparaName`` method. For species with a real common name
+Species common names are used to construct attributes on PyCogent ``Compara`` instances). You can get the name that will be using the ``get_compara_name`` method. For species with a real common name
 
 .. doctest::
     
-    >>> Species.getComparaName('Procavia capensis')
+    >>> Species.get_compara_name('Procavia capensis')
     'RockHyrax'
 
 or with a shortened species name
 
 .. doctest::
     
-    >>> Species.getComparaName('Caenorhabditis remanei')
+    >>> Species.get_compara_name('Caenorhabditis remanei')
     'Cremanei'
 
 Get genomic features
@@ -426,7 +426,7 @@ We get statistics on the ortholog CDS lengths.
 
 .. doctest::
     
-    >>> print orthologs.getMaxCdsLengths()
+    >>> print orthologs.get_max_cds_lengths()
     [10008, 10257, 10257]
 
 We get the sequences as a sequence collection, with annotations for gene.
@@ -444,14 +444,14 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     
     >>> from cogent3.core.alphabet import AlphabetError
     >>> common_names = ["mouse", "rat", "human", "opossum"]
-    >>> latin_names = set([Species.getSpeciesName(n) for n in common_names])
+    >>> latin_names = set([Species.get_species_name(n) for n in common_names])
     >>> latin_to_common = dict(zip(latin_names, common_names))
     >>> compara = Compara(common_names, release=76, account=account)
     >>> for gene in compara.Human.get_genes_matching(BioType='protein_coding'):
     ...     orthologs = compara.get_related_genes(gene,
     ...                                  Relationship='ortholog_one2one')
     ...     # make sure all species represented
-    ...     if orthologs is None or orthologs.getSpeciesSet() != latin_names:
+    ...     if orthologs is None or orthologs.get_species_set() != latin_names:
     ...         continue
     ...     seqs = []
     ...     for m in orthologs.Members:

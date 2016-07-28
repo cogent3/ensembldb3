@@ -31,7 +31,7 @@ class FeatureCoordLevelsCache(object):
     _species_feature_dbs = {}
 
     def __init__(self, species):
-        self.Species = _Species.getSpeciesName(species)
+        self.Species = _Species.get_species_name(species)
 
     def __repr__(self):
         """print table format"""
@@ -111,16 +111,16 @@ class FeatureCoordLevelsCache(object):
     def __call__(self, species=None, core_db=None, feature_types=None, var_db=None, otherfeature_db=None):
         if 'variation' in feature_types:
             assert var_db is not None
-        species = _Species.getSpeciesName(core_db.db_name.Species or species)
+        species = _Species.get_species_name(core_db.db_name.Species or species)
         self._set_species_feature_levels(
             species, core_db, feature_types, var_db, otherfeature_db)
         return self._species_feature_levels[species]
 
 
-class feature_coord_levels(FeatureCoordLevelsCache):
+class FeatureCoordLevels(FeatureCoordLevelsCache):
 
     def __init__(self, species):
-        self.Species = _Species.getSpeciesName(species)
+        self.Species = _Species.get_species_name(species)
 
     def __repr__(self):
         """print table format"""

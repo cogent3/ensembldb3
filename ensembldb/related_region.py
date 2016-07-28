@@ -38,12 +38,12 @@ class _RelatedRegions(LazyRecord):
         data.append(')')
         return "\n\t".join(data)
 
-    def getSeqCollection(self, feature_types=None, where_feature=None):
+    def get_seq_collection(self, feature_types=None, where_feature=None):
         """returns a SequenceCollection instance of the unaligned sequences"""
         seqs = []
         for member in self.Members:
             if feature_types:
-                seq = member.getAnnotatedSeq(feature_types, where_feature)
+                seq = member.get_annotated_seq(feature_types, where_feature)
             else:
                 seq = member.Seq
             if seq is None:
@@ -55,7 +55,7 @@ class _RelatedRegions(LazyRecord):
         """returns a vector of lengths"""
         return [len(member) for member in self.Members]
 
-    def getSpeciesSet(self):
+    def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
         return set([m.location.Species for m in self.Members])
 
@@ -80,9 +80,9 @@ class RelatedGenes(_RelatedRegions):
     def __repr__(self):
         return self.__str__()
 
-    def getMaxCdsLengths(self):
+    def get_max_cds_lengths(self):
         """returns the vector of maximum Cds lengths from member transcripts"""
-        return [max(member.getCdsLengths()) for member in self.Members]
+        return [max(member.get_cds_lengths()) for member in self.Members]
 
 
 class SyntenicRegion(LazyRecord):
@@ -197,7 +197,7 @@ class SyntenicRegion(LazyRecord):
                                                  ensembl_coord=True)
             relative_start = aln_loc[0]
             relative_end = aln_loc[1]
-            # new location with correct length
+            # new location with correct length ensembl_start
             loc = block_loc.copy()
             loc.end = loc.start + (relative_end - relative_start)
 
@@ -219,7 +219,7 @@ class SyntenicRegion(LazyRecord):
             self._cached['AlignedSeq'] = None
             return
         if feature_types:
-            seq = region.getAnnotatedSeq(feature_types, where_feature)
+            seq = region.get_annotated_seq(feature_types, where_feature)
         else:
             seq = region.Seq
 
@@ -234,7 +234,7 @@ class SyntenicRegion(LazyRecord):
 
     AlignedSeq = property(_get_aligned_seq)
 
-    def getAnnotatedAligned(self, feature_types, where_feature=None):
+    def get_annotated_aligned(self, feature_types, where_feature=None):
         """returns aligned seq annotated for the specified feature types"""
         region = self._get_cached_value('Region', self._make_map_func)
         if region is None:
@@ -323,7 +323,7 @@ class SyntenicRegions(_RelatedRegions):
 
         for member in self.Members:
             if feature_types:
-                seq = member.getAnnotatedAligned(feature_types, where_feature)
+                seq = member.get_annotated_aligned(feature_types, where_feature)
             else:
                 seq = member.AlignedSeq
             if seq is None:

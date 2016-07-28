@@ -140,7 +140,7 @@ class _Region(LazyRecord):
             data = None
         return data
 
-    def getAnnotatedSeq(self, feature_types=None, where_feature=None):
+    def get_annotated_seq(self, feature_types=None, where_feature=None):
         regions = list(self.get_features(feature_types=feature_types,
                                         where_feature=where_feature))
         # seq_map is on the + strand, regardless the actual strand of sequence
@@ -158,7 +158,7 @@ class _Region(LazyRecord):
             self.Seq.add_annotation(Feature, data[0], data[1], feature_map)
 
             if region.Type == 'gene':  # TODO: SHOULD be much simplified
-                sub_data = region.subFeatureData(seq_map)
+                sub_data = region.sub_feature_data(seq_map)
                 for feature_type, feature_name, feature_map in sub_data:
                     if self.location.strand == -1:
                         # again, change feature map to -1 strand sequence if
@@ -252,7 +252,7 @@ class _StableRegion(GenericRegion):
 
     StableId = property(_get_stable_id)
 
-    def getMember(self, StableId, member_types=None):
+    def get_member(self, StableId, member_types=None):
         """returns the associated member with matching StableId or None if not
         found.
 
@@ -415,9 +415,9 @@ class Gene(_StableRegion):
 
     Transcripts = property(_get_transcripts)
 
-    def subFeatureData(self, parent_map):
+    def sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. These can be
-        automatically applied to the Seq by the getAnnotatedSeq method.
+        automatically applied to the Seq by the get_annotated_seq method.
         Returns None if self lies outside parent's span.
         """
         features = []
@@ -425,22 +425,22 @@ class Gene(_StableRegion):
             transcript_data = transcript.feature_data(parent_map)
             if transcript_data:
                 features.append(transcript_data)
-                data = transcript.subFeatureData(parent_map)
+                data = transcript.sub_feature_data(parent_map)
                 features.extend(data)
         return features
 
-    def getCdsLengths(self):
+    def get_cds_lengths(self):
         """returns the Cds lengths from transcripts with the same biotype.
         returns None if no transcripts."""
         if self.Transcripts is self.NULL_VALUE:
             return None
-        l = [ts.getCdsLength() for ts in self.Transcripts
+        l = [ts.get_cds_length() for ts in self.Transcripts
              if ts.BioType == self.BioType]
         return l
 
-    def getLongestCdsTranscript(self):
+    def get_longest_cds_transcript(self):
         """returns the Transcript with the longest Cds and the same biotype"""
-        result = sorted([(ts.getCdsLength(), ts) for ts in self.Transcripts
+        result = sorted([(ts.get_cds_length(), ts) for ts in self.Transcripts
                          if ts.BioType == self.BioType])
 
         if result:  # last result is longest
@@ -719,15 +719,15 @@ class Transcript(_StableRegion):
                 continue
             full_seq += exon.Seq
 
-        # check first exon PhaseStart is 0 and last exon PhaseEnd
-        if exons[0].PhaseStart > 0:
+        # check first exon phase_start is 0 and last exon phase_end
+        if exons[0].phase_start > 0:
             fill = DNA.make_sequence(
-                'N' * exons[0].PhaseStart, name=full_seq.name)
+                'N' * exons[0].phase_start, name=full_seq.name)
             full_seq = fill + full_seq
 
-        if exons[-1].PhaseEnd > 0:
+        if exons[-1].phase_end > 0:
             fill = DNA.make_sequence(
-                'N' * exons[-1].PhaseEnd, name=full_seq.name)
+                'N' * exons[-1].phase_end, name=full_seq.name)
             full_seq += fill
 
         self._cached['Cds'] = full_seq
@@ -737,7 +737,7 @@ class Transcript(_StableRegion):
 
     Cds = property(_get_cds)
 
-    def getCdsLength(self):
+    def get_cds_length(self):
         """returns the length of the Cds. If this property is not available,
         returns None."""
         if self.Cds is self.NULL_VALUE:
@@ -841,9 +841,9 @@ class Transcript(_StableRegion):
             features.append(("3'UTR", str(self.StableId), utr3_map))
         return features
 
-    def subFeatureData(self, parent_map):
+    def sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. This can be automatically
-        applied to the Seq by the getAnnotatedSeq method. Returns None if
+        applied to the Seq by the get_annotated_seq method. Returns None if
         self lies outside parent's span.
         """
         features = self._get_exon_feature_data(parent_map)
@@ -920,18 +920,18 @@ class Exon(_StableRegion):
             self._get_exon_record()
 
         exon = self._table_rows['exon']
-        self._cached['PhaseStart'] = exon['phase']
-        self._cached['PhaseEnd'] = exon['end_phase']
+        self._cached['phase_start'] = exon['phase']
+        self._cached['phase_end'] = exon['end_phase']
 
     @property
-    def PhaseStart(self):
+    def phase_start(self):
         """reading frame start for this exon"""
-        return self._get_cached_value('PhaseStart', self._make_phase)
+        return self._get_cached_value('phase_start', self._make_phase)
 
     @property
-    def PhaseEnd(self):
+    def phase_end(self):
         """reading frame end for this exon"""
-        return self._get_cached_value('PhaseEnd', self._make_phase)
+        return self._get_cached_value('phase_end', self._make_phase)
 
 
 class Intron(GenericRegion):

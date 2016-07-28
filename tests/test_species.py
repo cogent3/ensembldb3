@@ -17,35 +17,35 @@ class TestSpeciesNamemaps(TestCase):
     def test_get_name_type(self):
         """should return the (latin|common) name given a latin, common or ensembl
         db prefix names"""
-        self.assertEqual(Species.getSpeciesName("human"), "Homo sapiens")
-        self.assertEqual(Species.getSpeciesName(
+        self.assertEqual(Species.get_species_name("human"), "Homo sapiens")
+        self.assertEqual(Species.get_species_name(
             "homo_sapiens"), "Homo sapiens")
-        self.assertEqual(Species.getCommonName("Mus musculus"), "Mouse")
-        self.assertEqual(Species.getCommonName("mus_musculus"), "Mouse")
+        self.assertEqual(Species.get_common_name("Mus musculus"), "Mouse")
+        self.assertEqual(Species.get_common_name("mus_musculus"), "Mouse")
 
     def test_get_ensembl_format(self):
         """should take common or latin names and return the corresponding
         ensembl db prefix"""
-        self.assertEqual(Species.getEnsemblDbPrefix("human"), "homo_sapiens")
-        self.assertEqual(Species.getEnsemblDbPrefix("mouse"), "mus_musculus")
-        self.assertEqual(Species.getEnsemblDbPrefix("Mus musculus"),
+        self.assertEqual(Species.get_ensembl_db_prefix("human"), "homo_sapiens")
+        self.assertEqual(Species.get_ensembl_db_prefix("mouse"), "mus_musculus")
+        self.assertEqual(Species.get_ensembl_db_prefix("Mus musculus"),
                          "mus_musculus")
 
     def test_add_new_species(self):
         """should correctly add a new species/common combination and infer the
         correct ensembl prefix"""
         species_name, common_name = "Otolemur garnettii", "Bushbaby"
-        Species.amendSpecies(species_name, common_name)
-        self.assertEqual(Species.getSpeciesName(species_name), species_name)
-        self.assertEqual(Species.getSpeciesName("Bushbaby"), species_name)
-        self.assertEqual(Species.getSpeciesName(common_name), species_name)
-        self.assertEqual(Species.getCommonName(species_name), common_name)
-        self.assertEqual(Species.getCommonName("Bushbaby"), common_name)
-        self.assertEqual(Species.getEnsemblDbPrefix(
+        Species.amend_species(species_name, common_name)
+        self.assertEqual(Species.get_species_name(species_name), species_name)
+        self.assertEqual(Species.get_species_name("Bushbaby"), species_name)
+        self.assertEqual(Species.get_species_name(common_name), species_name)
+        self.assertEqual(Species.get_common_name(species_name), common_name)
+        self.assertEqual(Species.get_common_name("Bushbaby"), common_name)
+        self.assertEqual(Species.get_ensembl_db_prefix(
             "Bushbaby"), "otolemur_garnettii")
-        self.assertEqual(Species.getEnsemblDbPrefix(
+        self.assertEqual(Species.get_ensembl_db_prefix(
             species_name), "otolemur_garnettii")
-        self.assertEqual(Species.getEnsemblDbPrefix(
+        self.assertEqual(Species.get_ensembl_db_prefix(
             common_name), "otolemur_garnettii")
 
     def test_amend_existing(self):
@@ -54,23 +54,23 @@ class TestSpeciesNamemaps(TestCase):
         common_name1 = 'american pika'
         common_name2 = 'pika'
         ensembl_pref = 'ochotona_princeps'
-        Species.amendSpecies(species_name, common_name1)
-        self.assertEqual(Species.getCommonName(species_name), common_name1)
-        Species.amendSpecies(species_name, common_name2)
-        self.assertEqual(Species.getSpeciesName(common_name2), species_name)
-        self.assertEqual(Species.getSpeciesName(ensembl_pref), species_name)
-        self.assertEqual(Species.getCommonName(species_name), common_name2)
-        self.assertEqual(Species.getCommonName(ensembl_pref), common_name2)
-        self.assertEqual(Species.getEnsemblDbPrefix(species_name),
+        Species.amend_species(species_name, common_name1)
+        self.assertEqual(Species.get_common_name(species_name), common_name1)
+        Species.amend_species(species_name, common_name2)
+        self.assertEqual(Species.get_species_name(common_name2), species_name)
+        self.assertEqual(Species.get_species_name(ensembl_pref), species_name)
+        self.assertEqual(Species.get_common_name(species_name), common_name2)
+        self.assertEqual(Species.get_common_name(ensembl_pref), common_name2)
+        self.assertEqual(Species.get_ensembl_db_prefix(species_name),
                          ensembl_pref)
-        self.assertEqual(Species.getEnsemblDbPrefix(common_name2),
+        self.assertEqual(Species.get_ensembl_db_prefix(common_name2),
                          ensembl_pref)
 
     def test_get_compara_name(self):
         """should correctly form valid names for assignment onto objects"""
-        self.assertEqual(Species.getComparaName('pika'), 'Pika')
-        self.assertEqual(Species.getComparaName('C.elegans'), 'Celegans')
-        self.assertEqual(Species.getComparaName('Caenorhabditis elegans'),
+        self.assertEqual(Species.get_compara_name('pika'), 'Pika')
+        self.assertEqual(Species.get_compara_name('C.elegans'), 'Celegans')
+        self.assertEqual(Species.get_compara_name('Caenorhabditis elegans'),
                          'Celegans')
 
 

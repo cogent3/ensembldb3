@@ -114,12 +114,12 @@ class Coordinate(object):
         # ensembl counting starts from 1
         return self.start + 1
 
-    EnsemblStart = property(_get_ensembl_start)
+    ensembl_start = property(_get_ensembl_start)
 
     def _get_ensembl_end(self):
         return self.end
 
-    EnsemblEnd = property(_get_ensembl_end)
+    ensembl_end = property(_get_ensembl_end)
 
     def __str__(self):
         return '%s:%s:%s:%d-%d:%d' % (self.Species, self.CoordType,
@@ -127,7 +127,7 @@ class Coordinate(object):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        name = _Species.getCommonName(self.Species)
+        name = _Species.get_common_name(self.Species)
         coord_type = self.CoordType
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
                                        self.coord_name, self.start, self.end, self.strand)
@@ -176,7 +176,7 @@ class Coordinate(object):
             raise ValueError
         return new
 
-    def makeRelativeTo(self, other, make_relative=True):
+    def make_relative_to(self, other, make_relative=True):
         """returns a new coordinate with attributes adopted from other, and
         positioned relative to other."""
 
@@ -272,7 +272,7 @@ class CoordSystemCache(object):
         # (see MySQL table) as is this shouldn't be a __call__, see line 168
         # for reason why we should have a method to set data: setSpeciesCoord
         # call then then just returns the coords for the named species
-        species = _Species.getSpeciesName(species or core_db.db_name.Species)
+        species = _Species.get_species_name(species or core_db.db_name.Species)
         self._set_species_system(core_db, species)
         if seq_level:
             result = self._get_seq_level_system(species)
@@ -315,8 +315,8 @@ def _rank_checking(query_coord_type, target_coord_type, core_db, species):
 def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
                            target_prefix, target_coord_type):
     # TODO better function name
-    start = query_coord.EnsemblStart
-    end = query_coord.EnsemblEnd
+    start = query_coord.ensembl_start
+    end = query_coord.ensembl_end
     strand = query_coord.strand
 
     ori = assembly_row['ori']
@@ -397,8 +397,8 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
                                                                seq_region.c.coord_system_id == target_coord_system_id,
                                                                assembly.c['%s_seq_region_id' % query_prefix] ==
                                                                query_location.seq_region_id))
-    query = location_query(assembly, query_location.EnsemblStart,
-                           query_location.EnsemblEnd,
+    query = location_query(assembly, query_location.ensembl_start,
+                           query_location.ensembl_end,
                            start_col="%s_start" % query_prefix,
                            end_col="%s_end" % query_prefix, query=query,
                            where=where)

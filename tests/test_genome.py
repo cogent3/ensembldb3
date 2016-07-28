@@ -100,7 +100,7 @@ class TestGenome(GenomeTestBase):
         """a region should return a sequence with the correct annotation"""
         new_loc = self.brca2.location.resized(-100, 100)
         region = self.human.get_region(region=new_loc)
-        annot_seq = region.getAnnotatedSeq(feature_types='gene')
+        annot_seq = region.get_annotated_seq(feature_types='gene')
         gene_annots = annot_seq.get_annotations_matching('gene')
         self.assertEqual(gene_annots[0].name, self.brca2.Symbol)
 
@@ -163,8 +163,8 @@ class TestGene(GenomeTestBase):
                          'ENST00000380152')
         # note length can change between genome builds
         self.assertGreaterThan(len(brca2), 83700)
-        transcript = brca2.getMember('ENST00000544455')
-        self.assertEqual(transcript.getCdsLength(), len(transcript.Cds))
+        transcript = brca2.get_member('ENST00000544455')
+        self.assertEqual(transcript.get_cds_length(), len(transcript.Cds))
 
     def test_get_genes_by_stable_id(self):
         """if get gene by stable_id, attributes should be correctly
@@ -173,7 +173,7 @@ class TestGene(GenomeTestBase):
 
     def test_get_exons(self):
         """transcript should return correct exons for brca2"""
-        transcript = self.brca2.getMember('ENST00000380152')
+        transcript = self.brca2.get_member('ENST00000380152')
         self.assertEqual(len(transcript.TranslatedExons), 26)
         self.assertEqual(len(transcript.Cds), 3419 * 3)
         self.assertEqual(len(transcript.ProteinSeq), 3418)
@@ -182,7 +182,7 @@ class TestGene(GenomeTestBase):
         """should correctly translate a gene with 2 exons but 1st exon
         transcribed"""
         gene = self.mouse.get_gene_by_stableid(StableId='ENSMUSG00000036136')
-        transcript = gene.getMember('ENSMUST00000041133')
+        transcript = gene.get_member('ENSMUST00000041133')
         self.assertTrue(len(transcript.ProteinSeq) > 0)
         # now one on the - strand
         gene = self.mouse.get_gene_by_stableid(StableId='ENSMUSG00000045912')
@@ -196,13 +196,13 @@ class TestGene(GenomeTestBase):
         # infer the CDS boundaries for according to Ensembl, but the CDS
         # length is not divisible by 3.
         gene = self.macaq.get_gene_by_stableid(StableId='ENSMMUG00000001551')
-        transcript = gene.getMember('ENSMMUT00000002194')
+        transcript = gene.get_member('ENSMMUT00000002194')
         # the following works because we enforce the length being divisble by 3
         # in producing ProteinSeq
         prot_seq = transcript.ProteinSeq
         # BUT if you work off the Cds you will need to slice the CDS to be
         # divisible by 3 to get the same protein sequence
-        l = transcript.getCdsLength()
+        l = transcript.get_cds_length()
         trunc_cds = transcript.Cds[: l - (l % 3)]
         prot_seq = trunc_cds.get_translation()
         self.assertEqual(str(prot_seq),
@@ -215,9 +215,9 @@ class TestGene(GenomeTestBase):
         gene = self.human.get_gene_by_stableid(StableId=stable_id)
         exon1 = gene.Transcripts[1].Exons[0]
         # first two bases of codon missing
-        self.assertEqual(exon1.PhaseStart, 2)
+        self.assertEqual(exon1.phase_start, 2)
         # last two bases of codon missing
-        self.assertEqual(exon1.PhaseEnd, 1)
+        self.assertEqual(exon1.phase_end, 1)
         # can translate the sequence if we take those into account
         seq = exon1.Seq[1:-1].get_translation()
         self.assertEqual(str(seq), 'HMLSKVGMWDFDIFLFDRLTN')
@@ -243,7 +243,7 @@ class TestGene(GenomeTestBase):
         self.assertTrue(len(gene.Transcripts) > 1)
         # .. and correctly construct the Cds and location
         for transcript in gene.Transcripts:
-            self.assertTrue(transcript.getCdsLength() > 0)
+            self.assertTrue(transcript.get_cds_length() > 0)
             self.assertEqual(transcript.location.coord_name, '17')
 
     def test_get_longest_cds_transcript2(self):
@@ -252,25 +252,25 @@ class TestGene(GenomeTestBase):
         for stable_id, max_cds_length in [('ENSG00000123552', 2445),
                                           ('ENSG00000206629', 164)]:
             gene = self.human.get_gene_by_stableid(StableId=stable_id)
-            ts = gene.getLongestCdsTranscript()
+            ts = gene.get_longest_cds_transcript()
             self.assertEqual(len(ts.Cds), max_cds_length)
-            self.assertEqual(ts.getCdsLength(), max(gene.getCdsLengths()))
+            self.assertEqual(ts.get_cds_length(), max(gene.get_cds_lengths()))
 
     def test_get_longest_cds_transcript1(self):
         """should correctly return transcript with longest cds"""
         stable_id = 'ENSG00000178591'
         gene = self.human.get_gene_by_stableid(StableId=stable_id)
-        ts = gene.getLongestCdsTranscript()
-        self.assertEqual(ts.getCdsLength(), max(gene.getCdsLengths()))
+        ts = gene.get_longest_cds_transcript()
+        self.assertEqual(ts.get_cds_length(), max(gene.get_cds_lengths()))
 
     def test_rna_transcript_cds(self):
         """should return a Cds for an RNA gene too"""
         rna_gene = self.human.get_gene_by_stableid(StableId='ENSG00000210049')
-        self.assertTrue(rna_gene.Transcripts[0].getCdsLength() > 0)
+        self.assertTrue(rna_gene.Transcripts[0].get_cds_length() > 0)
 
     def test_gene_annotation(self):
         """should correctly annotated a sequence"""
-        annot_seq = self.brca2.getAnnotatedSeq(feature_types='gene')
+        annot_seq = self.brca2.get_annotated_seq(feature_types='gene')
         gene_annots = annot_seq.get_annotations_matching('gene')
         self.assertEqual(gene_annots[0].name, self.brca2.Symbol)
 
@@ -300,11 +300,11 @@ class TestGene(GenomeTestBase):
 
     def test_get_member(self):
         """should return correct exon and translated exon"""
-        transcript = self.brca2.getMember('ENST00000380152')
+        transcript = self.brca2.get_member('ENST00000380152')
         # just returns the first
         exon_id = 'ENSE00001484009'
-        exon = transcript.getMember(exon_id)
-        trans_exon = transcript.getMember(exon_id, 'TranslatedExons')
+        exon = transcript.get_member(exon_id)
+        trans_exon = transcript.get_member(exon_id, 'TranslatedExons')
         self.assertEqual(exon.StableId, exon_id)
         self.assertEqual(trans_exon.StableId, exon_id)
         # we check we got Exon in the first call and TranslatedExon in the
@@ -354,7 +354,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.CanonicalTranscript.StableId,
                          transcript.StableId)
         self.assertEqual(
-            brca2.CanonicalTranscript.getCdsLength(), len(transcript.Cds))
+            brca2.CanonicalTranscript.get_cds_length(), len(transcript.Cds))
         self.assertEqual(str(brca2.CanonicalTranscript.Cds),
                          str(transcript.Cds))
         self.assertEqual(str(brca2.CanonicalTranscript.Cds),
@@ -430,7 +430,7 @@ class TestGene(GenomeTestBase):
                 ('IL2', 'ENST00000226730', 1, 'gtaagtatat', 'actttcttag'),
                 ('IL13', 'ENST00000304506', 3, 'gtaaggcatc', 'tgtcctgcag')]:
             gene = asserted_one(self.human.get_genes_matching(Symbol=symbol))
-            seq = gene.getAnnotatedSeq(feature_types='gene')
+            seq = gene.get_annotated_seq(feature_types='gene')
             intron = asserted_one(seq.get_annotations_matching('intron',
                                                              '%s-%d' % (stable_id, rank)))
             intron_seq = str(seq.get_region_covering_all(intron).get_slice())
@@ -619,7 +619,7 @@ class TestFeatures(GenomeTestBase):
                                  strand='+')
         for region in [mouse, rat]:
             features = region.get_features(feature_types=['gene'])
-            ann_seq = region.getAnnotatedSeq(feature_types='gene')
+            ann_seq = region.get_annotated_seq(feature_types='gene')
             genes = ann_seq.get_annotations_matching('gene')
             self.assertTrue(genes != [])
 
@@ -649,8 +649,8 @@ class TestFeatures(GenomeTestBase):
         minus.strand *= -1
         minus = self.human.get_region(region=minus)
         # get Sequence
-        plus_seq = plus.getAnnotatedSeq(feature_types='gene')
-        minus_seq = minus.getAnnotatedSeq(feature_types='gene')
+        plus_seq = plus.get_annotated_seq(feature_types='gene')
+        minus_seq = minus.get_annotated_seq(feature_types='gene')
         # the seqs should be the rc of each other
         self.assertEqual(str(plus_seq), str(minus_seq.rc()))
         # the Cds, however, from the annotated sequences should be identical
@@ -669,13 +669,13 @@ class TestFeatures(GenomeTestBase):
         ps_feat = human.get_region(strand=1, **coord)
         ms_feat = human.get_region(strand=-1, **coord)
 
-        ps_seq = ps_feat.getAnnotatedSeq(feature_types='CpG')
+        ps_seq = ps_feat.get_annotated_seq(feature_types='CpG')
         ps_cgi = ps_seq.get_annotations_matching('CpGisland')[0]
 
         self.assertEqual(ps_feat.Seq, ms_feat.Seq.rc())
 
         self.assertEqual(ps_cgi.get_slice().rc(), exp)
-        ms_seq = ms_feat.getAnnotatedSeq(feature_types='CpG')
+        ms_seq = ms_feat.get_annotated_seq(feature_types='CpG')
         ms_cgi = ms_seq.get_annotations_matching('CpGisland')[0]
 
         self.assertEqual(ms_cgi.get_slice(), ps_cgi.get_slice())
@@ -693,8 +693,8 @@ class TestFeatures(GenomeTestBase):
 
         self.assertEqual(ms_repeat.Seq, ps_repeat.Seq.rc())
 
-        ps_annot_seq = ps_repeat.getAnnotatedSeq(feature_types='repeat')
-        ms_annot_seq = ms_repeat.getAnnotatedSeq(feature_types='repeat')
+        ps_annot_seq = ps_repeat.get_annotated_seq(feature_types='repeat')
+        ms_annot_seq = ms_repeat.get_annotated_seq(feature_types='repeat')
         ps_seq = ps_annot_seq.get_annotations_matching('repeat')[0]
         ms_seq = ms_annot_seq.get_annotations_matching('repeat')[0]
         self.assertEqual(ms_seq.get_slice(), ps_seq.get_slice())

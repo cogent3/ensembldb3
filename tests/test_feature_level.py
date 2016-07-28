@@ -6,7 +6,7 @@ from cogent3.util.unit_test import TestCase, main
 from ensembldb.host import HostAccount, get_ensembl_account
 from ensembldb.genome import Genome
 from ensembldb.assembly import CoordSystem, Coordinate, get_coord_conversion
-from ensembldb.feature_level import feature_coord_levels
+from ensembldb.feature_level import FeatureCoordLevels
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -37,7 +37,7 @@ class TestFeatureCoordLevels(TestCase):
                               account=account)
 
     def test_feature_levels(self):
-        ChickenFeatureLevels = feature_coord_levels('chicken')
+        ChickenFeatureLevels = FeatureCoordLevels('chicken')
         chicken_feature_levels = ChickenFeatureLevels(
             feature_types=['gene', 'cpg', 'est'],
             core_db=self.chicken.CoreDb,

@@ -51,7 +51,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
             StableId="FBgn0040286")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
-        collection = Orthologs.getSeqCollection()
+        collection = Orthologs.get_seq_collection()
         self.assertTrue(len(collection.Seqs[0]) > 1000)
 
 

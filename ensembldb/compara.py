@@ -33,7 +33,7 @@ class Compara(object):
         self._account = account
         self._pool_recycle = pool_recycle
         self._compara_db = None
-        sp = sorted([_Species.getSpeciesName(sp) for sp in set(species)])
+        sp = sorted([_Species.get_species_name(sp) for sp in set(species)])
         self.Species = tuple(sp)
         self._genomes = {}
         self._attach_genomes()
@@ -46,7 +46,7 @@ class Compara(object):
 
     def _attach_genomes(self):
         for species in self.Species:
-            attr_name = _Species.getComparaName(species)
+            attr_name = _Species.get_compara_name(species)
             genome = Genome(Species=species, release=self.release,
                             account=self._account)
             self._genomes[species] = genome
@@ -286,7 +286,7 @@ class Compara(object):
         # column renamed between versions
         prefix = coord.genome.Species.lower()
         if int(self.release) > 58:
-            prefix = _Species.getEnsemblDbPrefix(prefix)
+            prefix = _Species.get_ensembl_db_prefix(prefix)
 
         query = sql.select([dnafrag_table.c.dnafrag_id,
                             dnafrag_table.c.coord_system_name],
@@ -310,8 +310,8 @@ class Compara(object):
                                     method_clade_id,
                                     genomic_align_table.c.dnafrag_id == dnafrag_id))
         query = location_query(genomic_align_table,
-                               coord.EnsemblStart,
-                               coord.EnsemblEnd,
+                               coord.ensembl_start,
+                               coord.ensembl_end,
                                start_col='dnafrag_start',
                                end_col='dnafrag_end',
                                query=query)
@@ -363,7 +363,7 @@ class Compara(object):
                                "specified[%s]" % (align_method, align_clade))
 
         if region is None:
-            ref_genome = self._genomes[_Species.getSpeciesName(Species)]
+            ref_genome = self._genomes[_Species.get_species_name(Species)]
             region = ref_genome.make_location(coord_name=coord_name,
                                              start=start, end=end, strand=strand,
                                              ensembl_coord=ensembl_coord)
@@ -399,9 +399,9 @@ class Compara(object):
                         record.name == region.coord_name:
                     # this is the ref species and we adjust the ref_location
                     # for this block
-                    diff_start = record.dnafrag_start - region.EnsemblStart
+                    diff_start = record.dnafrag_start - region.ensembl_start
                     shift_start = [0, diff_start][diff_start > 0]
-                    diff_end = record.dnafrag_end - region.EnsemblEnd
+                    diff_end = record.dnafrag_end - region.ensembl_end
                     shift_end = [diff_end, 0][diff_end > 0]
                     try:
                         ref_location = region.resized(shift_start, shift_end)
