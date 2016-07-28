@@ -41,7 +41,7 @@ class TestDatabase(TestCase):
         tn, tc = 'variation_feature', 'consequence_types'
         expected = set(('3_prime_UTR_variant', 'splice_acceptor_variant',
                         '5_prime_UTR_variant'))
-        got = db.getDistinct(tn, tc)
+        got = db.get_distinct(tn, tc)
         self.assertNotEqual(set(got) & expected, set())
 
         db = Database(account=account, release=release,
@@ -50,11 +50,11 @@ class TestDatabase(TestCase):
         expected = set(['protein_coding', 'pseudogene', 'processed_transcript',
                         'Mt_tRNA', 'Mt_rRNA', 'IG_V_gene', 'IG_J_gene',
                         'IG_C_gene', 'IG_D_gene', 'miRNA', 'misc_RNA', 'snoRNA', 'snRNA', 'rRNA'])
-        got = set(db.getDistinct(tn, tc))
+        got = set(db.get_distinct(tn, tc))
         self.assertNotEqual(set(got) & expected, set())
 
         db = Database(account=account, release=release, db_type='compara')
-        got = set(db.getDistinct('homology', 'description'))
+        got = set(db.get_distinct('homology', 'description'))
         expected = set(['gene_split', 'alt_allele', 'other_paralog',
                         'ortholog_one2many', 'ortholog_one2one',
                         'within_species_paralog', 'ortholog_many2many'])

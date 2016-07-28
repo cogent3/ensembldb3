@@ -211,7 +211,7 @@ There are obviously different types of genes, and the ``Genome`` object provides
 
 .. doctest::
 
-    >>> print human.getDistinct('BioType')
+    >>> print human.get_distinct('BioType')
     [u'unitary_pseudogene', u'rRNA', u'lincRNA'...
 
 The genome can be queried for any of these types, for instance we'll query for ``rRNA``. We'll get the first few records and then exit.
@@ -256,7 +256,7 @@ Getting Variation
 
 .. doctest::
 
-    >>> print human.getDistinct('Effect')
+    >>> print human.get_distinct('Effect')
     ['3_prime_UTR_variant', 'splice_acceptor_variant', 'intergenic_variant'...
 
 and that information can be used to query the genome for all variation of that effect. 
@@ -377,11 +377,11 @@ The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to
     >>> print brca2
     Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast...
 
-We can now use this result to search compara for related genes. We note here that like ``Genome``, ``Compara`` has the ``getDistinct`` method to assist in identifying appropriate search criteria. What are the distinct types of gene relationships recorded in Ensembl, for instance?
+We can now use this result to search compara for related genes. We note here that like ``Genome``, ``Compara`` has the ``get_distinct`` method to assist in identifying appropriate search criteria. What are the distinct types of gene relationships recorded in Ensembl, for instance?
 
 .. doctest::
 
-    >>> relationships = compara.getDistinct('relationship')
+    >>> relationships = compara.get_distinct('relationship')
     >>> print relationships
     [u'gene_split', u'alt_allele', u'ortholog_one2many', u'ortholog_one2one'...
 

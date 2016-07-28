@@ -416,7 +416,7 @@ class Compara(object):
                 " location"
             yield SyntenicRegions(self, members, ref_location=ref_location)
 
-    def getDistinct(self, property_type):
+    def get_distinct(self, property_type):
         """returns the Ensembl data-bases distinct values for the named
         property_type.
 
@@ -430,4 +430,4 @@ class Compara(object):
             raise RuntimeError(
                 "ERROR: Unknown property type: %s" % property_type)
         table_name, column = property_map[property_type]
-        return list(db.getDistinct(table_name, column))
+        return list(db.get_distinct(table_name, column))

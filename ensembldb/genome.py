@@ -628,7 +628,7 @@ class Genome(object):
                              start=start, end=end, strand=strand,
                              Location=region, ensembl_coord=ensembl_coord)
 
-    def getDistinct(self, property_type):
+    def get_distinct(self, property_type):
         """returns the Ensembl data-bases distinct values for the named
         property_type.
 
@@ -653,4 +653,4 @@ class Genome(object):
                 "ERROR: Unknown property type: %s" % property_type)
 
         table_name, column = property_map[property_type]
-        return list(db.getDistinct(table_name, column))
+        return list(db.get_distinct(table_name, column))

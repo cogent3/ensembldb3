@@ -63,7 +63,7 @@ class Database(object):
             self._tables[name] = table
         return table
 
-    def getDistinct(self, table_name, column):
+    def get_distinct(self, table_name, column):
         """returns the Ensembl data-bases distinct values for the named
         property_type.
 

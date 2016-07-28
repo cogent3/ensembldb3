@@ -140,14 +140,14 @@ class TestGenome(GenomeTestBase):
                          'CCTTCAAGGAGAAAGGTGGCTGTCTGATAAGCTGA')
 
     def test_get_distinct_biotype(self):
-        """Genome instance getDistinct for biotype should work on all genomes"""
+        """Genome instance get_distinct for biotype should work on all genomes"""
         for genome in self.gorilla, self.human, self.mouse, self.rat, self.macaq:
-            biotypes = genome.getDistinct('biotype')
+            biotypes = genome.get_distinct('biotype')
 
     def test_get_distinct_effect(self):
-        """Genome instance getDistinct for SNP effect should work on all genomes"""
+        """Genome instance get_distinct for SNP effect should work on all genomes"""
         for genome in self.human, self.mouse, self.rat, self.macaq:
-            biotypes = genome.getDistinct('effect')
+            biotypes = genome.get_distinct('effect')
 
 
 class TestGene(GenomeTestBase):

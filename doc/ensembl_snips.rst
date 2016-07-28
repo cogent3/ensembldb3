@@ -394,7 +394,7 @@ What gene relationships are available
     >>> from ensembldb import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
-    >>> print compara.getDistinct('relationship')
+    >>> print compara.get_distinct('relationship')
     [u'gene_split', u'alt_allele', u'ortholog_one2many', u'ortholog_one2one'...
 
 Get one-to-one orthologs
