@@ -40,7 +40,7 @@ def _assemble_seq(frags, start, end, frag_positions):
 def _make_coord(genome, coord_name, start, end, strand):
     """returns a Coordinate"""
     return Coordinate(CoordName=coord_name, start=start, end=end,
-                      Strand=strand, genome=genome)
+                      strand=strand, genome=genome)
 
 
 def get_lower_coord_conversion(coord, species, core_db):
@@ -72,7 +72,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
     # TODO clean up use of a coord
     genome = coord.genome
     # no matter what strand user provide, we get the + sequence first
-    coord.Strand = 1
+    coord.strand = 1
     species = genome.Species
     coord_type = CoordSystem(species=species, core_db=genome.CoreDb,
                              seq_level=True)
@@ -90,7 +90,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
     dna = genome.CoreDb.getTable('dna')
     seqs, positions = [], []
     for q_loc, t_loc in assemblies:
-        assert q_loc.Strand == 1
+        assert q_loc.strand == 1
         length = len(t_loc)
         # get MySQL to do the string slicing via substr function
         query = sql.select([substr(dna.c.sequence,
@@ -100,7 +100,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
         record = asserted_one(query.execute().fetchall())
         seq = record['sequence']
         seq = DNA.make_sequence(seq)
-        if t_loc.Strand == -1:
+        if t_loc.strand == -1:
             seq = seq.rc()
         seqs.append(str(seq))
         positions.append((q_loc.start, q_loc.end))
@@ -119,7 +119,7 @@ def _get_sequence_from_lower_assembly(coord, DEBUG):
 
     seqs, positions = [], []
     for q_loc, t_loc in assemblies:
-        t_strand = t_loc.Strand
+        t_strand = t_loc.strand
         temp_seq = _get_sequence_from_direct_assembly(t_loc, DEBUG)
         if t_strand == -1:
             temp_seq = temp_seq.rc()
@@ -142,7 +142,7 @@ def get_sequence(coord=None, genome=None, coord_name=None, start=None, end=None,
     else:
         coord = coord.copy()
 
-    strand = coord.Strand
+    strand = coord.strand
 
     try:
         sequence = _get_sequence_from_direct_assembly(coord, DEBUG)

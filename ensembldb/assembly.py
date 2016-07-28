@@ -70,7 +70,7 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
 
 class Coordinate(object):
 
-    def __init__(self, genome, CoordName, start, end, Strand=1,
+    def __init__(self, genome, CoordName, start, end, strand=1,
                  CoordType=None, seq_region_id=None, ensembl_coord=False):
         if not CoordType or not (seq_region_id or start or end):
             seq_region_data, CoordType = \
@@ -91,13 +91,13 @@ class Coordinate(object):
             end += 1
 
         if start > end:
-            assert Strand == -1,\
+            assert strand == -1,\
                 "strand incorrect for start[%s] > end[%s]" % (start, end)
             start, end = end, start
 
         self.start = start
         self.end = end
-        self.Strand = convert_strand(Strand)
+        self.strand = convert_strand(strand)
         self.seq_region_id = seq_region_id
         self.genome = genome
 
@@ -123,14 +123,14 @@ class Coordinate(object):
 
     def __str__(self):
         return '%s:%s:%s:%d-%d:%d' % (self.Species, self.CoordType,
-                                      self.CoordName, self.start, self.end, self.Strand)
+                                      self.CoordName, self.start, self.end, self.strand)
 
     def __repr__(self):
         my_type = self.__class__.__name__
         name = _Species.getCommonName(self.Species)
         coord_type = self.CoordType
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
-                                       self.CoordName, self.start, self.end, self.Strand)
+                                       self.CoordName, self.start, self.end, self.strand)
         return c.replace("'", "")
 
     def adopted(self, other, shift=False):
@@ -144,7 +144,7 @@ class Coordinate(object):
             shift = [0, other.start][shift]
         return self.__class__(other.genome, CoordName=other.CoordName,
                               start=self.start + shift, end=self.end + shift,
-                              Strand=other.Strand,
+                              strand=other.strand,
                               seq_region_id=other.seq_region_id)
 
     def shifted(self, value):
@@ -158,7 +158,7 @@ class Coordinate(object):
     def copy(self):
         """returns a copy"""
         return self.__class__(genome=self.genome, CoordName=self.CoordName,
-                              start=self.start, end=self.end, Strand=self.Strand,
+                              start=self.start, end=self.end, strand=self.strand,
                               CoordType=self.CoordType, seq_region_id=self.seq_region_id)
 
     def resized(self, from_start, from_end):
@@ -180,7 +180,7 @@ class Coordinate(object):
         """returns a new coordinate with attributes adopted from other, and
         positioned relative to other."""
 
-        if other.Strand != self.Strand:
+        if other.strand != self.strand:
             start = other.end - self.end
         elif make_relative:
             start = self.start - other.start
@@ -190,7 +190,7 @@ class Coordinate(object):
         end = start + len(self)
 
         return self.__class__(other.genome, CoordName=other.CoordName,
-                              start=start, end=end, Strand=other.Strand,
+                              start=start, end=end, strand=other.strand,
                               seq_region_id=other.seq_region_id)
 
 
@@ -317,7 +317,7 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
     # TODO better function name
     start = query_coord.EnsemblStart
     end = query_coord.EnsemblEnd
-    strand = query_coord.Strand
+    strand = query_coord.strand
 
     ori = assembly_row['ori']
     q_strand, t_strand = strand, strand * ori
@@ -342,12 +342,12 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
     t_end = int(assembly_row['%s_end' % target_prefix]) - d_end
 
     q_location = Coordinate(CoordName=query_coord.CoordName, start=q_start,
-                            end=q_end, Strand=q_strand,
+                            end=q_end, strand=q_strand,
                             CoordType=query_coord.CoordType,
                             seq_region_id=q_seq_region_id,
                             genome=query_coord.genome, ensembl_coord=True)
     t_location = Coordinate(CoordName=assembly_row['name'], start=t_start,
-                            end=t_end, Strand=t_strand, CoordType=target_coord_type,
+                            end=t_end, strand=t_strand, CoordType=target_coord_type,
                             seq_region_id=t_seq_region_id,
                             genome=query_coord.genome,
                             ensembl_coord=True)

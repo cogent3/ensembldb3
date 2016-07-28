@@ -155,13 +155,13 @@ class SyntenicRegion(LazyRecord):
         block_loc = self.genome.makeLocation(CoordName=ref_record['name'],
                                              start=record_start,
                                              end=record_end,
-                                             Strand=record_strand,
+                                             strand=record_strand,
                                              ensembl_coord=True)
 
         ref_location = self.parent.ref_location
         relative_start = ref_location.start - block_loc.start
         relative_end = relative_start + len(ref_location)
-        if block_loc.Strand != 1:
+        if block_loc.strand != 1:
             relative_start = len(block_loc) - relative_end
             relative_end = relative_start + len(ref_location)
 
@@ -171,7 +171,7 @@ class SyntenicRegion(LazyRecord):
         self.aln_map = aln_map
         self.aln_loc = aln_loc
         region_loc = ref_location.copy()
-        region_loc.Strand = block_loc.Strand
+        region_loc.strand = block_loc.strand
         region = self.genome.getRegion(region=region_loc)
         self._cached['Region'] = region
 
@@ -192,7 +192,7 @@ class SyntenicRegion(LazyRecord):
             block_loc = self.genome.makeLocation(CoordName=record['name'],
                                                  start=record['dnafrag_start'],
                                                  end=record['dnafrag_end'],
-                                                 Strand=record[
+                                                 strand=record[
                                                      'dnafrag_strand'],
                                                  ensembl_coord=True)
             relative_start = aln_loc[0]
@@ -201,7 +201,7 @@ class SyntenicRegion(LazyRecord):
             loc = block_loc.copy()
             loc.end = loc.start + (relative_end - relative_start)
 
-            if block_loc.Strand != 1:
+            if block_loc.strand != 1:
                 shift = len(block_loc) - relative_end
             else:
                 shift = relative_start
@@ -293,8 +293,8 @@ class SyntenicRegions(_RelatedRegions):
         if self._do_rc is not None:
             return self._do_rc
         self._populate_ref()
-        inferred = self.ref_member._cached['Region'].Location.Strand
-        self._do_rc = self.ref_location.Strand != inferred
+        inferred = self.ref_member._cached['Region'].Location.strand
+        self._do_rc = self.ref_location.strand != inferred
         return self._do_rc
 
     _rc = property(fget=_get_rc_state)
@@ -332,7 +332,7 @@ class SyntenicRegions(_RelatedRegions):
 
             if self._rc:  # names should reflect change to strand
                 loc = member.Location.copy()
-                loc.Strand *= -1
+                loc.strand *= -1
                 name = str(loc)
 
             annotations[name] = seq.data.annotations

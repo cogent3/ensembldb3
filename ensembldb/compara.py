@@ -271,7 +271,7 @@ class Compara(object):
             gene = list(genome.getGenesMatching(StableId=StableId))
             assert len(gene) == 1, "Error in selecting genes: %s" % gene
             gene = gene[0]
-            gene.Location.Strand = record[frag_strand]
+            gene.Location.strand = record[frag_strand]
             data += [gene]
 
         if not data:
@@ -334,13 +334,13 @@ class Compara(object):
         return query.execute().fetchall()
 
     def getSyntenicRegions(self, Species=None, CoordName=None, start=None,
-                           end=None, Strand=1, ensembl_coord=False, region=None,
+                           end=None, strand=1, ensembl_coord=False, region=None,
                            align_method=None, align_clade=None, method_clade_id=None):
         """returns a SyntenicRegions instance
 
         Arguments:
             - Species: the species name
-            - CoordName, start, end, Strand: the coordinates for the region
+            - CoordName, start, end, strand: the coordinates for the region
             - ensembl_coord: whether the coordinates are in Ensembl form
             - region: a region instance or a location, in which case the
               CoordName etc .. arguments are ignored
@@ -365,7 +365,7 @@ class Compara(object):
         if region is None:
             ref_genome = self._genomes[_Species.getSpeciesName(Species)]
             region = ref_genome.makeLocation(CoordName=CoordName,
-                                             start=start, end=end, Strand=Strand,
+                                             start=start, end=end, strand=strand,
                                              ensembl_coord=ensembl_coord)
         elif hasattr(region, 'Location'):
             region = region.Location
@@ -376,7 +376,7 @@ class Compara(object):
             # recreate region from our instance
             region = ref_genome.makeLocation(CoordName=region.CoordName,
                                              start=region.start, end=region.end,
-                                             Strand=region.Strand)
+                                             strand=region.strand)
 
         ref_dnafrag_id = self._get_dnafrag_id_for_coord(region)
         blocks = self._get_genomic_align_blocks_for_dna_frag_id(method_clade_id,

@@ -245,11 +245,11 @@ class Genome(object):
 
         return query
 
-    def makeLocation(self, CoordName, start=None, end=None, Strand=1,
+    def makeLocation(self, CoordName, start=None, end=None, strand=1,
                      ensembl_coord=False):
         """returns a location in the genome"""
         return Coordinate(self, CoordName=CoordName, start=start, end=end,
-                          Strand=Strand, ensembl_coord=ensembl_coord)
+                          strand=strand, ensembl_coord=ensembl_coord)
 
     def getGeneByStableId(self, StableId):
         """returns the gene matching StableId, or None if no record found"""
@@ -398,7 +398,7 @@ class Genome(object):
                                start=record['seq_region_start'],
                                end=record['seq_region_end'],
                                seq_region_id=record['seq_region_id'],
-                               Strand=record['seq_region_strand'],
+                               strand=record['seq_region_strand'],
                                ensembl_coord=True)
             if query_coord.CoordName != target_coord.CoordName:
                 coord = asserted_one(get_coord_conversion(
@@ -424,7 +424,7 @@ class Genome(object):
                                start=record['seq_region_start'],
                                end=record['seq_region_end'],
                                seq_region_id=record['seq_region_id'],
-                               Strand=record['seq_region_strand'],
+                               strand=record['seq_region_strand'],
                                ensembl_coord=True)
             if query_coord.CoordName != target_coord.CoordName:
                 coord = asserted_one(get_coord_conversion(
@@ -458,7 +458,7 @@ class Genome(object):
             new = Coordinate(self, CoordName=query_coord.CoordName,
                              start=record['seq_region_start'],
                              end=record['seq_region_end'],
-                             Strand=record['seq_region_strand'],
+                             strand=record['seq_region_strand'],
                              seq_region_id=record['seq_region_id'],
                              ensembl_coord=True)
 
@@ -499,7 +499,7 @@ class Genome(object):
     FeatureCoordLevels = property(_feature_coord_levels)
 
     def getFeatures(self, region=None, feature_types=None, where_feature=None,
-                    CoordName=None, start=None, end=None, Strand=None,
+                    CoordName=None, start=None, end=None, strand=None,
                     ensembl_coord=False):
         """returns Region instances for the specified location"""
         if isinstance(feature_types, str):
@@ -511,7 +511,7 @@ class Genome(object):
             seq_region_id = self._get_seq_region_id(CoordName)
             region = Coordinate(self, CoordName=CoordName, start=start,
                                 end=end,
-                                Strand=convert_strand(Strand),
+                                strand=convert_strand(strand),
                                 seq_region_id=seq_region_id,
                                 ensembl_coord=ensembl_coord)
         elif hasattr(region, 'Location'):
@@ -608,7 +608,7 @@ class Genome(object):
                             data=record)
 
     def getRegion(self, region=None, CoordName=None, start=None, end=None,
-                  Strand=None, ensembl_coord=False):
+                  strand=None, ensembl_coord=False):
         """returns a single generic region for the specified coordinates
         Arguments:
             - region: a genomic region or a Coordinate instance
@@ -618,14 +618,14 @@ class Genome(object):
             seq_region_id = self._get_seq_region_id(CoordName)
             region = Coordinate(self, CoordName=CoordName, start=start,
                                 end=end,
-                                Strand=convert_strand(Strand),
+                                strand=convert_strand(strand),
                                 seq_region_id=seq_region_id,
                                 ensembl_coord=ensembl_coord)
         elif hasattr(region, 'Location'):
             region = region.Location
 
         return GenericRegion(self, self.CoreDb, CoordName=CoordName,
-                             start=start, end=end, Strand=Strand,
+                             start=start, end=end, strand=strand,
                              Location=region, ensembl_coord=ensembl_coord)
 
     def getDistinct(self, property_type):

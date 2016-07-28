@@ -149,7 +149,7 @@ We get the canonical transcripts for *BRCA2*.
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript
-    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315473; end=32400266; length=84793; Strand='+')
+    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315473; end=32400266; length=84793; strand='+')
 
 Get the CDS for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -176,8 +176,8 @@ Look at all transcripts for a gene
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> for transcript in brca2.Transcripts:
     ...     print transcript
-    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315473; end=32400266; length=84793; Strand='+')
-    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315504; end=32333291; length=17787; Strand='+')...
+    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315473; end=32400266; length=84793; strand='+')
+    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315504; end=32333291; length=17787; strand='+')...
 
 Get the first exon for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -221,7 +221,7 @@ Inspect the genomic coordinate for a feature
     13
     >>> print brca2.Location.start
     32315473
-    >>> print brca2.Location.Strand
+    >>> print brca2.Location.strand
     1
 
 Get repeat elements in a genomic interval
@@ -239,7 +239,7 @@ We query the genome for repeats within a specific coordinate range on chromosome
     ...     print repeat
     ...     break
     SINE/Alu
-    Repeat(CoordName='13'; start=32305225; end=32305525; length=300; Strand='-', Score=2770.0)
+    Repeat(CoordName='13'; start=32305225; end=32305525; length=300; strand='-', Score=2770.0)
 
 Get CpG island elements in a genomic interval
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -254,7 +254,7 @@ We query the genome for CpG islands within a specific coordinate range on chromo
     >>> for island in islands:
     ...     print island
     ...     break
-    CpGisland(CoordName='11'; start=2137721; end=2141254; length=3533; Strand='-', Score=3254.0)
+    CpGisland(CoordName='11'; start=2137721; end=2141254; length=3533; strand='-', Score=3254.0)
 
 Get SNPs
 --------
@@ -361,7 +361,7 @@ alignment method in the vertebrates clade:
     >>> chrom, start, end, strand = "X", 155754928, 155755079, "-"
     >>> regions = compara.getSyntenicRegions(Species="mouse", CoordName=chrom, 
     ...                                      start=start, end=end, align_method="PECAN", 
-    ...                                      align_clade=clade, Strand=strand)     
+    ...                                      align_clade=clade, strand=strand)     
     >>> aligned_pairs = [r for r in regions]
     >>> alignment = aligned_pairs[0]                                                            
     >>> aligned_regions = [m for m in alignment.Members
