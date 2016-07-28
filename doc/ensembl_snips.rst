@@ -93,7 +93,7 @@ We query for the *BRCA2* gene for humans.
     >>> human = Genome('human', release=76, account=account)
     >>> print human
     Genome(Species='Homo sapiens'; release='76')
-    >>> genes = human.getGenesMatching(Symbol='BRCA2')
+    >>> genes = human.get_genes_matching(Symbol='BRCA2')
     >>> for gene in genes:
     ...     if gene.Symbol == 'BRCA2':
     ...         print gene
@@ -122,7 +122,7 @@ We look for breast cancer related genes that are estrogen induced.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> genes = human.getGenesMatching(Description='breast cancer anti-estrogen')
+    >>> genes = human.get_genes_matching(Description='breast cancer anti-estrogen')
     >>> for gene in genes:
     ...     print gene
     Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; Symbol='BCAR4')...
@@ -131,7 +131,7 @@ We can also require that an exact (case insensitive) match to the word(s) occurs
 
 .. doctest::
     
-    >>> genes = human.getGenesMatching(Description='breast cancer anti-estrogen',
+    >>> genes = human.get_genes_matching(Description='breast cancer anti-estrogen',
     ...                                  like=False)
     >>> for gene in genes:
     ...     print gene
@@ -447,7 +447,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     >>> latin_names = set([Species.getSpeciesName(n) for n in common_names])
     >>> latin_to_common = dict(zip(latin_names, common_names))
     >>> compara = Compara(common_names, release=76, account=account)
-    >>> for gene in compara.Human.getGenesMatching(BioType='protein_coding'):
+    >>> for gene in compara.Human.get_genes_matching(BioType='protein_coding'):
     ...     orthologs = compara.get_related_genes(gene,
     ...                                  Relationship='ortholog_one2one')
     ...     # make sure all species represented

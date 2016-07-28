@@ -277,7 +277,7 @@ class TestGene(GenomeTestBase):
     def test_get_by_symbol(self):
         """selecting a gene by it's HGNC symbol should correctly populate all
         specified attributes"""
-        results = self.human.getGenesMatching(Symbol="BRCA2")
+        results = self.human.get_genes_matching(Symbol="BRCA2")
         found = False
         for gene in results:
             if gene.StableId == 'ENSG00000139618':
@@ -288,14 +288,14 @@ class TestGene(GenomeTestBase):
     def test_get_by_symbol_synonym(self):
         """return correct gene if provide a synonymn, rather than symbol"""
         synonym = 'FOXO1A'
-        gene = list(self.human.getGenesMatching(Symbol=synonym))[0]
+        gene = list(self.human.get_genes_matching(Symbol=synonym))[0]
         self.assertEqual(gene.Symbol, 'FOXO1')
 
     def test_get_by_description(self):
         """if get by description, all attributes should be correctly
         constructed"""
         description = 'breast cancer 2'
-        results = list(self.human.getGenesMatching(Description=description))
+        results = list(self.human.get_genes_matching(Description=description))
         self._eval_brca2(results[0])
 
     def test_get_member(self):
@@ -313,13 +313,13 @@ class TestGene(GenomeTestBase):
         self.assertGreaterThan(len(exon), len(trans_exon))
 
     def test_get_by_biotype(self):
-        results = list(self.human.getGenesMatching(
+        results = list(self.human.get_genes_matching(
             BioType='Mt_tRNA', like=False))
         self.assertEqual(len(results), 22)
 
     def test_get_by_decsr_biotype(self):
         """combining the description and biotype should return a result"""
-        results = list(self.human.getGenesMatching(BioType="protein_coding",
+        results = list(self.human.get_genes_matching(BioType="protein_coding",
                                                    Description="cancer"))
         self.assertTrue(len(results) > 50)
 
@@ -377,7 +377,7 @@ class TestGene(GenomeTestBase):
             ('ENSG00000227268', 'ENST00000445946', 0),
             ('ENSG00000132199', 'ENST00000583771', 5),
             ('ENSG00000132199', 'ENST00000340116', 14)]:
-            gene = asserted_one(self.human.getGenesMatching(StableId=gene_id))
+            gene = asserted_one(self.human.get_genes_matching(StableId=gene_id))
             transcript = asserted_one(
                 [t for t in gene.Transcripts if t.StableId == transcript_id])
             if exp_number == 0:
@@ -400,7 +400,7 @@ class TestGene(GenomeTestBase):
         for symbol, stable_id, exp_introns in [
             ('IL2', 'ENST00000226730', IL2_exp_introns),
             ('IL13', 'ENST00000304506', IL13_exp_introns)]:
-            gene = asserted_one(self.human.getGenesMatching(Symbol=symbol))
+            gene = asserted_one(self.human.get_genes_matching(Symbol=symbol))
             strand = gene.Location.strand
             transcript = asserted_one(
                 [t for t in gene.Transcripts if t.StableId == stable_id])
@@ -429,7 +429,7 @@ class TestGene(GenomeTestBase):
         for symbol, stable_id, rank, exp_seq5, exp_seq3 in [
                 ('IL2', 'ENST00000226730', 1, 'gtaagtatat', 'actttcttag'),
                 ('IL13', 'ENST00000304506', 3, 'gtaaggcatc', 'tgtcctgcag')]:
-            gene = asserted_one(self.human.getGenesMatching(Symbol=symbol))
+            gene = asserted_one(self.human.get_genes_matching(Symbol=symbol))
             seq = gene.getAnnotatedSeq(feature_types='gene')
             intron = asserted_one(seq.get_annotations_matching('intron',
                                                              '%s-%d' % (stable_id, rank)))

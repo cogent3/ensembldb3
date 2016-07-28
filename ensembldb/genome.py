@@ -261,7 +261,7 @@ class Genome(object):
             gene = None
         return gene
 
-    def getGenesMatching(self, Symbol=None, Description=None, StableId=None,
+    def get_genes_matching(self, Symbol=None, Description=None, StableId=None,
                          BioType=None, like=True):
         """Symbol: HGC gene symbol, case doesn't matter
         description: a functional description

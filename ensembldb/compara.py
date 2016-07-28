@@ -268,7 +268,7 @@ class Compara(object):
         for record in gene_set.execute():
             genome = self.taxon_id_species[record['taxon_id']]
             StableId = record['stable_id']
-            gene = list(genome.getGenesMatching(StableId=StableId))
+            gene = list(genome.get_genes_matching(StableId=StableId))
             assert len(gene) == 1, "Error in selecting genes: %s" % gene
             gene = gene[0]
             gene.Location.strand = record[frag_strand]

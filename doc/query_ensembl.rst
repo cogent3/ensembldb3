@@ -105,7 +105,7 @@ The genome can be queried for gene's in a number of ways. You can search for gen
     >>> print brca1.Description
     breast cancer 1, early onset...
 
-Alternatively, you can query using the ``Genome.getGenesMatching`` method. This method allows querying for gene(s) by the following identifiers: HGNC symbol; Ensembl ``stable_id``; description; or coding type.
+Alternatively, you can query using the ``Genome.get_genes_matching`` method. This method allows querying for gene(s) by the following identifiers: HGNC symbol; Ensembl ``stable_id``; description; or coding type.
 
 .. note:: When querying by description, you can specify that the exact words in the query must be present in the description by setting the argument ``like=True``. The default is ``like=False``.
 
@@ -113,9 +113,9 @@ In general for such queries, case shouldn't matter. For instance, find the *BRCA
 
 .. doctest::
 
-    >>> genes = human.getGenesMatching(Symbol='brca2')
+    >>> genes = human.get_genes_matching(Symbol='brca2')
 
-Because there can be multiple hits from a ``getGenesMatching`` query, and because we wish to not spend time doing things (like talking to the database) unnecessarily, the result of the query is a python generator. This acts like a series and allows you to iterate over the database hits until you find the one you want and then terminate the record collection.
+Because there can be multiple hits from a ``get_genes_matching`` query, and because we wish to not spend time doing things (like talking to the database) unnecessarily, the result of the query is a python generator. This acts like a series and allows you to iterate over the database hits until you find the one you want and then terminate the record collection.
 
 .. doctest::
 
@@ -131,7 +131,7 @@ Because there can be multiple hits from a ``getGenesMatching`` query, and becaus
     >>> print brca2
     Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast...
 
-This code serves to illustrate a few things. First, the sorts of properties that exist on the object. These can be directly accessed as illustrated above. Secondly, that the argument names to ``getGenesMatching`` match the properties.
+This code serves to illustrate a few things. First, the sorts of properties that exist on the object. These can be directly accessed as illustrated above. Secondly, that the argument names to ``get_genes_matching`` match the properties.
 
 Gene's also have a location. The length of a gene is the difference between its start and end location.
 
@@ -218,7 +218,7 @@ The genome can be queried for any of these types, for instance we'll query for `
 
 .. doctest::
 
-    >>> rRNA_genes = human.getGenesMatching(BioType='rRNA')
+    >>> rRNA_genes = human.get_genes_matching(BioType='rRNA')
     >>> count = 0
     >>> for gene in rRNA_genes:
     ...     print gene
