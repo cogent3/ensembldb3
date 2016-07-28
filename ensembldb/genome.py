@@ -245,10 +245,10 @@ class Genome(object):
 
         return query
 
-    def makeLocation(self, CoordName, start=None, end=None, strand=1,
+    def makeLocation(self, coord_name, start=None, end=None, strand=1,
                      ensembl_coord=False):
         """returns a location in the genome"""
-        return Coordinate(self, CoordName=CoordName, start=start, end=end,
+        return Coordinate(self, coord_name=coord_name, start=start, end=end,
                           strand=strand, ensembl_coord=ensembl_coord)
 
     def getGeneByStableId(self, StableId):
@@ -364,14 +364,14 @@ class Genome(object):
         for record in records:
             yield Est(self, self.OtherFeaturesDb, StableId=StableId, data=record)
 
-    def _get_seq_region_id(self, CoordName):
-        """returns the seq_region_id for the provided CoordName"""
+    def _get_seq_region_id(self, coord_name):
+        """returns the seq_region_id for the provided coord_name"""
         seq_region_table = self.CoreDb.getTable('seq_region')
         coord_systems = CoordSystem(core_db=self.CoreDb)
         coord_system_ids = [
             k for k in coord_systems if type(k) not in (str, str)]
         record = sql.select([seq_region_table.c.seq_region_id],
-                            sql.and_(seq_region_table.c.name == CoordName,
+                            sql.and_(seq_region_table.c.name == coord_name,
                                      seq_region_table.c.coord_system_id.in_(coord_system_ids)))
         record = asserted_one(record.execute().fetchall())
         return record['seq_region_id']
@@ -394,13 +394,13 @@ class Genome(object):
                                where=where_feature)
         records = query.execute()
         for record in records:
-            coord = Coordinate(self, CoordName=query_coord.CoordName,
+            coord = Coordinate(self, coord_name=query_coord.coord_name,
                                start=record['seq_region_start'],
                                end=record['seq_region_end'],
                                seq_region_id=record['seq_region_id'],
                                strand=record['seq_region_strand'],
                                ensembl_coord=True)
-            if query_coord.CoordName != target_coord.CoordName:
+            if query_coord.coord_name != target_coord.coord_name:
                 coord = asserted_one(get_coord_conversion(
                     coord, target_coord.CoordType, self.CoreDb))[1]
 
@@ -420,13 +420,13 @@ class Genome(object):
         query = location_query(repeat_feature_table, query_coord.EnsemblStart,
                                query_coord.EnsemblEnd, query=query, where=where_feature)
         for record in query.execute():
-            coord = Coordinate(self, CoordName=query_coord.CoordName,
+            coord = Coordinate(self, coord_name=query_coord.coord_name,
                                start=record['seq_region_start'],
                                end=record['seq_region_end'],
                                seq_region_id=record['seq_region_id'],
                                strand=record['seq_region_strand'],
                                ensembl_coord=True)
-            if query_coord.CoordName != target_coord.CoordName:
+            if query_coord.coord_name != target_coord.coord_name:
                 coord = asserted_one(get_coord_conversion(
                     coord, target_coord.CoordType, self.CoreDb))[1]
             # coord = coord.makeRelativeTo(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
@@ -455,7 +455,7 @@ class Genome(object):
                                query_coord.EnsemblEnd, query=query, where=where_feature)
 
         for record in query.execute():
-            new = Coordinate(self, CoordName=query_coord.CoordName,
+            new = Coordinate(self, coord_name=query_coord.coord_name,
                              start=record['seq_region_start'],
                              end=record['seq_region_end'],
                              strand=record['seq_region_strand'],
@@ -499,7 +499,7 @@ class Genome(object):
     FeatureCoordLevels = property(_feature_coord_levels)
 
     def getFeatures(self, region=None, feature_types=None, where_feature=None,
-                    CoordName=None, start=None, end=None, strand=None,
+                    coord_name=None, start=None, end=None, strand=None,
                     ensembl_coord=False):
         """returns Region instances for the specified location"""
         if isinstance(feature_types, str):
@@ -508,8 +508,8 @@ class Genome(object):
         feature_coord_levels = self._get_feature_coord_levels(feature_types)
 
         if region is None:
-            seq_region_id = self._get_seq_region_id(CoordName)
-            region = Coordinate(self, CoordName=CoordName, start=start,
+            seq_region_id = self._get_seq_region_id(coord_name)
+            region = Coordinate(self, coord_name=coord_name, start=start,
                                 end=end,
                                 strand=convert_strand(strand),
                                 seq_region_id=seq_region_id,
@@ -607,7 +607,7 @@ class Genome(object):
             yield Variation(self, self.CoreDb, Effect=Effect, Symbol=Symbol,
                             data=record)
 
-    def getRegion(self, region=None, CoordName=None, start=None, end=None,
+    def getRegion(self, region=None, coord_name=None, start=None, end=None,
                   strand=None, ensembl_coord=False):
         """returns a single generic region for the specified coordinates
         Arguments:
@@ -615,8 +615,8 @@ class Genome(object):
             - ensembl_coords: if True, follows indexing system of Ensembl
               where indexing starts at 1"""
         if region is None:
-            seq_region_id = self._get_seq_region_id(CoordName)
-            region = Coordinate(self, CoordName=CoordName, start=start,
+            seq_region_id = self._get_seq_region_id(coord_name)
+            region = Coordinate(self, coord_name=coord_name, start=start,
                                 end=end,
                                 strand=convert_strand(strand),
                                 seq_region_id=seq_region_id,
@@ -624,7 +624,7 @@ class Genome(object):
         elif hasattr(region, 'Location'):
             region = region.Location
 
-        return GenericRegion(self, self.CoreDb, CoordName=CoordName,
+        return GenericRegion(self, self.CoreDb, coord_name=coord_name,
                              start=start, end=end, strand=strand,
                              Location=region, ensembl_coord=ensembl_coord)
 

@@ -293,7 +293,7 @@ class Compara(object):
                            sql.and_(dnafrag_table.c.genome_db_id ==
                                     genome_db_table.c.genome_db_id,
                                     genome_db_table.c.name == prefix,
-                                    dnafrag_table.c.name == str(coord.CoordName)))
+                                    dnafrag_table.c.name == str(coord.coord_name)))
         try:
             record = asserted_one(query.execute().fetchall())
             dnafrag_id = record['dnafrag_id']
@@ -333,17 +333,17 @@ class Compara(object):
                                     dnafrag_table.c.genome_db_id.in_(list(self.genome_taxon.keys()))))
         return query.execute().fetchall()
 
-    def getSyntenicRegions(self, Species=None, CoordName=None, start=None,
+    def getSyntenicRegions(self, Species=None, coord_name=None, start=None,
                            end=None, strand=1, ensembl_coord=False, region=None,
                            align_method=None, align_clade=None, method_clade_id=None):
         """returns a SyntenicRegions instance
 
         Arguments:
             - Species: the species name
-            - CoordName, start, end, strand: the coordinates for the region
+            - coord_name, start, end, strand: the coordinates for the region
             - ensembl_coord: whether the coordinates are in Ensembl form
             - region: a region instance or a location, in which case the
-              CoordName etc .. arguments are ignored
+              coord_name etc .. arguments are ignored
             - align_method, align_clade: the alignment method and clade to use
               Note: the options for this instance can be found by printing
               the method_species_links attribute of this object.
@@ -364,7 +364,7 @@ class Compara(object):
 
         if region is None:
             ref_genome = self._genomes[_Species.getSpeciesName(Species)]
-            region = ref_genome.makeLocation(CoordName=CoordName,
+            region = ref_genome.makeLocation(coord_name=coord_name,
                                              start=start, end=end, strand=strand,
                                              ensembl_coord=ensembl_coord)
         elif hasattr(region, 'Location'):
@@ -374,7 +374,7 @@ class Compara(object):
         ref_genome = self._genomes[region.genome.Species]
         if ref_genome is not region.genome:
             # recreate region from our instance
-            region = ref_genome.makeLocation(CoordName=region.CoordName,
+            region = ref_genome.makeLocation(coord_name=region.coord_name,
                                              start=region.start, end=region.end,
                                              strand=region.strand)
 
@@ -393,10 +393,10 @@ class Compara(object):
                 genome = self.taxon_id_species[taxon_id]
                 # we have a case where we getback different coordinate system
                 # results for the ref genome. We keep only those that match
-                # the CoordName of region
+                # the coord_name of region
 
                 if genome is region.genome and \
-                        record.name == region.CoordName:
+                        record.name == region.coord_name:
                     # this is the ref species and we adjust the ref_location
                     # for this block
                     diff_start = record.dnafrag_start - region.EnsemblStart

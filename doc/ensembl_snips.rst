@@ -149,7 +149,7 @@ We get the canonical transcripts for *BRCA2*.
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript
-    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315473; end=32400266; length=84793; strand='+')
+    Transcript(Species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
 
 Get the CDS for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -176,8 +176,8 @@ Look at all transcripts for a gene
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
     >>> for transcript in brca2.Transcripts:
     ...     print transcript
-    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315473; end=32400266; length=84793; strand='+')
-    Transcript(Species='Homo sapiens'; CoordName='13'; start=32315504; end=32333291; length=17787; strand='+')...
+    Transcript(Species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
+    Transcript(Species='Homo sapiens'; coord_name='13'; start=32315504; end=32333291; length=17787; strand='+')...
 
 Get the first exon for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -217,7 +217,7 @@ Inspect the genomic coordinate for a feature
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.getGeneByStableId(StableId='ENSG00000139618')
-    >>> print brca2.Location.CoordName
+    >>> print brca2.Location.coord_name
     13
     >>> print brca2.Location.start
     32315473
@@ -233,13 +233,13 @@ We query the genome for repeats within a specific coordinate range on chromosome
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> repeats = human.getFeatures(CoordName='13', start=32305473, end=32315473, feature_types='repeat')
+    >>> repeats = human.getFeatures(coord_name='13', start=32305473, end=32315473, feature_types='repeat')
     >>> for repeat in repeats:
     ...     print repeat.RepeatClass
     ...     print repeat
     ...     break
     SINE/Alu
-    Repeat(CoordName='13'; start=32305225; end=32305525; length=300; strand='-', Score=2770.0)
+    Repeat(coord_name='13'; start=32305225; end=32305525; length=300; strand='-', Score=2770.0)
 
 Get CpG island elements in a genomic interval
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -250,11 +250,11 @@ We query the genome for CpG islands within a specific coordinate range on chromo
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> islands = human.getFeatures(CoordName='11', start=2129111, end=2149604, feature_types='cpg')
+    >>> islands = human.getFeatures(coord_name='11', start=2129111, end=2149604, feature_types='cpg')
     >>> for island in islands:
     ...     print island
     ...     break
-    CpGisland(CoordName='11'; start=2137721; end=2141254; length=3533; strand='-', Score=3254.0)
+    CpGisland(coord_name='11'; start=2137721; end=2141254; length=3533; strand='-', Score=3254.0)
 
 Get SNPs
 --------
@@ -359,7 +359,7 @@ alignment method in the vertebrates clade:
     >>> compara = Compara(species, release=66)
     >>> clade = "vertebrates"
     >>> chrom, start, end, strand = "X", 155754928, 155755079, "-"
-    >>> regions = compara.getSyntenicRegions(Species="mouse", CoordName=chrom, 
+    >>> regions = compara.getSyntenicRegions(Species="mouse", coord_name=chrom, 
     ...                                      start=start, end=end, align_method="PECAN", 
     ...                                      align_clade=clade, strand=strand)     
     >>> aligned_pairs = [r for r in regions]
@@ -367,9 +367,9 @@ alignment method in the vertebrates clade:
     >>> aligned_regions = [m for m in alignment.Members
     ...                    if m.Region is not None]
     >>> source_region, target_region = aligned_regions
-    >>> print source_region.Location.CoordName, source_region.Location.start, source_region.Location.end
+    >>> print source_region.Location.coord_name, source_region.Location.start, source_region.Location.end
     X 155754928 155755079
-    >>> print target_region.Location.CoordName, target_region.Location.start, target_region.Location.end
+    >>> print target_region.Location.coord_name, target_region.Location.start, target_region.Location.end
     X 20222659 20223163
 
 .. note:: We took the aligned regions from the ``regions`` generator and put them in a list for convenience.

@@ -63,7 +63,7 @@ class _Region(LazyRecord):
         result = asserted_one(query.execute().fetchall())
         coord_name = result['name']
 
-        coord = Coordinate(genome=self.genome, CoordName=coord_name,
+        coord = Coordinate(genome=self.genome, coord_name=coord_name,
                            start=start, end=end, strand=strand,
                            seq_region_id=seq_region_id,
                            ensembl_coord=True)
@@ -175,19 +175,19 @@ class GenericRegion(_Region):
 
     Type = 'generic_region'
 
-    def __init__(self, genome, db, Location=None, CoordName=None, start=None,
+    def __init__(self, genome, db, Location=None, coord_name=None, start=None,
                  end=None, strand=1, ensembl_coord=False):
         super(GenericRegion, self).__init__()
         self.genome = genome
         self.db = db
 
-        if Location is None and CoordName:
-            self._get_seq_region_record(str(CoordName))
+        if Location is None and coord_name:
+            self._get_seq_region_record(str(coord_name))
             if end is not None:
                 assert self._table_rows['seq_region']['length'] > end, \
                     'Requested end[%s] too large' % end
             seq_region_id = self._table_rows['seq_region']['seq_region_id']
-            Location = Coordinate(genome=genome, CoordName=str(CoordName),
+            Location = Coordinate(genome=genome, coord_name=str(coord_name),
                                   start=start, end=end, strand=strand,
                                   seq_region_id=seq_region_id,
                                   ensembl_coord=ensembl_coord)
@@ -197,22 +197,22 @@ class GenericRegion(_Region):
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species='%s'; CoordName='%s'; start=%s; end=%s;"\
+        return "%s(Species='%s'; coord_name='%s'; start=%s; end=%s;"\
                " length=%s; strand='%s')" % (my_type,
                                              self.genome.Species,
-                                             self.Location.CoordName, self.Location.start,
+                                             self.Location.coord_name, self.Location.start,
                                              self.Location.end, len(self), '-+'[self.Location.strand > 0])
 
-    def _get_seq_region_record(self, CoordName):
+    def _get_seq_region_record(self, coord_name):
         # override the _Region class method, since, we take the provided start
         # etc .. attributes
-        # CoordName comes from seq_region_table.c.name
+        # coord_name comes from seq_region_table.c.name
         # matched, by coord_system_id, to default coord system
         seq_region_table = self.genome.db.getTable('seq_region')
         coord_systems = CoordSystem(core_db=self.genome.CoreDb)
         coord_system_ids = [k for k in coord_systems if not isinstance(k, str)]
         record = sql.select([seq_region_table],
-                            sql.and_(seq_region_table.c.name == CoordName,
+                            sql.and_(seq_region_table.c.name == coord_name,
                                      seq_region_table.c.coord_system_id.in_(coord_system_ids)))
         record = asserted_one(record.execute().fetchall())
         self._table_rows['seq_region'] = record
@@ -541,14 +541,14 @@ class Transcript(_StableRegion):
         intron_positions = [(span.start, span.end)
                             for span in intron_map.spans if span.start != 0]
 
-        chrom = self.Location.CoordName
+        chrom = self.Location.coord_name
         strand = self.Location.strand
         introns = []
         rank = 1
         if strand == -1:
             intron_positions.reverse()
         for s, e in intron_positions:
-            coord = self.genome.makeLocation(CoordName=chrom, start=s, end=e,
+            coord = self.genome.makeLocation(coord_name=chrom, start=s, end=e,
                                              strand=strand, ensembl_coord=False)
             introns.append(Intron(self.genome, self.db, rank, self.StableId,
                                   coord))
@@ -1330,9 +1330,9 @@ class CpGisland(GenericRegion):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(CoordName='%s'; start=%s; end=%s; length=%s;"\
+        return "%s(coord_name='%s'; start=%s; end=%s; length=%s;"\
                " strand='%s', Score=%.1f)" % (my_type,
-                                              self.Location.CoordName,
+                                              self.Location.coord_name,
                                               self.Location.start,
                                               self.Location.end,
                                               len(self),
@@ -1356,9 +1356,9 @@ class Repeat(GenericRegion):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(CoordName='%s'; start=%s; end=%s; length=%s;"\
+        return "%s(coord_name='%s'; start=%s; end=%s; length=%s;"\
                " strand='%s', Score=%.1f)" % (my_type,
-                                              self.Location.CoordName,
+                                              self.Location.coord_name,
                                               self.Location.start, self.Location.end, len(
                                                   self),
                                               '-+'[self.Location.strand > 0], self.Score)

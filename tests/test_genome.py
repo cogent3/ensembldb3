@@ -51,7 +51,7 @@ class TestGenome(GenomeTestBase):
         """should correctly return record for ENSESTG00000000010"""
         est = self.human.getEstMatching(StableId='ENSESTG00000000010')
         direct = list(est)[0]
-        ests = self.human.getFeatures(feature_types='est', CoordName=6,
+        ests = self.human.getFeatures(feature_types='est', coord_name=6,
                                       start=99994000, end=100076519)
         stable_ids = [est.StableId for est in ests]
         self.assertContains(stable_ids, direct.StableId)
@@ -63,7 +63,7 @@ class TestGenome(GenomeTestBase):
 
     def test_make_location(self):
         """should correctly make a location for an entire chromosome"""
-        loc = self.human.makeLocation(CoordName=1)
+        loc = self.human.makeLocation(coord_name=1)
         self.assertEqual(len(loc), 248956422)
 
     def test_get_region(self):
@@ -71,18 +71,18 @@ class TestGenome(GenomeTestBase):
         chrom = 1
         start = 11137
         end = start + 20
-        region = self.human.getRegion(CoordName=chrom, start=start, end=end,
+        region = self.human.getRegion(coord_name=chrom, start=start, end=end,
                                       ensembl_coord=True)
         self.assertEqual(region.Location.start, start - 1)
         self.assertEqual(region.Location.end, end)
-        self.assertEqual(region.Location.CoordName, str(chrom))
+        self.assertEqual(region.Location.coord_name, str(chrom))
         self.assertEqual(region.Location.CoordType, 'chromosome')
         self.assertEqual(region.Seq, 'ACCTCAGTAATCCGAAAAGCC')
 
     def test_get_assembly_exception_region(self):
         """should return correct sequence for region with an assembly
         exception"""
-        region = self.human.getRegion(CoordName="Y", start=57211873,
+        region = self.human.getRegion(coord_name="Y", start=57211873,
                                       end=57211894, strand=1, ensembl_coord=True)
 
         self.assertEqual(str(region.Seq), 'CGAGGACGACTGGGAATCCTAG')
@@ -92,7 +92,7 @@ class TestGenome(GenomeTestBase):
         krat = Genome('Kangaroo rat', release=58)
         start = 24385
         end = start + 100
-        region = krat.getRegion(CoordName='scaffold_13754', start=start,
+        region = krat.getRegion(coord_name='scaffold_13754', start=start,
                                 end=end)
         self.assertEqual(str(region.Seq), 'N' * (end - start))
 
@@ -244,7 +244,7 @@ class TestGene(GenomeTestBase):
         # .. and correctly construct the Cds and location
         for transcript in gene.Transcripts:
             self.assertTrue(transcript.getCdsLength() > 0)
-            self.assertEqual(transcript.Location.CoordName, '17')
+            self.assertEqual(transcript.Location.coord_name, '17')
 
     def test_get_longest_cds_transcript2(self):
         """should correctly return transcript with longest cds"""
@@ -593,7 +593,7 @@ class TestFeatures(GenomeTestBase):
         """should not fail to get multiple feature types"""
         regions =\
             self.human.getFeatures(feature_types=['repeat', 'gene', 'cpg'],
-                                   CoordName=1, start=869936, end=901867)
+                                   coord_name=1, start=869936, end=901867)
         for region in regions:
             pass
 
@@ -613,9 +613,9 @@ class TestFeatures(GenomeTestBase):
 
     def test_other_genes(self):
         """docstring for est_other_genes"""
-        mouse = self.mouse.getRegion(CoordName='5', start=150791005,
+        mouse = self.mouse.getRegion(coord_name='5', start=150791005,
                                      end=150838512, strand='-')
-        rat = self.rat.getRegion(CoordName='12', start=4282534, end=4324019,
+        rat = self.rat.getRegion(coord_name='12', start=4282534, end=4324019,
                                  strand='+')
         for region in [mouse, rat]:
             features = region.getFeatures(feature_types=['gene'])
@@ -631,7 +631,7 @@ class TestFeatures(GenomeTestBase):
         c = 0
         loc = self.brca2.Location
         for snp in snps:
-            self.assertEqual(snp.Location.CoordName, loc.CoordName)
+            self.assertEqual(snp.Location.coord_name, loc.coord_name)
             self.assertTrue(loc.start < snp.Location.start < loc.end)
             c += 1
             if c == 2:
@@ -642,7 +642,7 @@ class TestFeatures(GenomeTestBase):
         and the Cogent sequence annotations slice should return the same
         result"""
         plus = list(self.human.getFeatures(feature_types='gene',
-                                           CoordName=13,
+                                           coord_name=13,
                                            start=31787610,
                                            end=31871820))[0]
         minus = plus.Location.copy()
@@ -661,8 +661,8 @@ class TestFeatures(GenomeTestBase):
     def test_other_feature_data_correct(self):
         """should apply CpG feature data in a manner consistent with strand"""
         human = self.human
-        coord = dict(CoordName=11, start=2143894, end=2144494)
-        exp_coord = dict(CoordName=11, start=2143906, end=2144442)
+        coord = dict(coord_name=11, start=2143894, end=2144494)
+        exp_coord = dict(coord_name=11, start=2143906, end=2144442)
         exp_loc = human.getRegion(strand=1, ensembl_coord=True, **exp_coord)
         exp = exp_loc.Seq
 
@@ -682,7 +682,7 @@ class TestFeatures(GenomeTestBase):
 
     def test_other_repeat(self):
         """should apply repeat feature data in a manner consistent with strand"""
-        coord = dict(CoordName=13, start=32316063, end=32316363)
+        coord = dict(coord_name=13, start=32316063, end=32316363)
         # 13:32316063 -32316363
         ps_repeat = self.human.getRegion(strand=1, **coord)
         ms_repeat = self.human.getRegion(strand=-1, **coord)

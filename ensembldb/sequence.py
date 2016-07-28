@@ -39,7 +39,7 @@ def _assemble_seq(frags, start, end, frag_positions):
 
 def _make_coord(genome, coord_name, start, end, strand):
     """returns a Coordinate"""
-    return Coordinate(CoordName=coord_name, start=start, end=end,
+    return Coordinate(coord_name=coord_name, start=start, end=end,
                       strand=strand, genome=genome)
 
 

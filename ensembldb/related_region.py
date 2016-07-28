@@ -152,7 +152,7 @@ class SyntenicRegion(LazyRecord):
         record_end = ref_record['dnafrag_end']
         record_strand = ref_record['dnafrag_strand']
 
-        block_loc = self.genome.makeLocation(CoordName=ref_record['name'],
+        block_loc = self.genome.makeLocation(coord_name=ref_record['name'],
                                              start=record_start,
                                              end=record_end,
                                              strand=record_strand,
@@ -189,7 +189,7 @@ class SyntenicRegion(LazyRecord):
             self.aln_loc = aln_loc  # probably unnecesary to store??
 
             # we make a loc for the aligned region
-            block_loc = self.genome.makeLocation(CoordName=record['name'],
+            block_loc = self.genome.makeLocation(coord_name=record['name'],
                                                  start=record['dnafrag_start'],
                                                  end=record['dnafrag_end'],
                                                  strand=record[

@@ -70,11 +70,11 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
 
 class Coordinate(object):
 
-    def __init__(self, genome, CoordName, start, end, strand=1,
+    def __init__(self, genome, coord_name, start, end, strand=1,
                  CoordType=None, seq_region_id=None, ensembl_coord=False):
         if not CoordType or not (seq_region_id or start or end):
             seq_region_data, CoordType = \
-                _get_coord_type_and_seq_region_id(CoordName, genome.CoreDb)
+                _get_coord_type_and_seq_region_id(coord_name, genome.CoreDb)
             seq_region_id = seq_region_data['seq_region_id']
             start = start or 0
             end = end or seq_region_data['length']
@@ -82,7 +82,7 @@ class Coordinate(object):
         self.Species = genome.Species
         self.CoordType = DisplayString(CoordType, repr_length=4,
                                        with_quotes=False)
-        self.CoordName = DisplayString(CoordName, repr_length=4,
+        self.coord_name = DisplayString(coord_name, repr_length=4,
                                        with_quotes=False)
         # if start == end, we +1 to end, unless these are ensembl_coord's
         if ensembl_coord:
@@ -105,10 +105,10 @@ class Coordinate(object):
         return self.end - self.start
 
     def __lt__(self, other):
-        return (self.CoordName, self.start) < (other.CoordName, other.start)
+        return (self.coord_name, self.start) < (other.coord_name, other.start)
 
     def __eq__(self, other):
-        return (self.CoordName, self.start) == (other.CoordName, other.start)
+        return (self.coord_name, self.start) == (other.coord_name, other.start)
 
     def _get_ensembl_start(self):
         # ensembl counting starts from 1
@@ -123,18 +123,18 @@ class Coordinate(object):
 
     def __str__(self):
         return '%s:%s:%s:%d-%d:%d' % (self.Species, self.CoordType,
-                                      self.CoordName, self.start, self.end, self.strand)
+                                      self.coord_name, self.start, self.end, self.strand)
 
     def __repr__(self):
         my_type = self.__class__.__name__
         name = _Species.getCommonName(self.Species)
         coord_type = self.CoordType
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
-                                       self.CoordName, self.start, self.end, self.strand)
+                                       self.coord_name, self.start, self.end, self.strand)
         return c.replace("'", "")
 
     def adopted(self, other, shift=False):
-        """adopts the seq_region_id (including CoordName and CoordType) of
+        """adopts the seq_region_id (including coord_name and CoordType) of
         another coordinate.
 
         Arguments:
@@ -142,7 +142,7 @@ class Coordinate(object):
               If bool, other.start is added to start/end"""
         if type(shift) == bool:
             shift = [0, other.start][shift]
-        return self.__class__(other.genome, CoordName=other.CoordName,
+        return self.__class__(other.genome, coord_name=other.coord_name,
                               start=self.start + shift, end=self.end + shift,
                               strand=other.strand,
                               seq_region_id=other.seq_region_id)
@@ -157,7 +157,7 @@ class Coordinate(object):
 
     def copy(self):
         """returns a copy"""
-        return self.__class__(genome=self.genome, CoordName=self.CoordName,
+        return self.__class__(genome=self.genome, coord_name=self.coord_name,
                               start=self.start, end=self.end, strand=self.strand,
                               CoordType=self.CoordType, seq_region_id=self.seq_region_id)
 
@@ -189,7 +189,7 @@ class Coordinate(object):
 
         end = start + len(self)
 
-        return self.__class__(other.genome, CoordName=other.CoordName,
+        return self.__class__(other.genome, coord_name=other.coord_name,
                               start=start, end=end, strand=other.strand,
                               seq_region_id=other.seq_region_id)
 
@@ -341,12 +341,12 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
     t_start = int(assembly_row['%s_start' % target_prefix]) + d_start
     t_end = int(assembly_row['%s_end' % target_prefix]) - d_end
 
-    q_location = Coordinate(CoordName=query_coord.CoordName, start=q_start,
+    q_location = Coordinate(coord_name=query_coord.coord_name, start=q_start,
                             end=q_end, strand=q_strand,
                             CoordType=query_coord.CoordType,
                             seq_region_id=q_seq_region_id,
                             genome=query_coord.genome, ensembl_coord=True)
-    t_location = Coordinate(CoordName=assembly_row['name'], start=t_start,
+    t_location = Coordinate(coord_name=assembly_row['name'], start=t_start,
                             end=t_end, strand=t_strand, CoordType=target_coord_type,
                             seq_region_id=t_seq_region_id,
                             genome=query_coord.genome,
