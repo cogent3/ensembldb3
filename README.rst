@@ -15,4 +15,29 @@ Because PyCogent requires numpy be installed prior to running PyCogent's setup.p
 ::
 
     $ pip install numpy
-    $ pip install hg+https://gavin.huttley@bitbucket.org/gavin.huttley/mutationmotif
+    $ pip install hg+ssh://hg@bitbucket.org/pycogent3/ensembldb
+
+*****
+Usage
+*****
+
+Install adds an experimental download script ``ensembl_download`` which uses rsync to download mysql dumps from the `ensembl ftp site <ftp://ftp.ensembl.org/pub/>`_. ``ensembl_download``  requires the user to specify a config file indicating the release, species and their databases to download. A sample config file is included for demonstration purposes. Here's an example ::
+
+    [local path] # required
+    path=/tmp/ensembldb_download
+    [release] # required
+    release=85
+    [S.cerevisiae]
+    db=core
+    [Xenopus]
+    db=core
+    [Human]
+    db=core,variation
+    [compara]
+    db=compara
+
+You then download the corresponding databases as ::
+
+    $ ensembldb_download -c /path/to/your.cfg -v
+
+The ``-v`` option means verbose. Use ``--help`` for more information.
