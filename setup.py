@@ -50,6 +50,11 @@ setup(
     install_requires=[
               'numpy',
               'cogent3',
+              'click',
               'PyMySQL',
               'sqlalchemy'],
+    entry_points={
+        'console_scripts': ['ensembl_download=ensembldb.download:run',
+                            ],
+    }
 )
