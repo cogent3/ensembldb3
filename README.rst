@@ -41,3 +41,5 @@ You then download the corresponding databases as ::
     $ ensembldb_download -c /path/to/your.cfg -v
 
 The ``-v`` option means verbose. Use ``--help`` for more information.
+
+:NOTE: The species common name is used in the ``[]`` and the db's to be downloaded are comma separated.
