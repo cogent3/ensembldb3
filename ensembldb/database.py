@@ -30,7 +30,7 @@ class Database(object):
         self._db = DbConnection(account=account, db_name=self.db_name,
                                 pool_recycle=pool_recycle)
         self._meta = sql.MetaData(self._db)
-        self.Type = db_type
+        self.type = db_type
 
     def __str__(self):
         return str(self.db_name)
@@ -49,8 +49,8 @@ class Database(object):
             custom_columns = []
             for r in c.fetchall():
                 Field = r["Field"]
-                Type = r["Type"]
-                if "tinyint" in Type:
+                type_ = r["Type"]
+                if "tinyint" in type_:
                     custom_columns.append(sql.Column(Field, sql.Integer))
             try:
                 table = sql.Table(name, self._meta, autoload=True,

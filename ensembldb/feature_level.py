@@ -22,7 +22,7 @@ class _FeatureLevelRecord(object):
         self.levels = coord_system_names
 
     def __str__(self):
-        return 'feature = %s; Levels = %s' % (self.feature_type,
+        return 'feature = %s; levels = %s' % (self.feature_type,
                                               ', '.join(self.levels))
 
 
@@ -35,7 +35,7 @@ class FeatureCoordLevelsCache(object):
 
     def __repr__(self):
         """print table format"""
-        header = ['Type', 'Levels']
+        header = ['type', 'levels']
         result = []
         for species in list(self._species_feature_levels.keys()):
             feature_levels = self._species_feature_levels[species]
@@ -124,7 +124,7 @@ class FeatureCoordLevels(FeatureCoordLevelsCache):
 
     def __repr__(self):
         """print table format"""
-        header = ['Type', 'Levels']
+        header = ['type', 'levels']
         if self.species not in self._species_feature_levels:
             result = ''
         else:

@@ -23,7 +23,7 @@ class _RelatedRegions(LazyRecord):
     # a basic related region, capable of providing the sequences
     # obtaining SyntenicRegions -- for getting aligned blocks -- is delegated
     # to compara
-    Type = None
+    type = None
 
     def __init__(self):
         super(_RelatedRegions, self).__init__()
@@ -61,7 +61,7 @@ class _RelatedRegions(LazyRecord):
 
 
 class RelatedGenes(_RelatedRegions):
-    Type = 'related_genes'
+    type = 'related_genes'
 
     def __init__(self, compara, Members, Relationships):
         super(RelatedGenes, self).__init__()
@@ -245,7 +245,7 @@ class SyntenicRegion(LazyRecord):
 
 
 class SyntenicRegions(_RelatedRegions):
-    Type = 'syntenic_regions'
+    type = 'syntenic_regions'
 
     def __init__(self, compara, Members, ref_location):
         super(SyntenicRegions, self).__init__()

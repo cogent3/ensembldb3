@@ -41,28 +41,28 @@ class TestEnsemblDbName(TestCase):
         """should correctly handle a db name without a build"""
         n = EnsemblDbName("pongo_pygmaeus_core_49_1")
         self.assertEqual(n.prefix, "pongo_pygmaeus")
-        self.assertEqual(n.Type, "core")
+        self.assertEqual(n.type, "core")
         self.assertEqual(n.Build, '1')
 
     def test_species_with_three_words_name(self):
         """should correctly parse a db name that contains a three words species name"""
         n = EnsemblDbName("mustela_putorius_furo_core_70_1")
         self.assertEqual(n.prefix, "mustela_putorius_furo")
-        self.assertEqual(n.Type, "core")
+        self.assertEqual(n.type, "core")
         self.assertEqual(n.Build, '1')
 
     def test_ensemblgenomes_names(self):
         """correctly handle the ensemblgenomes naming system"""
         n = EnsemblDbName('aedes_aegypti_core_5_58_1e')
         self.assertEqual(n.prefix, 'aedes_aegypti')
-        self.assertEqual(n.Type, 'core')
+        self.assertEqual(n.type, 'core')
         self.assertEqual(n.release, '5')
         self.assertEqual(n.general_release, '58')
         self.assertEqual(n.Build, '1e')
         n = EnsemblDbName('ensembl_compara_metazoa_6_59')
         self.assertEqual(n.release, '6')
         self.assertEqual(n.general_release, '59')
-        self.assertEqual(n.Type, 'compara')
+        self.assertEqual(n.type, 'compara')
 
 
 class TestHostAccount(TestCase):
@@ -116,7 +116,7 @@ class TestDBconnects(TestCase):
         # correctness
         one_valid = False
         for db in available:
-            if db.Type == "compara":
+            if db.type == "compara":
                 one_valid = True
                 break
         self.assertEqual(one_valid, True)

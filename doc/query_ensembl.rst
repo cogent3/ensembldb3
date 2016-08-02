@@ -345,7 +345,7 @@ In Ensembl's databases, each type of feature may be recorded at multiple coordin
    >>> print chicken.feature_coord_levels
    Gallus gallus
    ============================================
-        Type                             Levels
+        type                             levels
    --------------------------------------------
         gene                         chromosome
       repeat                             contig

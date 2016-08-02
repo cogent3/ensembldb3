@@ -30,7 +30,7 @@ _limit_words = lambda x: DisplayString(x, with_quotes=True, num_words=3)
 
 class _Region(LazyRecord):
     """a simple genomic region object"""
-    Type = None
+    type = None
 
     def __init__(self):
         super(_Region, self).__init__()
@@ -135,7 +135,7 @@ class _Region(LazyRecord):
             if self.location.strand == -1:
                 # this map is relative to + strand
                 feat_map = feat_map.reversed()
-            data = (self.Type, str(symbol), feat_map)
+            data = (self.type, str(symbol), feat_map)
         else:
             data = None
         return data
@@ -157,7 +157,7 @@ class _Region(LazyRecord):
                            data[-1].nucleic_reversed()][self.location.strand == -1]
             self.Seq.add_annotation(Feature, data[0], data[1], feature_map)
 
-            if region.Type == 'gene':  # TODO: SHOULD be much simplified
+            if region.type == 'gene':  # TODO: SHOULD be much simplified
                 sub_data = region.sub_feature_data(seq_map)
                 for feature_type, feature_name, feature_map in sub_data:
                     if self.location.strand == -1:
@@ -173,7 +173,7 @@ class _Region(LazyRecord):
 class GenericRegion(_Region):
     """a generic genomic region"""
 
-    Type = 'generic_region'
+    type = 'generic_region'
 
     def __init__(self, genome, db, location=None, coord_name=None, start=None,
                  end=None, strand=1, ensembl_coord=False):
@@ -257,7 +257,7 @@ class _StableRegion(GenericRegion):
         found.
 
         Arguments:
-            - member_types: the property to be searched, depends on self.Type.
+            - member_types: the property to be searched, depends on self.type.
               Transcripts for genes, Exons/TranslatedExons for Transcripts."""
 
         member_types = member_types or self._member_types
@@ -268,7 +268,7 @@ class _StableRegion(GenericRegion):
             member = getattr(self, member_type, None)
             if member is None:
                 raise AttributeError(
-                    "%s doesn't have property %s" % (self.Type, member_type))
+                    "%s doesn't have property %s" % (self.type, member_type))
             for element in member:
                 if element.StableId == StableId:
                     return element
@@ -277,7 +277,7 @@ class _StableRegion(GenericRegion):
 
 class Gene(_StableRegion):
     """a gene region"""
-    Type = 'gene'
+    type = 'gene'
     _member_types = ['Transcripts']
 
     def __init__(self, genome, db, StableId=None, symbol=None, location=None, data=None):
@@ -450,7 +450,7 @@ class Gene(_StableRegion):
 
 
 class Transcript(_StableRegion):
-    Type = 'transcript'
+    type = 'transcript'
     _member_types = ['Exons', 'TranslatedExons']
 
     def __init__(self, genome, db, transcript_id, data, location=None):
@@ -855,7 +855,7 @@ class Transcript(_StableRegion):
 
 
 class Exon(_StableRegion):
-    Type = 'exon'
+    type = 'exon'
 
     def __init__(self, genome, db, exon_id, Rank, location=None):
         """created by a Gene"""
@@ -935,7 +935,7 @@ class Exon(_StableRegion):
 
 
 class Intron(GenericRegion):
-    Type = 'intron'
+    type = 'intron'
 
     def __init__(self, genome, db, rank, transcript_stable_id, location=None):
         GenericRegion.__init__(self, genome, db, location=location)
@@ -961,7 +961,7 @@ class Intron(GenericRegion):
 
 class Est(Gene):
     """an EST region"""
-    Type = 'est'
+    type = 'est'
 
 
 def _set_to_string(val):
@@ -975,7 +975,7 @@ def _set_to_string(val):
 
 class Variation(_Region):
     """genomic variation"""
-    Type = 'variation'
+    type = 'variation'
 
     def __init__(self, genome, db=None, Effect=None, symbol=None, data=None):
         self.genome = genome
@@ -1320,7 +1320,7 @@ class Variation(_Region):
 
 
 class CpGisland(GenericRegion):
-    Type = 'CpGisland'
+    type = 'CpGisland'
 
     def __init__(self, genome, db, location, Score):
         super(CpGisland, self).__init__(genome=genome, db=db,
@@ -1340,7 +1340,7 @@ class CpGisland(GenericRegion):
 
 
 class Repeat(GenericRegion):
-    Type = 'repeat'
+    type = 'repeat'
 
     def __init__(self, genome, db, location, Score, data):
         super(Repeat, self).__init__(genome=genome, db=db, location=location)

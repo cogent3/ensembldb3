@@ -144,7 +144,7 @@ def get_db_name(account=None, species=None, db_type=None, release=None,
                 continue
             name = EnsemblDbName(row[0])
             if (release is None or name.release == str(release)) and\
-                    (db_type is None or name.Type == db_type):
+                    (db_type is None or name.type == db_type):
                 dbs.append(name)
         except (IndexError, RuntimeError):
             if DEBUG:

@@ -189,7 +189,7 @@ class Genome(object):
                 gene_table, gene_id_table.c.gene_id == gene_table.c.gene_id)
             select_obj = [gene_id_table.c.stable_id, gene_table]
 
-        if db.Type == 'core':
+        if db.type == 'core':
             join_obj = join_obj.outerjoin(
                 xref_table, gene_table.c.display_xref_id == xref_table.c.xref_id)
             select_obj.append(xref_table.c.display_label)
@@ -218,7 +218,7 @@ class Genome(object):
 
     def _get_gene_query(self, db, symbol=None, Description=None, StableId=None,
                         BioType=None, synonym=None, like=True):
-        xref_table = [None, db.get_table('xref')][db.Type == 'core']
+        xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
 
         # after release 65, the gene_id_table is removed. The following is to maintain
@@ -313,7 +313,7 @@ class Genome(object):
 
     def _get_transcript_query(self, db, symbol=None, Description=None, StableId=None,
                               BioType=None, synonym=None, like=True):
-        xref_table = [None, db.get_table('xref')][db.Type == 'core']
+        xref_table = [None, db.get_table('xref')][db.type == 'core']
         transcript_table = db.get_table('transcript')
 
         # after release 65, the transcript_id_table is removed. The following is to maintain
@@ -349,7 +349,7 @@ class Genome(object):
                 transcript_table, transcript_id_table.c.gene_id == transcript_table.c.transcript_id)
             select_obj = [transcript_id_table.c.stable_id, transcript_table]
 
-        if db.Type == 'core':
+        if db.type == 'core':
             join_obj = join_obj.outerjoin(
                 xref_table, transcript_table.c.display_xref_id == xref_table.c.xref_id)
             select_obj.append(xref_table.c.display_label)
@@ -437,7 +437,7 @@ class Genome(object):
     def _get_gene_features(self, db, klass, target_coord, query_coord,
                            where_feature):
         """returns all genes"""
-        xref_table = [None, db.get_table('xref')][db.Type == 'core']
+        xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
 
         # after release 65, the gene_id_table is removed. The following is to maintain
