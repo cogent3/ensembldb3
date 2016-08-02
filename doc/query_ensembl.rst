@@ -113,18 +113,18 @@ In general for such queries, case shouldn't matter. For instance, find the *BRCA
 
 .. doctest::
 
-    >>> genes = human.get_genes_matching(Symbol='brca2')
+    >>> genes = human.get_genes_matching(symbol='brca2')
 
 Because there can be multiple hits from a ``get_genes_matching`` query, and because we wish to not spend time doing things (like talking to the database) unnecessarily, the result of the query is a python generator. This acts like a series and allows you to iterate over the database hits until you find the one you want and then terminate the record collection.
 
 .. doctest::
 
     >>> for gene in genes:
-    ...     if gene.Symbol.lower() == 'brca2':
+    ...     if gene.symbol.lower() == 'brca2':
     ...         break
     ...
     >>> brca2 = gene # so we keep track of this reference for later on
-    >>> print brca2.Symbol
+    >>> print brca2.symbol
     BRCA2
     >>> print brca2.Description
     breast cancer 2...
@@ -274,7 +274,7 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
     ...         break
     ...     
     >>> print nsyn_variant
-    Variation(Symbol='rs1638319'; Effect='missense_variant'; Alleles='A/G')
+    Variation(symbol='rs1638319'; Effect='missense_variant'; Alleles='A/G')
     >>> print nsyn_variant.AlleleFreqs
     =================================
     allele      freq    population_id
@@ -327,7 +327,7 @@ We can also use a slightly more involved query to find all variants within the g
     ...     if 'missense_variant' in snp.Effect:
     ...         break
     >>> print snp
-    Variation(Symbol='rs80358836'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', 'upstream_gene_variant', 'missense_variant'...
+    Variation(symbol='rs80358836'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', 'upstream_gene_variant', 'missense_variant'...
     >>> print snp.location
     Homo sapiens:chromosome:13:32316464-32316465:1
 

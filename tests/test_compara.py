@@ -47,7 +47,7 @@ class TestCompara(ComparaTestBase):
     def test_query_genome(self):
         """compara should attach valid genome attributes by common name"""
         brca2 = self.comp.Mouse.get_gene_by_stableid("ENSMUSG00000041147")
-        self.assertEqual(brca2.Symbol.lower(), 'brca2')
+        self.assertEqual(brca2.symbol.lower(), 'brca2')
 
     def test_get_related_genes(self):
         """should correctly return the related gene regions from each genome"""

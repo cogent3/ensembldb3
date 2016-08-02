@@ -216,7 +216,7 @@ class Genome(object):
             symbol = None
         return symbol
 
-    def _get_gene_query(self, db, Symbol=None, Description=None, StableId=None,
+    def _get_gene_query(self, db, symbol=None, Description=None, StableId=None,
                         BioType=None, synonym=None, like=True):
         xref_table = [None, db.get_table('xref')][db.Type == 'core']
         gene_table = db.get_table('gene')
@@ -229,9 +229,9 @@ class Genome(object):
         else:
             gene_id_table = db.get_table('gene_stable_id')
 
-        assert Symbol or Description or StableId or BioType, "no valid argument provided"
-        if Symbol:
-            condition = xref_table.c.display_label == Symbol
+        assert symbol or Description or StableId or BioType, "no valid argument provided"
+        if symbol:
+            condition = xref_table.c.display_label == symbol
         elif StableId and release_ge_65:
             condition = gene_table.c.stable_id == StableId
         elif StableId:
@@ -261,15 +261,15 @@ class Genome(object):
             gene = None
         return gene
 
-    def get_genes_matching(self, Symbol=None, Description=None, StableId=None,
+    def get_genes_matching(self, symbol=None, Description=None, StableId=None,
                          BioType=None, like=True):
-        """Symbol: HGC gene symbol, case doesn't matter
+        """symbol: HGC gene symbol, case doesn't matter
         description: a functional description
         StableId: the ensebl identifier
         BioType: the biological encoding type"""
         # TODO additional arguments to satisfy: external_ref, go_terms
-        if Symbol is not None:
-            Symbol = Symbol.lower()
+        if symbol is not None:
+            symbol = symbol.lower()
         # biotype -> gene
         # description -> gene
         # Symbols -> xref
@@ -282,15 +282,15 @@ class Genome(object):
 
         # TODO catch conditions where user passes in both a symbol and a
         # biotype
-        args = dict(Symbol=Symbol, Description=Description,
+        args = dict(symbol=symbol, Description=Description,
                     StableId=StableId, BioType=BioType, like=like)
         query = self._get_gene_query(self.CoreDb, **args)
         records = query.execute()
-        if records.rowcount == 0 and Symbol is not None:
+        if records.rowcount == 0 and symbol is not None:
             # see if the symbol has a synonym
-            Symbol = self._get_symbol_from_synonym(self.CoreDb, Symbol)
-            if Symbol is not None:
-                args['Symbol'] = Symbol
+            symbol = self._get_symbol_from_synonym(self.CoreDb, symbol)
+            if symbol is not None:
+                args['symbol'] = symbol
                 records = self._get_gene_query(self.CoreDb, **args).execute()
             else:
                 records = []
@@ -311,7 +311,7 @@ class Genome(object):
             transcript = None
         return transcript
 
-    def _get_transcript_query(self, db, Symbol=None, Description=None, StableId=None,
+    def _get_transcript_query(self, db, symbol=None, Description=None, StableId=None,
                               BioType=None, synonym=None, like=True):
         xref_table = [None, db.get_table('xref')][db.Type == 'core']
         transcript_table = db.get_table('transcript')
@@ -324,9 +324,9 @@ class Genome(object):
         else:
             transcript_id_table = db.get_table('transcript_stable_id')
 
-        assert Symbol or Description or StableId or BioType, "no valid argument provided"
-        if Symbol:
-            condition = xref_table.c.display_label == Symbol
+        assert symbol or Description or StableId or BioType, "no valid argument provided"
+        if symbol:
+            condition = xref_table.c.display_label == symbol
         elif StableId and release_ge_65:
             condition = transcript_table.c.stable_id == StableId
         elif StableId:
@@ -476,7 +476,7 @@ class Genome(object):
         query = location_query(var_feature_table, query_coord.ensembl_start,
                                query_coord.ensembl_end, query=query, where=where_feature)
         for record in query.execute():
-            yield klass(self, self.CoreDb, Symbol=record['variation_name'],
+            yield klass(self, self.CoreDb, symbol=record['variation_name'],
                         data=record)
 
     def _get_feature_coord_levels(self, feature_types):
@@ -547,7 +547,7 @@ class Genome(object):
                                               other_coord, where_feature):
                         yield region
 
-    def get_variation(self, Effect=None, Symbol=None, like=True,
+    def get_variation(self, Effect=None, symbol=None, like=True,
                      validated=False, somatic=False, flanks_match_ref=False,
                      limit=None):
         """returns a generator of Variation instances
@@ -556,7 +556,7 @@ class Genome(object):
             - Effect: the coding impact, eg. nonsynonymous
             - like: Effect is exactly matched against records like that
               provided
-            - Symbol: the external or ensembl identifier - returns the exact
+            - symbol: the external or ensembl identifier - returns the exact
               match
             - validated: variant has validation_status != None
             - somatic: exclude somatic mutations
@@ -564,8 +564,8 @@ class Genome(object):
             - limit: only return this number of hits"""
         var_feature_table = self.VarDb.get_table('variation_feature')
 
-        assert Effect or Symbol, "No arguments provided"
-        #  if we don't have Symbol, then we deal with Effect
+        assert Effect or symbol, "No arguments provided"
+        #  if we don't have symbol, then we deal with Effect
 
         consequence_type = 'consequence_type'
         if self.general_release > 67:
@@ -579,7 +579,7 @@ class Genome(object):
             else:
                 query = var_feature_table.columns[consequence_type] == Effect
         else:
-            query = var_feature_table.c.variation_name == Symbol
+            query = var_feature_table.c.variation_name == symbol
 
         if validated:
             # in release 65, the default validated status is now ''
@@ -604,7 +604,7 @@ class Genome(object):
             query = query.limit(limit)
 
         for record in query.execute():
-            yield Variation(self, self.CoreDb, Effect=Effect, Symbol=Symbol,
+            yield Variation(self, self.CoreDb, Effect=Effect, symbol=symbol,
                             data=record)
 
     def get_region(self, region=None, coord_name=None, start=None, end=None,

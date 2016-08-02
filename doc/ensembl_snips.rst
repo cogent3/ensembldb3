@@ -93,12 +93,12 @@ We query for the *BRCA2* gene for humans.
     >>> human = Genome('human', release=76, account=account)
     >>> print human
     Genome(Species='Homo sapiens'; release='76')
-    >>> genes = human.get_genes_matching(Symbol='BRCA2')
+    >>> genes = human.get_genes_matching(symbol='BRCA2')
     >>> for gene in genes:
-    ...     if gene.Symbol == 'BRCA2':
+    ...     if gene.symbol == 'BRCA2':
     ...         print gene
     ...         break
-    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; Symbol='BRCA2')
+    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
 
 Find a gene by Ensembl Stable ID
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +111,7 @@ We use the stable ID for *BRCA2*.
     >>> human = Genome('human', release=76, account=account)
     >>> gene = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print gene
-    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; Symbol='BRCA2')
+    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
 
 Find genes matching a description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -125,7 +125,7 @@ We look for breast cancer related genes that are estrogen induced.
     >>> genes = human.get_genes_matching(Description='breast cancer anti-estrogen')
     >>> for gene in genes:
     ...     print gene
-    Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; Symbol='BCAR4')...
+    Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
 
 We can also require that an exact (case insensitive) match to the word(s) occurs within the description by setting ``like=False``.
 
@@ -135,7 +135,7 @@ We can also require that an exact (case insensitive) match to the word(s) occurs
     ...                                  like=False)
     >>> for gene in genes:
     ...     print gene
-    Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; Symbol='BCAR4')...
+    Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
 
 Get canonical transcript for a gene
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -277,7 +277,7 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
     >>> for variant in transcript.Variants:
     ...     print variant
     ...     break
-    Variation(Symbol='rs370721506'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', '5_prime...
+    Variation(symbol='rs370721506'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', '5_prime...
 
 Get a single SNP
 ^^^^^^^^^^^^^^^^
@@ -286,7 +286,7 @@ We get a single SNP and print it's allele frequencies.
 
 .. doctest::
     
-    >>> snp = list(human.get_variation(Symbol='rs34213141'))[0]
+    >>> snp = list(human.get_variation(symbol='rs34213141'))[0]
     >>> print snp.AlleleFreqs
     =================================
     allele      freq    population_id

@@ -105,7 +105,7 @@ class _Region(LazyRecord):
         # override in subclasses
         return None
 
-    Symbol = property(_get_symbol)
+    symbol = property(_get_symbol)
 
     def get_features(self, feature_types, where_feature=None):
         """queries the parent genome for feature types corresponding to this
@@ -128,7 +128,7 @@ class _Region(LazyRecord):
     Variants = property(_get_variants)
 
     def feature_data(self, parent_map):
-        symbol = self.Symbol or getattr(self, 'StableId', '')
+        symbol = self.symbol or getattr(self, 'StableId', '')
         assert not parent_map.reverse
         feat_map = parent_map[self.location.start:self.location.end]
         if feat_map.useful:
@@ -280,13 +280,13 @@ class Gene(_StableRegion):
     Type = 'gene'
     _member_types = ['Transcripts']
 
-    def __init__(self, genome, db, StableId=None, Symbol=None, location=None, data=None):
+    def __init__(self, genome, db, StableId=None, symbol=None, location=None, data=None):
         """constructed by a genome instance"""
         super(Gene, self).__init__(genome, db, location=location)
 
         self._attr_ensembl_table_map = dict(StableId=['gene_stable_id',
                                                       'gene'][genome.general_release >= 65],
-                                            Symbol='xref',
+                                            symbol='xref',
                                             Description='gene', BioType='gene', location='gene',
                                             CanonicalTranscript='gene',
                                             Transcripts='transcript',
@@ -294,7 +294,7 @@ class Gene(_StableRegion):
 
         if data is None:
             args = [dict(StableId=StableId), dict(
-                Symbol=Symbol)][StableId is None]
+                symbol=symbol)][StableId is None]
             assert args
             data = asserted_one(
                 list(self.genome._get_gene_query(db, **args).execute()))
@@ -303,10 +303,10 @@ class Gene(_StableRegion):
             [('StableId', self._get_gene_stable_id_record),
              ('BioType', self._get_gene_record),
              ('Description', self._get_gene_record),
-             ('Symbol', self._get_xref_record),
+             ('symbol', self._get_xref_record),
              ('location', self._get_gene_record)]:
             # For EST
-            if name == 'Symbol' and 'display_label' not in list(data.keys()):
+            if name == 'symbol' and 'display_label' not in list(data.keys()):
                 continue
             self._table_rows[self._attr_ensembl_table_map[name]] = data
             func()  # this populates the attributes
@@ -344,7 +344,7 @@ class Gene(_StableRegion):
         return
 
     def _get_xref_record(self):
-        attr_column_map = [('Symbol', 'display_label', _quoted)]
+        attr_column_map = [('symbol', 'display_label', _quoted)]
         self._populate_cache_from_record(attr_column_map, 'xref')
         return
 
@@ -355,11 +355,11 @@ class Gene(_StableRegion):
 
     def _get_symbol(self):
         if 'xref' in self._table_rows:
-            return self._get_cached_value('Symbol', self._get_xref_record)
-        self._set_null_values(['Symbol'])
-        return self._cached['Symbol']
+            return self._get_cached_value('symbol', self._get_xref_record)
+        self._set_null_values(['symbol'])
+        return self._cached['symbol']
 
-    Symbol = property(_get_symbol)
+    symbol = property(_get_symbol)
 
     def _get_description(self):
         return self._get_cached_value('Description', self._get_gene_record)
@@ -907,12 +907,12 @@ class Exon(_StableRegion):
         self._table_rows['exon'] = record
 
     def _make_symbol(self):
-        self._cached['Symbol'] = '%s-%s' % (self.StableId, self.Rank)
+        self._cached['symbol'] = '%s-%s' % (self.StableId, self.Rank)
 
     def _get_symbol(self):
-        return self._get_cached_value('Symbol', self._make_symbol)
+        return self._get_cached_value('symbol', self._make_symbol)
 
-    Symbol = property(_get_symbol)
+    symbol = property(_get_symbol)
 
     def _make_phase(self):
         """creates the exon phase attributes"""
@@ -951,12 +951,12 @@ class Intron(GenericRegion):
                                                  self.TranscriptStableId, self.Rank)
 
     def _make_symbol(self):
-        self._cached['Symbol'] = '%s-%s' % (self.TranscriptStableId, self.Rank)
+        self._cached['symbol'] = '%s-%s' % (self.TranscriptStableId, self.Rank)
 
     def _get_symbol(self):
-        return self._get_cached_value('Symbol', self._make_symbol)
+        return self._get_cached_value('symbol', self._make_symbol)
 
-    Symbol = property(_get_symbol)
+    symbol = property(_get_symbol)
 
 
 class Est(Gene):
@@ -977,7 +977,7 @@ class Variation(_Region):
     """genomic variation"""
     Type = 'variation'
 
-    def __init__(self, genome, db=None, Effect=None, Symbol=None, data=None):
+    def __init__(self, genome, db=None, Effect=None, symbol=None, data=None):
         self.genome = genome
 
         get_table = genome.VarDb.get_table
@@ -998,7 +998,7 @@ class Variation(_Region):
             self._get_flanking_seq_data = self._get_flanking_seq_data_ge_70
 
         self._attr_ensembl_table_map = dict(Effect='variation_feature',
-                                            Symbol='variation_feature',
+                                            symbol='variation_feature',
                                             Validation='variation_feature',
                                             MapWeight='variation_feature',
                                             FlankingSeq='flanking_sequence',
@@ -1011,7 +1011,7 @@ class Variation(_Region):
         assert data is not None, 'Variation record created in an unusual way'
         for name, value, func in \
             [('Effect', Effect, self._get_variation_table_record),
-             ('Symbol', Symbol, self._get_variation_table_record)]:
+             ('symbol', symbol, self._get_variation_table_record)]:
             if value is not None:
                 self._table_rows[self._attr_ensembl_table_map[name]] = data
                 if func is not None:
@@ -1026,8 +1026,8 @@ class Variation(_Region):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(Symbol=%r; Effect=%r; Alleles=%r)" % \
-               (my_type, self.Symbol, self.Effect, self.Alleles)
+        return "%s(symbol=%r; Effect=%r; Alleles=%r)" % \
+               (my_type, self.symbol, self.Effect, self.Alleles)
 
     def _get_variation_table_record(self):
         # this is actually the variation_feature table
@@ -1037,13 +1037,13 @@ class Variation(_Region):
 
         attr_name_map = [('Effect', consequence_type, _set_to_string),
                          ('Alleles', 'allele_string', _quoted),
-                         ('Symbol', 'variation_name', _quoted),
+                         ('symbol', 'variation_name', _quoted),
                          ('Validation', 'validation_status', _set_to_string),
                          ('MapWeight', 'map_weight', int),
                          ('Somatic', 'somatic', bool)]
         self._populate_cache_from_record(attr_name_map, 'variation_feature')
         # TODO handle obtaining the variation_feature if we were created in
-        # any way other than through the Symbol or Effect
+        # any way other than through the symbol or Effect
 
     def _get_ancestral_data(self):
         # actually the variation table
@@ -1200,10 +1200,10 @@ class Variation(_Region):
     AlleleFreqs = property(_get_allele_freqs)
 
     def _get_symbol(self):
-        return self._get_cached_value('Symbol',
+        return self._get_cached_value('symbol',
                                       self._get_variation_table_record)
 
-    Symbol = property(_get_symbol)
+    symbol = property(_get_symbol)
 
     def _get_validation(self):
         return self._get_cached_value('Validation',
@@ -1344,7 +1344,7 @@ class Repeat(GenericRegion):
 
     def __init__(self, genome, db, location, Score, data):
         super(Repeat, self).__init__(genome=genome, db=db, location=location)
-        self._attr_ensembl_table_map = dict(Symbol='repeat_consensus',
+        self._attr_ensembl_table_map = dict(symbol='repeat_consensus',
                                             RepeatType='repeat_consensus',
                                             RepeatClass='repeat_consensus',
                                             Consensus='repeat_consensus')
@@ -1372,17 +1372,17 @@ class Repeat(GenericRegion):
         record = asserted_one(record.execute().fetchall())
         self._table_rows['repeat_consensus'] = record
         limit_length = lambda x: DisplayString(x, repr_length=10)
-        attr_column_map = [('Symbol', 'repeat_name', _quoted),
+        attr_column_map = [('symbol', 'repeat_name', _quoted),
                            ('RepeatClass', 'repeat_class', _quoted),
                            ('RepeatType', 'repeat_type', _quoted),
                            ('Consensus', 'repeat_consensus', limit_length)]
         self._populate_cache_from_record(attr_column_map, 'repeat_consensus')
 
     def _get_symbol(self):
-        return self._get_cached_value('Symbol',
+        return self._get_cached_value('symbol',
                                       self._get_repeat_consensus_record)
 
-    Symbol = property(_get_symbol)
+    symbol = property(_get_symbol)
 
     def _get_repeat_class(self):
         return self._get_cached_value('RepeatClass',
