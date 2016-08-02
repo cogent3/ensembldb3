@@ -71,7 +71,7 @@ class EnsemblDbName(object):
             db_name = db_name.name
         self.name = db_name
         self.Type = get_dbtype_from_name(db_name)
-        self.Prefix = get_db_prefix(db_name)
+        self.prefix = get_db_prefix(db_name)
 
         release, build = get_version_from_name(db_name)
         self.release = release
@@ -90,11 +90,11 @@ class EnsemblDbName(object):
             self.Build = None
 
         self.species = None
-        self.species = Species.get_species_name(self.Prefix)
+        self.species = Species.get_species_name(self.prefix)
 
     def __repr__(self):
         build = ['', "; Build='%s'" % self.Build][self.Build is not None]
-        s = "db(Prefix='%s'; Type='%s'; release='%s'%s)" % (self.Prefix, self.Type,
+        s = "db(prefix='%s'; Type='%s'; release='%s'%s)" % (self.prefix, self.Type,
                                                             self.release, build)
         return s
 
