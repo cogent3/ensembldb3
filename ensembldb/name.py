@@ -79,21 +79,21 @@ class EnsemblDbName(object):
 
         if len(build) == 1:
             if self.type != 'compara':
-                self.Build = build[0]
+                self.build = build[0]
             else:
-                self.Build = None
+                self.build = None
                 self.general_release = build[0]
         elif build:
-            self.Build = build[1]
+            self.build = build[1]
             self.general_release = build[0]
         else:
-            self.Build = None
+            self.build = None
 
         self.species = None
         self.species = Species.get_species_name(self.prefix)
 
     def __repr__(self):
-        build = ['', "; Build='%s'" % self.Build][self.Build is not None]
+        build = ['', "; build='%s'" % self.build][self.build is not None]
         s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (self.prefix, self.type,
                                                             self.release, build)
         return s
