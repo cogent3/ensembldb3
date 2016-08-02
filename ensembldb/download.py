@@ -104,7 +104,7 @@ def download_db(remote_path, local_path, verbose=False, debug=False):
         kwargs = {}
     
     r = exec_command(cmnd, **kwargs)
-    if debug or verbose:
+    if debug or verbose and r:
         print(r)
     
 def read_config(config_path, verbose=False):
