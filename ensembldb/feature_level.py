@@ -31,7 +31,7 @@ class FeatureCoordLevelsCache(object):
     _species_feature_dbs = {}
 
     def __init__(self, species):
-        self.Species = _Species.get_species_name(species)
+        self.species = _Species.get_species_name(species)
 
     def __repr__(self):
         """print table format"""
@@ -111,7 +111,7 @@ class FeatureCoordLevelsCache(object):
     def __call__(self, species=None, core_db=None, feature_types=None, var_db=None, otherfeature_db=None):
         if 'variation' in feature_types:
             assert var_db is not None
-        species = _Species.get_species_name(core_db.db_name.Species or species)
+        species = _Species.get_species_name(core_db.db_name.species or species)
         self._set_species_feature_levels(
             species, core_db, feature_types, var_db, otherfeature_db)
         return self._species_feature_levels[species]
@@ -120,18 +120,18 @@ class FeatureCoordLevelsCache(object):
 class FeatureCoordLevels(FeatureCoordLevelsCache):
 
     def __init__(self, species):
-        self.Species = _Species.get_species_name(species)
+        self.species = _Species.get_species_name(species)
 
     def __repr__(self):
         """print table format"""
         header = ['Type', 'Levels']
-        if self.Species not in self._species_feature_levels:
+        if self.species not in self._species_feature_levels:
             result = ''
         else:
             collate = []
-            feature_levels = self._species_feature_levels[self.Species]
+            feature_levels = self._species_feature_levels[self.species]
             for feature in list(feature_levels.keys()):
                 record = feature_levels[feature]
                 collate.append([feature, ', '.join(record.levels)])
-            result = str(Table(header, collate, title=self.Species))
+            result = str(Table(header, collate, title=self.species))
         return result

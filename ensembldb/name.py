@@ -89,8 +89,8 @@ class EnsemblDbName(object):
         else:
             self.Build = None
 
-        self.Species = None
-        self.Species = Species.get_species_name(self.Prefix)
+        self.species = None
+        self.species = Species.get_species_name(self.Prefix)
 
     def __repr__(self):
         build = ['', "; Build='%s'" % self.Build][self.Build is not None]

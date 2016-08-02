@@ -70,7 +70,7 @@ class FeatureTypeCache(LazyRecord):
 class Genome(object):
     """An Ensembl Genome"""
 
-    def __init__(self, Species, release, account=None, pool_recycle=None):
+    def __init__(self, species, release, account=None, pool_recycle=None):
         super(Genome, self).__init__()
 
         assert release, 'invalid release specified'
@@ -88,7 +88,7 @@ class Genome(object):
         self._gen_release = None
 
         # TODO make name and release immutable properties
-        self.Species = _Species.get_species_name(Species)
+        self.species = _Species.get_species_name(species)
         self.release = str(release)
 
         # the db connections
@@ -96,11 +96,11 @@ class Genome(object):
         self._var_db = None
         self._other_db = None
         self._feature_type_ids = FeatureTypeCache(self)
-        self._feature_coord_levels = FeatureCoordLevels(self.Species)
+        self._feature_coord_levels = FeatureCoordLevels(self.species)
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species='%s'; release='%s')" % (my_type, self.Species,
+        return "%s(species='%s'; release='%s')" % (my_type, self.species,
                                                    self.release)
 
     def __repr__(self):
@@ -117,7 +117,7 @@ class Genome(object):
 
     def _connect_db(self, db_type):
         connection = dict(account=self._account, release=self.release,
-                          species=self.Species, pool_recycle=self._pool_recycle)
+                          species=self.species, pool_recycle=self._pool_recycle)
         if self._core_db is None and db_type == 'core':
             self._core_db = Database(db_type='core', **connection)
             gen_rel = self.CoreDb.db_name.general_release
@@ -485,7 +485,7 @@ class Genome(object):
             dbs["var_db"] = self.VarDb
         if 'est' in feature_types:
             dbs["otherfeature_db"] = self.OtherFeaturesDb
-        feature_coord_levels = self._feature_coord_levels(self.Species,
+        feature_coord_levels = self._feature_coord_levels(self.species,
                                                           feature_types=feature_types, **dbs)
         return feature_coord_levels
 

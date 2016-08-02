@@ -197,9 +197,9 @@ class GenericRegion(_Region):
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species='%s'; coord_name='%s'; start=%s; end=%s;"\
+        return "%s(species='%s'; coord_name='%s'; start=%s; end=%s;"\
                " length=%s; strand='%s')" % (my_type,
-                                             self.genome.Species,
+                                             self.genome.species,
                                              self.location.coord_name, self.location.start,
                                              self.location.end, len(self), '-+'[self.location.strand > 0])
 
@@ -228,7 +228,7 @@ class _StableRegion(GenericRegion):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return '%s(%s; %s)' % (my_type, self.genome.Species, self.StableId)
+        return '%s(%s; %s)' % (my_type, self.genome.species, self.StableId)
 
     def _get_record_for_stable_id(self):
         # subclasses need to provide a function for loading the correct
@@ -316,7 +316,7 @@ class Gene(_StableRegion):
         vals = ['%s=%r' % (key, val) for key, val in list(self._cached.items())
                 if val is not None]
         vals.sort()
-        vals.insert(0, "Species='%s'" % self.genome.Species)
+        vals.insert(0, "species='%s'" % self.genome.species)
         return '%s(%s)' % (my_type, '; '.join(vals))
 
     def __repr__(self):
@@ -324,7 +324,7 @@ class Gene(_StableRegion):
         vals = ['%s=%r' % (key, val) for key, val in list(self._cached.items())
                 if val is not None]
         vals.sort()
-        vals.insert(0, 'Species=%r' % self.genome.Species)
+        vals.insert(0, 'species=%r' % self.genome.species)
         return '%s(%s)' % (my_type, '; '.join(vals))
 
     def _get_gene_record(self):

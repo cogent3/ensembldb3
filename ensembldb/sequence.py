@@ -73,7 +73,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
     genome = coord.genome
     # no matter what strand user provide, we get the + sequence first
     coord.strand = 1
-    species = genome.Species
+    species = genome.species
     coord_type = CoordSystem(species=species, core_db=genome.CoreDb,
                              seq_level=True)
 
@@ -109,7 +109,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
 
 
 def _get_sequence_from_lower_assembly(coord, DEBUG):
-    assemblies = get_lower_coord_conversion(coord, coord.genome.Species,
+    assemblies = get_lower_coord_conversion(coord, coord.genome.species,
                                             coord.genome.CoreDb)
     if not assemblies:
         raise NoItemError('no assembly for %s' % coord)

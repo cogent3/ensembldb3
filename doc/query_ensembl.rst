@@ -83,9 +83,9 @@ As implied above, Ensembl databases are versioned, hence you must explicitly sta
 .. doctest::
 
     >>> from ensembldb import HostAccount, Genome
-    >>> human = Genome(Species='human', release=release, account=account)
+    >>> human = Genome(species='human', release=release, account=account)
     >>> print human
-    Genome(Species='Homo sapiens'; release='76')
+    Genome(species='Homo sapiens'; release='76')
 
 Notice I used the common name rather than full name. The ``Genome`` provides an interface to obtaining different attributes. It's primary role is to allow selection of genomic regions according to some search criteria. The type of region is presently limited to ``Gene``, ``Est``, ``CpGisland``, ``Repeat`` and ``Variation``. There's also a ``GenericRegion``. The specific types are also capable of identifying information related to themselves, as we will demonstrate below.
 
@@ -129,7 +129,7 @@ Because there can be multiple hits from a ``get_genes_matching`` query, and beca
     >>> print brca2.Description
     breast cancer 2...
     >>> print brca2
-    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast...
+    Gene(species='Homo sapiens'; BioType='protein_coding'; Description='breast...
 
 This code serves to illustrate a few things. First, the sorts of properties that exist on the object. These can be directly accessed as illustrated above. Secondly, that the argument names to ``get_genes_matching`` match the properties.
 
@@ -226,7 +226,7 @@ The genome can be queried for any of these types, for instance we'll query for `
     ...     if count == 1:
     ...         break
     ...
-    Gene(Species='Homo sapiens'; BioType='rRNA'; Description='RNA, 5S...
+    Gene(species='Homo sapiens'; BioType='rRNA'; Description='RNA, 5S...
 
 This has the effect of returning any gene whose ``BioType`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``Transcripts`` will have ``ProteinSeq==None`` and ``TranslatedExons==None``, but it will have ``Exons`` and a ``Cds``.
 
@@ -247,7 +247,7 @@ Ensembl's ``otherfeatures`` database mirrors the structure of the ``core`` datab
     >>> ests = human.get_features(feature_types='est', region=brca2)
     >>> for est in ests:
     ...     print est
-    Est(Species='Homo sapiens'; BioType='protein_coding'; Description='None';...
+    Est(species='Homo sapiens'; BioType='protein_coding'; Description='None';...
 
 Getting Variation
 ^^^^^^^^^^^^^^^^^
@@ -341,7 +341,7 @@ In Ensembl's databases, each type of feature may be recorded at multiple coordin
 
 .. doctest::
 
-   >>> chicken = Genome(Species='chook', release=release, account=account)
+   >>> chicken = Genome(species='chook', release=release, account=account)
    >>> print chicken.feature_coord_levels
    Gallus gallus
    ============================================
@@ -367,7 +367,7 @@ The Ensembl compara database is represented by ``cogent.db.ensembl.compara.Compa
     >>> compara = Compara(['human', 'mouse', 'rat'], account=account,
     ...                  release=release)
     >>> print compara
-    Compara(Species=('Homo sapiens', 'Mus musculus', 'Rattus norvegicus'); release=76...
+    Compara(species=('Homo sapiens', 'Mus musculus', 'Rattus norvegicus'); release=76...
 
 The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to itself as named attributes (use ``Species.get_compara_name`` to find out what the attribute will be). The genome instances are named according to their common name in CamelCase, or Scase. For instance, if we had created a ``Compara`` instance with the American pika species included, then that genome would be accessed as ``compara.AmericanPika``. Common names containing a '.' are treated differently. For instance, the common name for *Caenorhabditis remanei* is ``C.remanei`` which becomes ``compara.Cremanei``. We access the human genome in this ``Compara`` instance and conduct a gene search.
 
@@ -375,7 +375,7 @@ The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to
 
     >>> brca2 = compara.Human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print brca2
-    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast...
+    Gene(species='Homo sapiens'; BioType='protein_coding'; Description='breast...
 
 We can now use this result to search compara for related genes. We note here that like ``Genome``, ``Compara`` has the ``get_distinct`` method to assist in identifying appropriate search criteria. What are the distinct types of gene relationships recorded in Ensembl, for instance?
 
@@ -394,7 +394,7 @@ So we use the ``brca2`` instance above and search for orthologs among the human,
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(Species='Rattus norvegicus'; BioType='protein_coding'; Description='breast cancer ...
+      Gene(species='Rattus norvegicus'; BioType='protein_coding'; Description='breast cancer ...
 
 I could also have done that query using a ``StableId``, which I now do using the Ensembl mouse identifier for *Brca2*.
 
@@ -405,14 +405,14 @@ I could also have done that query using a ``StableId``, which I now do using the
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(Species='Rattus norvegicus'; BioType='protein_coding'; Description='breast cancer...
+      Gene(species='Rattus norvegicus'; BioType='protein_coding'; Description='breast cancer...
 
 The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``Members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
 
 .. doctest::
 
     >>> print orthologs.Members
-    (Gene(Species='Rattus norvegicus'; BioType='protein_coding'; Descr...
+    (Gene(species='Rattus norvegicus'; BioType='protein_coding'; Descr...
     >>> print orthologs.get_seqLengths()
     [40748, 84793, 47117]
 
@@ -440,7 +440,7 @@ We can also search for other relationship types, which we do here for a histone.
     >>> print paralogs
     RelatedGenes:
      Relationships=within_species_paralog
-      Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='H2A...
+      Gene(species='Homo sapiens'; BioType='protein_coding'; Description='H2A...
 
 Getting Comparative Alignments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -483,7 +483,7 @@ We consider a species for which pairwise alignments are available -- the bush ba
     >>> compara_pair = Compara(['Human', 'Bushbaby'], release=release,
     ...                        account=account)
     >>> print compara_pair
-    Compara(Species=('Homo sapiens', 'Otolemur garnettii'); release=76; connected=True)
+    Compara(species=('Homo sapiens', 'Otolemur garnettii'); release=76; connected=True)
 
 
 Printing the ``method_species_links`` table provides all the necessary information for specifying selection conditions.
@@ -503,7 +503,7 @@ Printing the ``method_species_links`` table provides all the necessary informati
     ...                             StableId='ENSOGAG00000003166')
     ...
     >>> print gene
-    Gene(Species='Otolemur garnettii'; BioType='protein_coding'...
+    Gene(species='Otolemur garnettii'; BioType='protein_coding'...
     >>> syntenic = compara_pair.get_syntenic_regions(region=gene,
     ...          align_method='LASTZ_NET', align_clade='H.sap-O.gar')
     ...

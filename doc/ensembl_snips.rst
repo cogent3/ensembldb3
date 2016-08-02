@@ -92,13 +92,13 @@ We query for the *BRCA2* gene for humans.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> print human
-    Genome(Species='Homo sapiens'; release='76')
+    Genome(species='Homo sapiens'; release='76')
     >>> genes = human.get_genes_matching(symbol='BRCA2')
     >>> for gene in genes:
     ...     if gene.symbol == 'BRCA2':
     ...         print gene
     ...         break
-    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
+    Gene(species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
 
 Find a gene by Ensembl Stable ID
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +111,7 @@ We use the stable ID for *BRCA2*.
     >>> human = Genome('human', release=76, account=account)
     >>> gene = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print gene
-    Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
+    Gene(species='Homo sapiens'; BioType='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
 
 Find genes matching a description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -125,7 +125,7 @@ We look for breast cancer related genes that are estrogen induced.
     >>> genes = human.get_genes_matching(Description='breast cancer anti-estrogen')
     >>> for gene in genes:
     ...     print gene
-    Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
+    Gene(species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
 
 We can also require that an exact (case insensitive) match to the word(s) occurs within the description by setting ``like=False``.
 
@@ -135,7 +135,7 @@ We can also require that an exact (case insensitive) match to the word(s) occurs
     ...                                  like=False)
     >>> for gene in genes:
     ...     print gene
-    Gene(Species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
+    Gene(species='Homo sapiens'; BioType='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
 
 Get canonical transcript for a gene
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -149,7 +149,7 @@ We get the canonical transcripts for *BRCA2*.
     >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
     >>> print transcript
-    Transcript(Species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
+    Transcript(species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
 
 Get the CDS for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -176,8 +176,8 @@ Look at all transcripts for a gene
     >>> brca2 = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> for transcript in brca2.Transcripts:
     ...     print transcript
-    Transcript(Species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
-    Transcript(Species='Homo sapiens'; coord_name='13'; start=32315504; end=32333291; length=17787; strand='+')...
+    Transcript(species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
+    Transcript(species='Homo sapiens'; coord_name='13'; start=32315504; end=32333291; length=17787; strand='+')...
 
 Get the first exon for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -359,7 +359,7 @@ alignment method in the vertebrates clade:
     >>> compara = Compara(species, release=66)
     >>> clade = "vertebrates"
     >>> chrom, start, end, strand = "X", 155754928, 155755079, "-"
-    >>> regions = compara.get_syntenic_regions(Species="mouse", coord_name=chrom, 
+    >>> regions = compara.get_syntenic_regions(species="mouse", coord_name=chrom, 
     ...                                      start=start, end=end, align_method="PECAN", 
     ...                                      align_clade=clade, strand=strand)     
     >>> aligned_pairs = [r for r in regions]
@@ -412,7 +412,7 @@ We get the one-to-one orthologs for *BRCA2*.
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(Species='Macaca mulatta'; BioType='protein_coding'; Description=...
+      Gene(species='Macaca mulatta'; BioType='protein_coding'; Description=...
 
 We iterate over the related members.
 
@@ -420,7 +420,7 @@ We iterate over the related members.
     
     >>> for ortholog in orthologs.Members:
     ...     print ortholog
-    Gene(Species='Macaca mulatta'; BioType='protein_coding'; Description=...
+    Gene(species='Macaca mulatta'; BioType='protein_coding'; Description=...
 
 We get statistics on the ortholog CDS lengths.
 
@@ -460,7 +460,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     ...             seq = m.CanonicalTranscript.Cds.trim_stop_codon()
     ...             # make the sequence name
     ...             seq.name = '%s:%s:%s' % \
-    ...         (latin_to_common[m.genome.Species], m.StableId, m.location)
+    ...         (latin_to_common[m.genome.species], m.StableId, m.location)
     ...             aa = seq.getTranslation()
     ...             seqs += [seq]
     ...         except (AlphabetError, AssertionError):
@@ -480,5 +480,5 @@ Get within species paralogs
     >>> print paralogs
     RelatedGenes:
      Relationships=within_species_paralog
-      Gene(Species='Homo sapiens'; BioType='protein_coding'; Description='H2A histone...
+      Gene(species='Homo sapiens'; BioType='protein_coding'; Description='H2A histone...
 

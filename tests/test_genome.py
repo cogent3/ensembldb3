@@ -37,11 +37,11 @@ else:
 
 
 class GenomeTestBase(TestCase):
-    human = Genome(Species="human", release=release, account=account)
-    mouse = Genome(Species="mouse", release=release, account=account)
-    rat = Genome(Species="rat", release=release, account=account)
-    macaq = Genome(Species="macaque", release=release, account=account)
-    gorilla = Genome(Species="gorilla", release=release, account=account)
+    human = Genome(species="human", release=release, account=account)
+    mouse = Genome(species="mouse", release=release, account=account)
+    rat = Genome(species="rat", release=release, account=account)
+    macaq = Genome(species="macaque", release=release, account=account)
+    gorilla = Genome(species="gorilla", release=release, account=account)
     brca2 = human.get_gene_by_stableid(StableId="ENSG00000139618")
 
 
@@ -58,7 +58,7 @@ class TestGenome(GenomeTestBase):
 
     def test_genome_comparison(self):
         """different genome instances with same CoreDb connection are equal"""
-        h2 = Genome(Species='human', release=release, account=account)
+        h2 = Genome(species='human', release=release, account=account)
         self.assertEqual(self.human, h2)
 
     def test_make_location(self):
@@ -120,13 +120,13 @@ class TestGenome(GenomeTestBase):
 
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
-        dog = Genome(Species="dog", release=release, account=account,
+        dog = Genome(species="dog", release=release, account=account,
                      pool_recycle=1000)
 
     def test_gorilla(self):
         """should correctly return a gorilla gene"""
         self.gorilla = Genome(
-            Species="gorilla", release=release, account=account)
+            species="gorilla", release=release, account=account)
         gene = self.gorilla.get_gene_by_stableid('ENSGGOG00000005730')
         self.assertEqual(str(gene.Seq[:10]), 'TGGGAGTCCA')
 

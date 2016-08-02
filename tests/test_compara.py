@@ -110,7 +110,7 @@ class TestCompara(ComparaTestBase):
         assembly gap"""
         start = 100000
         end = start + 100000
-        related = list(self.comp.get_syntenic_regions(Species='mouse',
+        related = list(self.comp.get_syntenic_regions(species='mouse',
                                                     coord_name='1', start=start, end=end,
                                                     align_method='PECAN', align_clade='vertebrates'))
         self.assertEqual(related, [])
@@ -138,47 +138,47 @@ class TestSyntenicRegions(TestCase):
         """should return the correct alignments"""
         # following cases have a mixture of strand between ref seq and others
         coords_expected = [
-            [{'coord_name': 4, 'end': 78207, 'Species': 'human', 'start': 78107, 'strand': -1},
+            [{'coord_name': 4, 'end': 78207, 'species': 'human', 'start': 78107, 'strand': -1},
              {'Homo sapiens:chromosome:4:77999-78099:-1':
               'ATGTAAATCAAAACCAAAGTCTGCATTTATTTGCGGAAAGAGATGCTACATGTTCAAAGATAAATATGGAACATTTTTTAAAAGCATTCATGACTTAGAA',
               'Macaca mulatta:chromosome:1:3891064-3891163:1':
               'ATGTCAATCAAAACCAAAGTCTGTATTTATTTGCAGAAAGAGATACTGCATGTTCAAAGATAAATATGGAAC-TTTTTAAAAAGCATTAATGACTTATAC',
               'Pan troglodytes:chromosome:4:102056-102156:-1':
               'ATGTAAATCAAAACCAAAGTCTGCATTTATTTGCGGAAAGAGATGCTACATGTTCAAAGATAAATATGGAACATTTTTAAAAAGCATTCATGACTTAGAA'}],
-            [{'coord_name': 18, 'end': 213739, 'Species': 'human', 'start': 213639, 'strand': -1},
+            [{'coord_name': 18, 'end': 213739, 'species': 'human', 'start': 213639, 'strand': -1},
                 {'Homo sapiens:chromosome:18:213639-213739:-1':
                  'ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGAGTGAGTGCAGATTATTCGGTAAACACT----CTTA',
                  'Macaca mulatta:chromosome:18:13858303-13858397:1':
                  '------GTTTCCCTTTAGGGCTCTAAGATGAGGTCATCATTGTTTTTAATCCTGAAGAAGGGCTACTGA----GTGCAGATTATTCTGTAAATGTGCTTACTTG',
                  'Pan troglodytes:chromosome:18:16601082-16601182:1':
                  'ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGA----GTGCAGATTATTCTGTAAACACTCACTCTTA'}],
-            [{'coord_name': 5, 'end': 204859, 'Species': 'human', 'start': 204759, 'strand': 1},
+            [{'coord_name': 5, 'end': 204859, 'species': 'human', 'start': 204759, 'strand': 1},
                 {'Homo sapiens:chromosome:5:204874-204974:1':
                  'AACACTTGGTATTT----CCCCTTTATGGAGTGAGAGAGATCTTTAAAATATAAACCCTTGATAATATAATATTACTACTTCCTATTA---CCTGTTATGCAGTTCT',
                  'Macaca mulatta:chromosome:6:1297736-1297840:-1':
                  'AACTCTTGGTGTTTCCTTCCCCTTTATGG---GAGAGAGATCTTTAAAATAAAAAACCTTGATAATATAATATTACTACTTTCTATTATCATCTGTTATGCAGTTCT',
                  'Pan troglodytes:chromosome:5:335911-336011:1':
                  'AACACTTGGTAGTT----CCCCTTTATGGAGTGAGAGAGATCTTTAAAATATAAACCCTTGATAATATAATATTACTACTTTCTATTA---CCTGTTATGCAGTTCT'}],
-            [{'coord_name': 18, 'end': 203270, 'Species': 'human', 'start': 203170, 'strand': -1},
+            [{'coord_name': 18, 'end': 203270, 'species': 'human', 'start': 203170, 'strand': -1},
                 {'Homo sapiens:chromosome:18:203170-203270:-1':
                  'GGAATAATGAAAGCAATTGTGAGTTAGCAATTACCTTCAAAGAATTACATTTCTTATACAAAGTAAAGTTCATTACTAACCTTAAGAACTTTGGCATTCA',
                  'Pan troglodytes:chromosome:18:16611584-16611684:1':
                  'GGAATAATGAAAGCAATTGTAAGTTAGCAATTACCTTCAAAGAATTACATTTCTTATACAAAGTAAAGTTCATTACTAACCTTAAGAACTTTGGCATTCA'}],
-            [{'coord_name': 2, 'end': 46445, 'Species': 'human', 'start': 46345, 'strand': -1},
+            [{'coord_name': 2, 'end': 46445, 'species': 'human', 'start': 46345, 'strand': -1},
                 {'Homo sapiens:chromosome:2:46345-46445:-1':
                  'CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCGGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAGCGCGCCCCCGAACGAGC',
                  'Macaca mulatta:chromosome:13:43921-44021:-1':
                  'CTGCCACTCCAGCGCGTCTCCGCTGCACCCGGAGCGCCGGCCGGTCCATTCCCCGCGAGGATGCGCGCCCTGGCGGCCCTGAACACGTCGGCGAGAGAGC',
                  'Pan troglodytes:chromosome:2a:36792-36892:-1':
                  'CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCAGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAACGCGCCCCCGAACGAGC'}],
-            [{'coord_name': 18, 'end': 268049, 'Species': 'human', 'start': 267949, 'strand': -1},
+            [{'coord_name': 18, 'end': 268049, 'species': 'human', 'start': 267949, 'strand': -1},
                 {'Homo sapiens:chromosome:18:267949-268049:-1':
                  'GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGAGGGG',
                  'Macaca mulatta:chromosome:18:13805604-13805703:1':
                  'GCGCAG-GGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGGCGGG',
                  'Pan troglodytes:chromosome:18:16546800-16546900:1':
                  'GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGCGGGG'}],
-            [{'coord_name': 16, 'end': 57443, 'Species': 'human', 'start': 57343, 'strand': -1},
+            [{'coord_name': 16, 'end': 57443, 'species': 'human', 'start': 57343, 'strand': -1},
                 {'Homo sapiens:chromosome:16:107343-107443:-1':
                  'AAGAAGCAAACAGGTTTATTTTATACAGTGGGCCAGGCCGTGGGTCTGCCATGTGACTAGGGCATTTGGACCTAGGGAGAGGTCAGTCTCAGGCCAAGTA',
                  'Pan troglodytes:chromosome:16:48943-49032:-1':

@@ -33,7 +33,7 @@ else:
 class TestFeatureCoordLevels(TestCase):
 
     def setUp(self):
-        self.chicken = Genome(Species='chicken', release=release,
+        self.chicken = Genome(species='chicken', release=release,
                               account=account)
 
     def test_feature_levels(self):

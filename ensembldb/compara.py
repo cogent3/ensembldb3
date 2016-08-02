@@ -34,7 +34,7 @@ class Compara(object):
         self._pool_recycle = pool_recycle
         self._compara_db = None
         sp = sorted([_Species.get_species_name(sp) for sp in set(species)])
-        self.Species = tuple(sp)
+        self.species = tuple(sp)
         self._genomes = {}
         self._attach_genomes()
 
@@ -45,17 +45,17 @@ class Compara(object):
         self.division = division
 
     def _attach_genomes(self):
-        for species in self.Species:
+        for species in self.species:
             attr_name = _Species.get_compara_name(species)
-            genome = Genome(Species=species, release=self.release,
+            genome = Genome(species=species, release=self.release,
                             account=self._account)
             self._genomes[species] = genome
             setattr(self, attr_name, genome)
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(Species=%s; release=%s; connected=%s)" % \
-            (my_type, self.Species, self.release,
+        return "%s(species=%s; release=%s; connected=%s)" % \
+            (my_type, self.species, self.release,
              self.ComparaDb is not None)
 
     def _connect_db(self):
@@ -73,7 +73,7 @@ class Compara(object):
     ComparaDb = property(_get_compara_db)
 
     def _make_species_id_map(self):
-        """caches the taxon id's for the self.Species"""
+        """caches the taxon id's for the self.species"""
         if self._species_id_map is not None:
             return self._species_id_map
 
@@ -81,7 +81,7 @@ class Compara(object):
         condition = sql.select(
             [genome_db_table.c.taxon_id, genome_db_table.c.name],
             genome_db_table.c.name.in_([sp.replace(' ', '_')
-                                        for sp in self.Species]))
+                                        for sp in self.species]))
 
         # TODO this should make the dict values the actual Genome instances
         id_genome = []
@@ -89,7 +89,7 @@ class Compara(object):
             id_genome += [(r['taxon_id'],
                            self._genomes[r['name'].replace('_', ' ').capitalize()])]
         self._species_id_map = dict(id_genome)
-        assert len(self._species_id_map) == len(self.Species)
+        assert len(self._species_id_map) == len(self.species)
         return self._species_id_map
 
     taxon_id_species = property(_make_species_id_map)
@@ -284,7 +284,7 @@ class Compara(object):
         genome_db_table = self.ComparaDb.get_table('genome_db')
 
         # column renamed between versions
-        prefix = coord.genome.Species.lower()
+        prefix = coord.genome.species.lower()
         if int(self.release) > 58:
             prefix = _Species.get_ensembl_db_prefix(prefix)
 
@@ -333,13 +333,13 @@ class Compara(object):
                                     dnafrag_table.c.genome_db_id.in_(list(self.genome_taxon.keys()))))
         return query.execute().fetchall()
 
-    def get_syntenic_regions(self, Species=None, coord_name=None, start=None,
+    def get_syntenic_regions(self, species=None, coord_name=None, start=None,
                            end=None, strand=1, ensembl_coord=False, region=None,
                            align_method=None, align_clade=None, method_clade_id=None):
         """returns a SyntenicRegions instance
 
         Arguments:
-            - Species: the species name
+            - species: the species name
             - coord_name, start, end, strand: the coordinates for the region
             - ensembl_coord: whether the coordinates are in Ensembl form
             - region: a region instance or a location, in which case the
@@ -363,7 +363,7 @@ class Compara(object):
                                "specified[%s]" % (align_method, align_clade))
 
         if region is None:
-            ref_genome = self._genomes[_Species.get_species_name(Species)]
+            ref_genome = self._genomes[_Species.get_species_name(species)]
             region = ref_genome.make_location(coord_name=coord_name,
                                              start=start, end=end, strand=strand,
                                              ensembl_coord=ensembl_coord)
@@ -371,7 +371,7 @@ class Compara(object):
             region = region.location
 
         # make sure the genome instances match
-        ref_genome = self._genomes[region.genome.Species]
+        ref_genome = self._genomes[region.genome.species]
         if ref_genome is not region.genome:
             # recreate region from our instance
             region = ref_genome.make_location(coord_name=region.coord_name,

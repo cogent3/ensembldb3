@@ -28,8 +28,8 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
 else:
     account = get_ensembl_account(release=release)
 
-human = Genome(Species='human', release=release, account=account)
-platypus = Genome(Species='platypus', release=release, account=account)
+human = Genome(species='human', release=release, account=account)
+platypus = Genome(species='platypus', release=release, account=account)
 
 
 class TestLocation(TestCase):
@@ -43,7 +43,7 @@ class TestLocation(TestCase):
         self.assertEqual(human_loc.start, 1000)
         self.assertEqual(human_loc.end, 10000)
         self.assertEqual(human_loc.strand, -1)
-        self.assertEqual(human_loc.Species, "Homo sapiens")
+        self.assertEqual(human_loc.species, "Homo sapiens")
         self.assertEqual(human_loc.seq_region_id, 131539)
 
     def test_get_coord_conversion(self):

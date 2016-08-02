@@ -49,7 +49,7 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
     seq_region_table = core_db.get_table('seq_region')
     rows = sql.select([seq_region_table]).\
         where(seq_region_table.c.name == str(coord_name)).execute().fetchall()
-    species_coord_sys = CoordSystem(species=core_db.db_name.Species,
+    species_coord_sys = CoordSystem(species=core_db.db_name.species,
                                     core_db=core_db)
     try:
         selected_row = asserted_one(rows)
@@ -79,7 +79,7 @@ class Coordinate(object):
             start = start or 0
             end = end or seq_region_data['length']
         # TODO allow creation with just seq_region_id
-        self.Species = genome.Species
+        self.species = genome.species
         self.CoordType = DisplayString(CoordType, repr_length=4,
                                        with_quotes=False)
         self.coord_name = DisplayString(coord_name, repr_length=4,
@@ -122,12 +122,12 @@ class Coordinate(object):
     ensembl_end = property(_get_ensembl_end)
 
     def __str__(self):
-        return '%s:%s:%s:%d-%d:%d' % (self.Species, self.CoordType,
+        return '%s:%s:%s:%d-%d:%d' % (self.species, self.CoordType,
                                       self.coord_name, self.start, self.end, self.strand)
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        name = _Species.get_common_name(self.Species)
+        name = _Species.get_common_name(self.species)
         coord_type = self.CoordType
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
                                        self.coord_name, self.start, self.end, self.strand)
@@ -264,7 +264,7 @@ class CoordSystemCache(object):
     def __call__(self, coord_type=None, core_db=None, species=None,
                  seq_level=False):
         """coord_type can be coord_type or coord_system_id"""
-        # TODO should only pass in core_db here, not that and Species, or just
+        # TODO should only pass in core_db here, not that and species, or just
         # the genome - what if someone wants to compare different ensembl
         # releases? keying by species is then a bad idea! better to key by
         # id(object)
@@ -272,7 +272,7 @@ class CoordSystemCache(object):
         # (see MySQL table) as is this shouldn't be a __call__, see line 168
         # for reason why we should have a method to set data: setSpeciesCoord
         # call then then just returns the coords for the named species
-        species = _Species.get_species_name(species or core_db.db_name.Species)
+        species = _Species.get_species_name(species or core_db.db_name.species)
         self._set_species_system(core_db, species)
         if seq_level:
             result = self._get_seq_level_system(species)
@@ -378,8 +378,8 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
     """returns the ???"""
     where = where or 'overlap'
     # TODO better function name
-    species = core_db.db_name.Species
-    assert query_location.Species == species
+    species = core_db.db_name.species
+    assert query_location.species == species
     assembly = core_db.get_table('assembly')
     seq_region = core_db.get_table('seq_region')
     target_coord_system_id = CoordSystem(target_coord_type, core_db=core_db,

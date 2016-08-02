@@ -30,7 +30,7 @@ class _RelatedRegions(LazyRecord):
 
     def __str__(self):
         # temporary string method, just to demo correct assembly
-        # TODO StableID, Species and Description
+        # TODO StableID and Description
         my_type = self.__class__.__name__
 
         data = list(map(repr, self.Members))
@@ -57,7 +57,7 @@ class _RelatedRegions(LazyRecord):
 
     def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.location.Species for m in self.Members])
+        return set([m.location.species for m in self.Members])
 
 
 class RelatedGenes(_RelatedRegions):
