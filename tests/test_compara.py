@@ -69,7 +69,7 @@ class TestCompara(ComparaTestBase):
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship="ortholog_one2one")
         collection = Orthologs.get_seq_collection()
-        self.assertTrue(len(collection.Seqs[0]) > 1000)
+        self.assertTrue(len(collection.seqs[0]) > 1000)
 
     def test_getting_alignment(self):
         mid = "ENSMUSG00000041147"

@@ -94,7 +94,7 @@ class _Region(LazyRecord):
                     alt_loc = assembly_exception_coordinate(self.location)
                     seq = get_sequence(alt_loc)
                 except NoItemError:
-                    seq = DNA.make_sequence("N" * len(self))
+                    seq = DNA.make_seq("N" * len(self))
             seq.name = str(self.location)
             self._cached['Seq'] = seq
         return self._cached['Seq']
@@ -688,7 +688,7 @@ class Transcript(_StableRegion):
             self._cached["Utr5"] = self.NULL_VALUE
             self._cached["Utr3"] = self.NULL_VALUE
             return
-        Utr5_seq, Utr3_seq = DNA.make_sequence(""), DNA.make_sequence("")
+        Utr5_seq, Utr3_seq = DNA.make_seq(""), DNA.make_seq("")
         for exon in self.UntranslatedExons5:
             Utr5_seq += exon.Seq
         for exon in self.UntranslatedExons3:
@@ -721,12 +721,12 @@ class Transcript(_StableRegion):
 
         # check first exon phase_start is 0 and last exon phase_end
         if exons[0].phase_start > 0:
-            fill = DNA.make_sequence(
+            fill = DNA.make_seq(
                 'N' * exons[0].phase_start, name=full_seq.name)
             full_seq = fill + full_seq
 
         if exons[-1].phase_end > 0:
-            fill = DNA.make_sequence(
+            fill = DNA.make_seq(
                 'N' * exons[-1].phase_end, name=full_seq.name)
             full_seq += fill
 
@@ -756,7 +756,7 @@ class Transcript(_StableRegion):
         length = len(cds)
         cds = cds[: length - (length % 3)]
         try:
-            cds = cds.without_terminal_stop_sodon()
+            cds = cds.trim_stop_codon()
         except AssertionError:
             if not DEBUG:
                 raise
@@ -1109,7 +1109,7 @@ class Variation(_Region):
         seqs = dict(up=up_seq, down=down_seq)
         for name, seq in list(seqs.items()):
             if seq is not None:
-                seq = DNA.make_sequence(seq)
+                seq = DNA.make_seq(seq)
             else:
                 resized = [(-301, -1), (1, 301)][name == 'down']
                 if self.location.strand == -1:

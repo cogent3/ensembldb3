@@ -52,7 +52,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
         collection = Orthologs.get_seq_collection()
-        self.assertTrue(len(collection.Seqs[0]) > 1000)
+        self.assertTrue(len(collection.seqs[0]) > 1000)
 
 
 class MZ_Genome(TestCase):
