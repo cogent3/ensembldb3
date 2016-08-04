@@ -14,6 +14,16 @@ from cogent3.util import parallel
 from ensembldb.species import Species
 from ensembldb.name import EnsemblDbName
 
+__author__ = "Gavin Huttley"
+__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__credits__ = ["Gavin Huttley", "Jason Merkin"]
+__license__ = "BSD"
+__version__ = "3.0a1"
+__maintainer__ = "Gavin Huttley"
+__email__ = "Gavin.Huttley@anu.edu.au"
+__status__ = "alpha"
+
+
 _remote_pub = "rsync://ftp.ensembl.org/ensembl/pub/"
 
 def makedirs(path):
