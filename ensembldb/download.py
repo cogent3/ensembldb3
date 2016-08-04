@@ -8,6 +8,9 @@ from pkg_resources import resource_filename
 
 import click
 
+os.environ['DONT_USE_MPI'] = "1"
+from cogent3.util import parallel
+
 from ensembldb.species import Species
 from ensembldb.name import EnsemblDbName
 
@@ -130,14 +133,28 @@ def read_config(config_path, verbose=False):
 
 _cfg = resource_filename('ensembldb', 'data/sample_ensembl.cfg')
 
+def WrapDownload(remote_template, local_base, release, verbose, debug):
+    """returns a callback function, that takes the database name and rsync downloads"""
+    def rsync_call_wrapper(dbname):
+        props = {'dbname': dbname, 'release': release}
+        remote_db_path = remote_template % props
+        local_db_path = os.path.join(local_base, dbname)
+        run_args = dict(remote_path=remote_db_path, local_path=local_db_path,
+                        verbose=verbose, debug=debug)
+        download_db(**run_args)
+    
+    return rsync_call_wrapper
+
 @click.command()
 @click.option('-c', '--configpath', default=_cfg, type=click.File(),
               help="path to config file specifying db's to download")
 @click.option('-v', '--verbose', is_flag=True,
               help="causes stdout/stderr from rsync download to be written to screen")
+@click.option('-n', '--numprocs', type=int, default=1,
+              help="number of processes to use for download")
 @click.option('--debug', is_flag=True,
               help="maximum verbosity")
-def run(configpath, verbose, debug):
+def run(configpath, verbose, numprocs, debug):
     if configpath.name == _cfg:
         warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
     
@@ -150,9 +167,15 @@ def run(configpath, verbose, debug):
     if verbose or debug:
         pprint(db_names)
     
-    for db_name in db_names:
-        props["dbname"] = db_name.name
-        remote_db_path = 'release-%(release)s/mysql/%(dbname)s/' % props
-        download_db(remote_db_path, os.path.join(local_path, db_name.name),
-                    verbose=verbose, debug=debug)
+    if numprocs > 1:
+        numprocs = min(numprocs, len(db_names), 5)
+        # should print warning if ask for more than 5
+        parallel.use_multiprocessing(numprocs)
+    
+    remote_template = 'release-%(release)s/mysql/%(dbname)s/'
+    rsync = WrapDownload(remote_template, local_path, release, verbose=verbose,
+                         debug=debug)
+    dbnames = [n.name for n in db_names]
+    for r in parallel.imap(rsync, dbnames):
+        pass
 
