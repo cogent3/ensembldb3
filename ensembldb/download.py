@@ -122,7 +122,10 @@ def read_config(config_path, verbose=False):
         if section in ('release', 'local path'):
             continue
         
-        species = Species.get_species_name(section, level='raise')
+        if section != 'compara':
+            species = Species.get_species_name(section, level='raise')
+        else:
+            species = "compara"
         dbs = [db.strip() for db in parser.get(section, 'db').split(',')]
         species_dbs[species] = dbs
     
