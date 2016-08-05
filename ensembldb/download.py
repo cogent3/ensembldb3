@@ -63,10 +63,10 @@ def listdir(dirname="", debug=True):
     r = result.splitlines()
     return r
 
-def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=True):
+def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
     """returns EnsemblNames corresponding to species db's"""
     if debug:
-        pprint.pprint(dirnames)
+        pprint(dirnames)
     
     db_names = []
     for record in dirnames:
