@@ -4,12 +4,13 @@ import configparser
 from pprint import pprint
 
 import click
+from cogent3.util import parallel
 
 from ensembldb.download import read_config, reduce_dirnames, _cfg
 from . import HostAccount
 from .host import DbConnection
-from .util import exec_command, open_
-from download import download_dbs
+from .util import exec_command, open_, abspath
+from .download import download_dbs
 
 ## commands should look like
 # $ ensembldb download ...
@@ -55,7 +56,7 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", debug=False):
       path to mysqlimport
     """
     # this template could be part of mysql.cfg
-    cmnd_template = mysqlimport + r" -h %(host)s -u %(user) -p %(passwd)s "\
+    cmnd_template = mysqlimport + r" -h %(host)s -u %(user)s -p %(passwd)s "\
         r"--fields_escaped_by=\\ %(dbname)s -L %(tablename)s"
     kwargs = dict(host=account.host, user=account.user, passwd=account.passwd,
                   dbname=dbname)
@@ -67,6 +68,9 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", debug=False):
         tablename = tablename.replace(".gz", "")
         # then install
         kwargs["tablename"] = tablename
+        if debug:
+            pprint(kwargs)
+        
         cmnd = cmnd_template % kwargs
         if debug:
             print(cmnd)
@@ -87,9 +91,12 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, debug=False):
         raise RuntimeError("sql file not present in %s" % dbpath)
     else:
         sqlfile = sqlfile[0]
-        with open_(sqlfile) as infile:
+        with open_(sqlfile, mode='rt') as infile:
             sql = infile.readlines()
         sql = "\n".join(sql)
+        # select the database
+        r = cursor.execute("USE %s" % dbname)
+        # TODO check whether table exists first, and drop if it does?
         r = cursor.execute(sql)
         # use cursor to execute command
         #cursor
@@ -114,7 +121,6 @@ def read_msql_config(config_path, verbose=False):
     return opts
 
 def display_dbs(cursor, release):
-    print("HERE")
     sql = "SHOW DATABASES"
     r = cursor.execute(sql)
     result = cursor.fetchall()
@@ -124,8 +130,6 @@ def display_dbs(cursor, release):
         
         if release in r:
             pprint(r)
-
-pass_config = click.make_pass_decorator(Config, ensure=True)
 
 # defining some of the options
 _cfgpath = click.option('-c', '--configpath', default=_cfg, type=click.File(),
@@ -173,7 +177,7 @@ def install(configpath, mysql, numprocs, verbose, debug):
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
-        install_one_db(cursor, account, dbname, local_path, numprocs)
+        install_one_db(cursor, account, dbname.name, local_path, numprocs, debug=debug)
         
     if verbose:
         display_dbs(cursor, release)
@@ -188,7 +192,10 @@ def install(configpath, mysql, numprocs, verbose, debug):
 @_debug
 def drop(configpath, mysql, verbose, debug):
     """drop databases from a MySQL server"""
-    server = get_server_cursor(mysql)
+    mysqlcfg = read_msql_config(mysql)
+    account = HostAccount(mysqlcfg["host"], mysqlcfg["user"],
+                          mysqlcfg["passwd"])
+    server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     cursor = server.cursor()
     release, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)

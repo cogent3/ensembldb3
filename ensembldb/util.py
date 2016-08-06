@@ -3,6 +3,7 @@ import gzip
 import bz2
 import re
 import subprocess
+import sys
 
 from sqlalchemy import create_engine, MetaData, Table
 
