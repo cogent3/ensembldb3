@@ -1,4 +1,6 @@
 import os
+import gzip
+import bz2
 import re
 import subprocess
 
@@ -12,6 +14,10 @@ __version__ = "1.5.3-dev"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
+
+def open_(filename, mode="r"):
+    func = {'gz': gzip.open, 'bz2': bz2.open}.get(filename.split('.')[-1], open)
+    return func(filename, mode=mode)
 
 def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """executes shell command and returns stdout if completes exit code 0
