@@ -50,7 +50,7 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         r = None
     return r
 
-def listdir(dirname="", debug=True):
+def rsync_listdir(dirname="", debug=True):
     if dirname:
         cmnd = "%s%s" % (_remote_pub, dirname)
     else:
@@ -81,7 +81,7 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
         try:
             name = EnsemblDbName(record)
         except (TypeError, RuntimeError):
-            # a non-species, or compara db
+            # a non-species
             if debug:
                 print(record)
             continue
@@ -123,7 +123,7 @@ def download_db(remote_path, local_path, verbose=False, debug=False):
 def read_config(config_path, verbose=False):
     """returns ensembl release, local path, and db specifics from the provided config path"""
     parser = configparser.ConfigParser()
-    parser.read_file(config_path)    
+    parser.read_file(config_path)
     release = parser.get('release', 'release')
     local_path = parser.get('local path', 'path')
     local_path = abspath(local_path)
@@ -175,7 +175,7 @@ def run(configpath, verbose, numprocs, debug):
     makedirs(local_path)
     
     props = dict(release=release)
-    contents = listdir('release-%(release)s/mysql/' % props, debug=debug)
+    contents = rsync_listdir('release-%(release)s/mysql/' % props, debug=debug)
     db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
     if verbose or debug:
         pprint(db_names)
