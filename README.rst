@@ -21,7 +21,7 @@ Because PyCogent3 requires numpy be installed prior to installation, the followi
 Usage
 *****
 
-Install adds an experimental download script ``ensembl_download`` which uses rsync to download mysql dumps from the `ensembl ftp site <ftp://ftp.ensembl.org/pub/>`_. ``ensembl_download``  requires the user to specify a config file indicating the release, species and their databases to download. A sample config file is included for demonstration purposes. Here's an example ::
+Install adds an experimental download script ``ensembl_admin`` which provides functions for downloading, installing and dropping databases. It uses rsync to download mysql dumps from the `ensembl ftp site <ftp://ftp.ensembl.org/pub/>`_. ``ensembl_download``  requires the user to specify a config file indicating the release, species and their databases to download. A sample config file is included for demonstration purposes. Here's an example ::
 
     [local path] # required
     path=/tmp/ensembldb_download
@@ -38,7 +38,7 @@ Install adds an experimental download script ``ensembl_download`` which uses rsy
 
 You then download the corresponding databases as ::
 
-    $ ensembldb_download -c /path/to/your.cfg -v
+    $ ensembl_admin -c /path/to/your.cfg -v
 
 The ``-v`` option means verbose. Use ``--help`` for more information.
 

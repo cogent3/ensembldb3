@@ -54,7 +54,7 @@ setup(
               'PyMySQL',
               'sqlalchemy'],
     entry_points={
-        'console_scripts': ['ensembl_download=ensembldb.download:run',
+        'console_scripts': ['ensembl_admin=ensembldb.admin:main',
                             ],
     }
 )

@@ -135,16 +135,7 @@ def WrapDownload(remote_template, local_base, release, verbose, debug):
     
     return rsync_call_wrapper
 
-@click.command()
-@click.option('-c', '--configpath', default=_cfg, type=click.File(),
-              help="path to config file specifying db's to download")
-@click.option('-v', '--verbose', is_flag=True,
-              help="causes stdout/stderr from rsync download to be written to screen")
-@click.option('-n', '--numprocs', type=int, default=1,
-              help="number of processes to use for download")
-@click.option('--debug', is_flag=True,
-              help="maximum verbosity")
-def run(configpath, verbose, numprocs, debug):
+def download_dbs(configpath, numprocs, verbose, debug):
     if configpath.name == _cfg:
         warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
     
