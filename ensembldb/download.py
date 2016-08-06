@@ -13,6 +13,7 @@ from cogent3.util import parallel
 
 from ensembldb.species import Species
 from ensembldb.name import EnsemblDbName
+from .util import exec_command
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -25,30 +26,6 @@ __status__ = "alpha"
 
 
 _remote_pub = "rsync://ftp.ensembl.org/ensembl/pub/"
-
-def makedirs(path):
-    """creates directory path if it doesn't exist"""
-    if os.path.exists(path):
-        return
-    
-    os.makedirs(path)
-
-def abspath(path):
-    path = os.path.abspath(os.path.expanduser(path))
-    return path
-
-def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
-    proc = subprocess.Popen(cmnd, shell=True, stdout=stdout, stderr=stderr)
-    out, err = proc.communicate()
-    if proc.returncode != 0:
-        msg = err
-        sys.stderr.writelines("FAILED: %s\n%s" % (cmnd, msg))
-        exit(proc.returncode)
-    if out is not None:
-        r = out.decode('utf8')
-    else:
-        r = None
-    return r
 
 def rsync_listdir(dirname="", debug=True):
     if dirname:

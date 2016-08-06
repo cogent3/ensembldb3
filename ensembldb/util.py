@@ -1,4 +1,6 @@
+import os
 import re
+import subprocess
 
 from sqlalchemy import create_engine, MetaData, Table
 
@@ -10,6 +12,40 @@ __version__ = "1.5.3-dev"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
+
+def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
+    """executes shell command and returns stdout if completes exit code 0
+    
+    Parameters
+    ----------
+    
+    cmnd : str
+      shell command to be executed
+    stdout, stderr : streams
+      Default value (PIPE) intercepts process output, setting to None
+      blocks this."""
+    proc = subprocess.Popen(cmnd, shell=True, stdout=stdout, stderr=stderr)
+    out, err = proc.communicate()
+    if proc.returncode != 0:
+        msg = err
+        sys.stderr.writelines("FAILED: %s\n%s" % (cmnd, msg))
+        exit(proc.returncode)
+    if out is not None:
+        r = out.decode('utf8')
+    else:
+        r = None
+    return r
+
+def makedirs(path):
+    """creates directory path if it doesn't exist"""
+    if os.path.exists(path):
+        return
+    
+    os.makedirs(path)
+
+def abspath(path):
+    path = os.path.abspath(os.path.expanduser(path))
+    return path
 
 
 class DisplayString(str):
