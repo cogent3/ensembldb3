@@ -1,3 +1,5 @@
+from warnings import filterwarnings
+filterwarnings("ignore", message="Not using MPI as mpi4py not found")
 import os
 from glob import glob, glob1
 import configparser
