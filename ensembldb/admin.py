@@ -196,6 +196,7 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
     
     # first install the sql files
     print(server)
+    cursor.close()
 
 @main.command()
 @_cfgpath
@@ -217,6 +218,8 @@ def drop(configpath, mysql, verbose, debug):
 
     if verbose:
         display_dbs(cursor, release)
+    
+    cursor.close()
 
 if __name__ == "__main__":
     main()
