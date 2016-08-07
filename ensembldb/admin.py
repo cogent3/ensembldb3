@@ -120,6 +120,11 @@ def read_msql_config(config_path, verbose=False):
     opts = dict((k, parser.get("mysql", k)) for k in ["host", "user", "passwd"])
     return opts
 
+def _drop_db(cursor, dbname):
+    """drops the database"""
+    sql = "DROP DATABASE IF EXISTS %s" % dbname
+    cursor.execute(sql)
+
 def display_dbs(cursor, release):
     sql = "SHOW DATABASES"
     r = cursor.execute(sql)
@@ -140,11 +145,14 @@ _verbose = click.option('-v', '--verbose', is_flag=True,
               help="causes stdout/stderr from rsync download to be written to screen")
 _numprocs = click.option('-n', '--numprocs', type=int, default=1,
               help="number of processes to use for download")
-_debug = click.option('--debug', is_flag=True,
+_force = click.option('-f', '--force_overwrite', is_flag=True,
+              help="drop existing database if it exists prior to installing")
+_debug = click.option('-d', '--debug', is_flag=True,
               help="maximum verbosity")
 
 @click.group()
 def main():
+    """admin tools for an Ensembl MySQL installation"""
     pass
 
 @main.command()
@@ -160,10 +168,11 @@ def download(configpath, numprocs, verbose, debug):
 @_cfgpath
 @_mysqlcfg
 @_numprocs
+@_force
 @_verbose
 @_debug
-def install(configpath, mysql, numprocs, verbose, debug):
-    """install databases into a MySQL server"""
+def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
+    """install ensembl databases into a MySQL server"""
     mysqlcfg = read_msql_config(mysql)
     account = HostAccount(mysqlcfg["host"], mysqlcfg["user"],
                           mysqlcfg["passwd"])
@@ -173,6 +182,9 @@ def install(configpath, mysql, numprocs, verbose, debug):
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
     for dbname in dbnames:
+        if force_overwrite:
+            _drop_db(cursor, dbname.name)
+        
         path = os.path.join(local_path, dbname.name)
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
@@ -201,8 +213,7 @@ def drop(configpath, mysql, verbose, debug):
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
     for dbname in dbnames:
-        sql = "DROP DATABASE IF EXISTS %s" % dbname
-        cursor.execute(sql)
+        _drop_db(cursor, dbname)
 
     if verbose:
         display_dbs(cursor, release)
