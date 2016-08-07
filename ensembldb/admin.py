@@ -14,20 +14,6 @@ from .host import DbConnection
 from .util import exec_command, open_, abspath
 from .download import download_dbs
 
-## commands should look like
-# $ ensembldb download ...
-# $ ensembldb install ...
-# $ ensembldb remove ...
-
-
-# We need a cfg file containing 
-# - the mysql host address
-# - mysqlimport path, defaults to assuming on PATH
-# - username
-# - password
-
-# The cfg file used by download
-
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
 __credits__ = ["Gavin Huttley", "Hua Ying", "Jason Merkin"]
@@ -77,11 +63,14 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", debug=False):
         if debug:
             print(cmnd)
         
-        r = exec_command(cmnd)
+        exec_args = {} if not debug else dict(stderr=None, stdout=None)
+        r = exec_command(cmnd, **exec_args)
+        return r
     
     return install_table
 
 def install_one_db(cursor, account, dbname, local_path, numprocs, debug=False):
+    """installs a single ensembl database"""
     # first create the database in mysql
     # find the .sql file, load all contents into memory
     # then execute using mysql cursor?
@@ -98,10 +87,8 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, debug=False):
         sql = "\n".join(sql)
         # select the database
         r = cursor.execute("USE %s" % dbname)
-        # TODO check whether table exists first, and drop if it does?
+        # create the table definitions
         r = cursor.execute(sql)
-        # use cursor to execute command
-        #cursor
     
     tablenames = listpaths(dbpath, "*.txt*")
     if debug:
@@ -112,9 +99,12 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, debug=False):
     if numprocs > 1:
         parallel.use_multiprocessing(numprocs)
     
+    # we do the table install in parallel
     for r in parallel.imap(install_table, tablenames):
         pass
     
+
+## can we get away with the ~/.my.cnf for the sql cursor?
 def read_msql_config(config_path, verbose=False):
     """returns a dict with mysql config options"""
     parser = configparser.ConfigParser()
@@ -128,6 +118,7 @@ def _drop_db(cursor, dbname):
     cursor.execute(sql)
 
 def display_dbs(cursor, release):
+    """shows what databases for the nominated release exist at the server"""
     sql = "SHOW DATABASES"
     r = cursor.execute(sql)
     result = cursor.fetchall()
@@ -137,10 +128,11 @@ def display_dbs(cursor, release):
         
         if release in r:
             pprint(r)
+    
 
 # defining some of the options
 _cfgpath = click.option('-c', '--configpath', default=_cfg, type=click.File(),
-              help="path to config file specifying db's to download")
+              help="path to config file specifying databases, only species or compara at present")
 _mysqlcfg = click.option('-m', '--mysql', default=_cfg, type=click.File(),
               help="path to mysql config file specifying host, user, installing data for writing")
 _verbose = click.option('-v', '--verbose', is_flag=True,
@@ -195,9 +187,8 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
         
     if verbose:
         display_dbs(cursor, release)
+        print(server)
     
-    # first install the sql files
-    print(server)
     cursor.close()
 
 @main.command()
