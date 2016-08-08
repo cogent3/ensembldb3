@@ -1,5 +1,6 @@
 from warnings import filterwarnings
 filterwarnings("ignore", message="Not using MPI as mpi4py not found")
+filterwarnings("ignore", message="Can't drop database.*")
 import os
 from glob import glob, glob1
 import configparser
@@ -32,7 +33,7 @@ def listpaths(dirname, glob_pattern):
     fns = [os.path.join(dirname, fn) for fn in fns]
     return fns
 
-def InstallTable(account, dbname, mysqlimport="mysqlimport", debug=False):
+def InstallTable(account, dbname, mysqlimport="mysqlimport", verbose=False, debug=False):
     """returns a function that requires path to the db table
     
     Parameters
@@ -63,13 +64,16 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", debug=False):
         if debug:
             print(cmnd)
         
+        if verbose:
+            print("\tinstalling %s" % tablename)
+        
         exec_args = {} if not debug else dict(stderr=None, stdout=None)
         r = exec_command(cmnd, **exec_args)
         return r
     
     return install_table
 
-def install_one_db(cursor, account, dbname, local_path, numprocs, debug=False):
+def install_one_db(cursor, account, dbname, local_path, numprocs, verbose=False, debug=False):
     """installs a single ensembl database"""
     # first create the database in mysql
     # find the .sql file, load all contents into memory
@@ -80,27 +84,51 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, debug=False):
     sqlfile = listpaths(dbpath, "*.sql*")
     if not sqlfile:
         raise RuntimeError("sql file not present in %s" % dbpath)
-    else:
-        sqlfile = sqlfile[0]
-        with open_(sqlfile, mode='rt') as infile:
-            sql = infile.readlines()
-        sql = "\n".join(sql)
-        # select the database
-        r = cursor.execute("USE %s" % dbname)
-        # create the table definitions
-        r = cursor.execute(sql)
+    
+    sqlfile = sqlfile[0]
+    with open_(sqlfile, mode='rt') as infile:
+        sql = infile.readlines()
+    sql = "\n".join(sql)
+    # select the database
+    if verbose or debug:
+        print("\tcreating table definitions for %s" % dbname)
+    r = cursor.execute("USE %s" % dbname)
+    # make sure tables don't exist
+    r = cursor.execute("SHOW TABLES")
+    result = cursor.fetchall()
+    for table in result:
+        print(table)
+        r = cursor.execute("DROP TABLE IF EXISTS %s" % table)
+    
+    # create the table definitions
+    num_tables = sql.count("CREATE")
+    r = cursor.execute(sql)
+    
+    # the following step seems necessary for mysql to actually create all the table
+    # definitions... wtf?
+    r = cursor.execute("SHOW TABLES")
+    if r != num_tables:
+        pprint(cursor.fetchall())
+        raise RuntimeError("number of created tables doesn't match number in sql")
+    
+    if debug:
+        print(r)
+        print()
+        display_dbs_tables(cursor, dbname)
     
     tablenames = listpaths(dbpath, "*.txt*")
     if debug:
         pprint(tablenames)
     
-    install_table = InstallTable(account, dbname, debug=debug)
+    install_table = InstallTable(account, dbname, verbose=verbose, debug=debug)
     
     if numprocs > 1:
-        parallel.use_multiprocessing(numprocs)
+        procs = parallel.MultiprocessingParallelContext(numprocs)
+    else:
+        procs = parallel.NonParallelContext()
     
     # we do the table install in parallel
-    for r in parallel.imap(install_table, tablenames):
+    for r in procs.imap(install_table, tablenames):
         pass
     
 
@@ -128,6 +156,18 @@ def display_dbs(cursor, release):
         
         if release in r:
             pprint(r)
+    
+def display_dbs_tables(cursor, dbname):
+    """shows what databases for the nominated release exist at the server"""
+    #r = cursor.execute("USE %s" % dbname)
+    sql = "SHOW TABLES"
+    r = cursor.execute(sql)
+    result = cursor.fetchall()
+    for r in result:
+        if isinstance(r, tuple):
+            r = r[0]
+        
+        pprint(r)
     
 
 # defining some of the options
@@ -178,14 +218,17 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
     for dbname in dbnames:
         if force_overwrite:
             _drop_db(cursor, dbname.name)
-        
+        if verbose:
+            print("Creating database %s" % dbname.name)
         path = os.path.join(local_path, dbname.name)
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
-        install_one_db(cursor, account, dbname.name, local_path, numprocs, debug=debug)
-        
-    if verbose:
+        install_one_db(cursor, account, dbname.name, local_path, numprocs,
+                       verbose=verbose, debug=debug)
+    
+    
+    if debug:
         display_dbs(cursor, release)
         print(server)
     
@@ -207,6 +250,7 @@ def drop(configpath, mysql, verbose, debug):
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
     for dbname in dbnames:
+        print("Dropping %s" % dbname)
         _drop_db(cursor, dbname)
 
     if verbose:
