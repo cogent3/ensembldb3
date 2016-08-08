@@ -44,7 +44,7 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", debug=False):
       path to mysqlimport
     """
     # this template could be part of mysql.cfg
-    cmnd_template = mysqlimport + r" -h %(host)s -u %(user)s -p %(passwd)s "\
+    cmnd_template = mysqlimport + r" -h %(host)s -u %(user)s -p%(passwd)s "\
         r"--fields_escaped_by=\\ %(dbname)s -L %(tablename)s"
     kwargs = dict(host=account.host, user=account.user, passwd=account.passwd,
                   dbname=dbname)
