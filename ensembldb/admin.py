@@ -73,7 +73,7 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", verbose=False, debu
     
     return install_table
 
-def install_one_db(cursor, account, dbname, local_path, numprocs, verbose=False, debug=False):
+def install_one_db(cursor, account, dbname, local_path, numprocs, force_verwrite=False, verbose=False, debug=False):
     """installs a single ensembl database"""
     # first create the database in mysql
     # find the .sql file, load all contents into memory
@@ -81,6 +81,11 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, verbose=False,
     # ensembl instructions suggest the following
     # $ mysql -u uname dname < dbname.sql
     dbpath = os.path.join(local_path, dbname)
+    checkpoint_file = os.path.join(dbpath, "ENSEMBLDB_DONE")
+    if os.path.exists(checkpoint_file) and not force_verwrite:
+        print("ALREADY INSTALLED: %s, skipping" % dbname)
+        return True
+    
     sqlfile = listpaths(dbpath, "*.sql*")
     if not sqlfile:
         raise RuntimeError("sql file not present in %s" % dbpath)
@@ -140,6 +145,9 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, verbose=False,
     
     # we do the table install in parallel
     for r in procs.imap(install_table, tablenames):
+        pass
+    
+    with open(checkpoint_file, "w") as checked:
         pass
     
 
@@ -239,7 +247,8 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
         install_one_db(cursor, account, dbname.name, local_path, numprocs,
-                       verbose=verbose, debug=debug)
+                       force_verwrite=force_overwrite, verbose=verbose,
+                       debug=debug)
         cursor.close()
     
     
