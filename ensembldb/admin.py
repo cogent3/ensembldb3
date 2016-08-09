@@ -73,7 +73,17 @@ def InstallTable(account, dbname, mysqlimport="mysqlimport", verbose=False, debu
     
     return install_table
 
-def install_one_db(cursor, account, dbname, local_path, numprocs, force_verwrite=False, verbose=False, debug=False):
+def get_db_checkpoint_path(local_path, dbname):
+    """returns path to db checkpoint file"""
+    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DONE")
+    return checkpoint_file
+
+def is_installed(local_path, dbname):
+    """returns True if checkpoint file exists for dbname"""
+    chk = get_db_checkpoint_path(local_path, dbname)
+    return os.path.exists(chk)
+
+def install_one_db(cursor, account, dbname, local_path, numprocs, force_overwrite=False, verbose=False, debug=False):
     """installs a single ensembl database"""
     # first create the database in mysql
     # find the .sql file, load all contents into memory
@@ -81,8 +91,7 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, force_verwrite
     # ensembl instructions suggest the following
     # $ mysql -u uname dname < dbname.sql
     dbpath = os.path.join(local_path, dbname)
-    checkpoint_file = os.path.join(dbpath, "ENSEMBLDB_DONE")
-    if os.path.exists(checkpoint_file) and not force_verwrite:
+    if is_installed(local_path, dbname) and not force_overwrite:
         print("ALREADY INSTALLED: %s, skipping" % dbname)
         return True
     
@@ -147,6 +156,8 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, force_verwrite
     for r in procs.imap(install_table, tablenames):
         pass
     
+    # existence of this file signals completion of the install without failure
+    checkpoint_file = get_db_checkpoint_path(local_path, dbname)    
     with open(checkpoint_file, "w") as checked:
         pass
     
@@ -237,7 +248,7 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
     for dbname in dbnames:
         server.ping(reconnect=True) # reconnect if server not alive
         cursor = server.cursor()
-        if force_overwrite:
+        if force_overwrite or not is_installed(local_path, dbname.name):
             _drop_db(cursor, dbname.name)
         
         if verbose:
@@ -247,7 +258,7 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
         install_one_db(cursor, account, dbname.name, local_path, numprocs,
-                       force_verwrite=force_overwrite, verbose=verbose,
+                       force_overwrite=force_overwrite, verbose=verbose,
                        debug=debug)
         cursor.close()
     
