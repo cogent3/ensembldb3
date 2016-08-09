@@ -222,21 +222,25 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
     account = HostAccount(mysqlcfg["host"], mysqlcfg["user"],
                           mysqlcfg["passwd"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
-    cursor = server.cursor()
+    
     release, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
     for dbname in dbnames:
+        server.ping(reconnect=True) # reconnect if server not alive
+        cursor = server.cursor()
         if force_overwrite:
             _drop_db(cursor, dbname.name)
+        
         if verbose:
             print("Creating database %s" % dbname.name)
-        path = os.path.join(local_path, dbname.name)
+        
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
         install_one_db(cursor, account, dbname.name, local_path, numprocs,
                        verbose=verbose, debug=debug)
+        cursor.close()
     
     
     if debug:
