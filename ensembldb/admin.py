@@ -117,6 +117,17 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, verbose=False,
         display_dbs_tables(cursor, dbname)
     
     tablenames = listpaths(dbpath, "*.txt*")
+    tablenames_gzipped = listpaths(dbpath, "*.txt.gz")
+    # if uncompressed table exists, we'll remove it
+    if tablenames and tablenames_gzipped:
+        for name in tablenames_gzipped:
+            name = name[:-3]
+            if name in tablenames:
+                if verbose:
+                    print("\tWARN: Deleting %s, using compressed version" % name)
+                tablenames.remove(name)
+                os.remove(name)
+    
     if debug:
         pprint(tablenames)
     
