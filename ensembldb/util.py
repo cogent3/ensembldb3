@@ -5,6 +5,7 @@ import re
 import subprocess
 import sys
 
+from pkg_resources import resource_filename
 from sqlalchemy import create_engine, MetaData, Table
 
 __author__ = "Gavin Huttley"
@@ -15,6 +16,22 @@ __version__ = "1.5.3-dev"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
+
+def get_resource_dir():
+    """returns path to resource directory"""
+    if "ENSEMBLDBRC" in os.environ:
+        path = os.environ["ENSEMBLDBRC"]
+    else:
+        path = resource_filename("ensembldb", "data")
+    
+    if not os.path.exists(path):
+        raise ValueError("ENSEMBLDBRC directory '%s' does not exist")
+    
+    return path
+
+# the following is where essential files live, such as
+# the species/common name map and sample download.cfg
+ENSEMBLDBRC = get_resource_dir()
 
 def open_(filename, mode="r"):
     func = {'gz': gzip.open, 'bz2': bz2.open}.get(filename.split('.')[-1], open)
