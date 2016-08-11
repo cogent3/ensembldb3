@@ -1,4 +1,5 @@
 import os
+from pkg_resources import resource_filename
 from cogent3.util.table import Table
 
 from .util import CaseInsensitiveString, ENSEMBLDBRC
@@ -13,6 +14,12 @@ __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
 def load_species(species_path):
+    """returns [[latin_name, common_name],..] from species_path
+    
+    if species_path does not exist, defaults to default one"""
+    if not os.path.exists(species_path):
+        species_path = resource_filename("data", "species.tsv")
+    
     with open(species_path, "r") as infile:
         data = []
         for line in infile:
