@@ -281,6 +281,10 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     release, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
+    if verbose:
+        print("Installing db's in the following order:")
+        pprint(dbnames)
+    
     for dbname in dbnames:
         server.ping(reconnect=True) # reconnect if server not alive
         cursor = server.cursor()
