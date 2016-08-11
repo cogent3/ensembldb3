@@ -12,11 +12,10 @@ from pprint import pprint
 import click
 from cogent3.util import parallel
 
-from ensembldb.download import read_config, reduce_dirnames, _cfg
 from . import HostAccount
 from .host import DbConnection
 from .util import exec_command, open_, abspath, ENSEMBLDBRC
-from .download import download_dbs
+from .download import download_dbs, read_config, reduce_dirnames, _cfg
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -196,6 +195,9 @@ def read_mysql_config(config_path, section, verbose=False):
         return opts
     
     for k in ["host", "user", "passwd", "command"]:
+        if not parser.has_option(section, k):
+            continue
+        
         opts[k] = parser.get(section, k) or opts[k]
     
     return opts
@@ -318,6 +320,7 @@ def drop(configpath, mysqlcfg, verbose, debug):
     release, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
+    # todo: list db's to be dropped and user ask for confirmation
     for dbname in dbnames:
         print("Dropping %s" % dbname)
         _drop_db(cursor, dbname)
