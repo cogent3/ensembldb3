@@ -40,8 +40,17 @@ def rsync_listdir(dirname="", debug=True):
     r = result.splitlines()
     return r
 
+def _sort_dbs(dbnames):
+    """returns the dbnames sorted by their type"""
+    order = {'compara': 2, 'variation': 3, 'otherfeatures': 1}
+    names = [(order.get(n.type, 0), n.name, n) for n in dbnames]
+    dbs = [db for i,n,db in sorted(names)]
+    return dbs
+
 def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
-    """returns EnsemblNames corresponding to species db's"""
+    """returns EnsemblNames corresponding to species db's and sort by type
+    
+    sort order put's core db's first, compara and variation last"""
     if debug:
         pprint(dirnames)
     
@@ -73,6 +82,8 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
             db_names.append(name)
         elif name.type == 'compara' and 'compara' in species_dbs:
             db_names.append(name)
+    
+    db_names = _sort_dbs(db_names)
     return db_names
 
 def download_db(remote_path, local_path, verbose=False, debug=False):
