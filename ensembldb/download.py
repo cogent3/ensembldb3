@@ -121,7 +121,7 @@ def read_config(config_path, verbose=False):
         pprint(species_dbs)
     return release, local_path, species_dbs
 
-_cfg = resource_filename('ensembldb', 'data/sample_ensembl.cfg')
+_cfg = os.path.join(ENSEMBLDBRC, 'sample_ensembl.cfg')
 
 def WrapDownload(remote_template, local_base, release, verbose, debug):
     """returns a callback function, that takes the database name and rsync downloads"""
