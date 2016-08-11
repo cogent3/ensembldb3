@@ -1,7 +1,9 @@
 from warnings import filterwarnings
 filterwarnings("ignore", message="Not using MPI as mpi4py not found")
 filterwarnings("ignore", message="Can't drop database.*")
+
 import os
+import shutil
 from glob import glob, glob1
 import configparser
 from pprint import pprint
@@ -213,6 +215,8 @@ _force = click.option('-f', '--force_overwrite', is_flag=True,
               help="drop existing database if it exists prior to installing")
 _debug = click.option('-d', '--debug', is_flag=True,
               help="maximum verbosity")
+_dbrc_out = click.option('-o', '--outpath', type=click.Path(),
+                         help="path to directory to export all rc contents")
 
 @click.group()
 def main():
@@ -292,6 +296,17 @@ def drop(configpath, mysql, verbose, debug):
         display_dbs(cursor, release)
     
     cursor.close()
+
+@main.command()
+@_dbrc_out
+def exportrc(outpath):
+    """exports the rc directory to the nominated path
+    
+    setting an environment variable ENSEMBLDBRC with this path
+    will force it's contents to override the default ensembldb settings"""
+    shutil.copytree(ENSEMBLDBRC, outpath)
+    print("Contents written to %s" % outpath)
+    
 
 if __name__ == "__main__":
     main()
