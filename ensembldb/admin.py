@@ -135,6 +135,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
     
     # the following step seems necessary for mysql to actually create all the table
     # definitions... wtf?
+    # cursor.commit()
     r = cursor.execute("SHOW TABLES")
     if r != num_tables:
         pprint(cursor.fetchall())
@@ -307,11 +308,11 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
 @_mysqlcfg
 @_verbose
 @_debug
-def drop(configpath, mysql, verbose, debug):
+def drop(configpath, mysqlcfg, verbose, debug):
     """drop databases from a MySQL server"""
-    mysqlcfg = read_mysql_config(mysql, "mysql")
-    account = HostAccount(mysqlcfg["host"], mysqlcfg["user"],
-                          mysqlcfg["passwd"])
+    mysql_info = read_mysql_config(mysqlcfg, "mysql")
+    account = HostAccount(mysql_info["host"], mysql_info["user"],
+                          mysql_info["passwd"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     cursor = server.cursor()
     release, local_path, species_dbs = read_config(configpath)
