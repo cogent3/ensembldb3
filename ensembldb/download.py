@@ -13,7 +13,7 @@ from cogent3.util import parallel
 
 from ensembldb.species import Species
 from ensembldb.name import EnsemblDbName
-from .util import exec_command, abspath, makedirs
+from .util import exec_command, abspath, makedirs, ENSEMBLDBRC
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

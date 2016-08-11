@@ -15,7 +15,7 @@ from cogent3.util import parallel
 from ensembldb.download import read_config, reduce_dirnames, _cfg
 from . import HostAccount
 from .host import DbConnection
-from .util import exec_command, open_, abspath
+from .util import exec_command, open_, abspath, ENSEMBLDBRC
 from .download import download_dbs
 
 __author__ = "Gavin Huttley"
@@ -36,22 +36,34 @@ def listpaths(dirname, glob_pattern):
     fns = [os.path.join(dirname, fn) for fn in fns]
     return fns
 
-def InstallTable(account, dbname, mysqlimport="mysqlimport", verbose=False, debug=False):
+def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport", verbose=False, debug=False):
     """returns a function that requires path to the db table
     
     Parameters
     ----------
+    mysqlcfg : path
+      path to the mysql cfg file containing a mysqlimport section
     account : HostAccount
     dbname : str
       name of the database
     mysqlimport : str
       path to mysqlimport
     """
-    # this template could be part of mysql.cfg
-    cmnd_template = mysqlimport + r" -h %(host)s -u %(user)s -p%(passwd)s "\
-        r"--fields_escaped_by=\\ %(dbname)s -L %(tablename)s"
-    kwargs = dict(host=account.host, user=account.user, passwd=account.passwd,
+    info = read_mysql_config(mysqlcfg, "mysqlimport", verbose=verbose)
+    command = info["command"] or r"mysqlimport --fields_escaped_by=\\"
+    if None in [info["user"], info["passwd"]]:
+        acct = r" -u %(user)s -p%(passwd)s "
+    else:
+        acct = ""
+    
+    host = "" if info["host"] is None else r" -h %(host)s "
+    
+    cmnd_template = command + host + acct + " %(dbname)s -L %(tablename)s"
+    kwargs = dict(host=info["host"] or account.host,
+                  user=info["user"] or account.user,
+                  passwd=info["passwd"] or account.passwd,
                   dbname=dbname)
+    
     def install_table(tablename):
         """installs a single table"""
         if tablename.endswith(".gz"):
@@ -86,7 +98,7 @@ def is_installed(local_path, dbname):
     chk = get_db_checkpoint_path(local_path, dbname)
     return os.path.exists(chk)
 
-def install_one_db(cursor, account, dbname, local_path, numprocs, force_overwrite=False, verbose=False, debug=False):
+def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, force_overwrite=False, verbose=False, debug=False):
     """installs a single ensembl database"""
     # first create the database in mysql
     # find the .sql file, load all contents into memory
@@ -148,7 +160,7 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, force_overwrit
     if debug:
         pprint(tablenames)
     
-    install_table = InstallTable(account, dbname, verbose=verbose, debug=debug)
+    install_table = InstallTable(mysqlcfg, account, dbname, verbose=verbose, debug=debug)
     
     if numprocs > 1:
         procs = parallel.MultiprocessingParallelContext(numprocs)
@@ -215,12 +227,14 @@ def display_dbs_tables(cursor, dbname):
             r = r[0]
         
         pprint(r)
-    
+
+# default mysql config    
+_mycfg = os.path.join(ENSEMBLDBRC, 'mysql.cfg')
 
 # defining some of the options
 _cfgpath = click.option('-c', '--configpath', default=_cfg, type=click.File(),
               help="path to config file specifying databases, only species or compara at present")
-_mysqlcfg = click.option('-m', '--mysql', default=_cfg, type=click.File(),
+_mysqlcfg = click.option('-m', '--mysqlcfg', default=_mycfg, type=click.File(),
               help="path to mysql config file specifying host, user, installing data for writing")
 _verbose = click.option('-v', '--verbose', is_flag=True,
               help="causes stdout/stderr from rsync download to be written to screen")
@@ -254,7 +268,7 @@ def download(configpath, numprocs, verbose, debug):
 @_force
 @_verbose
 @_debug
-def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
+def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     """install ensembl databases into a MySQL server"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(mysql_info["host"], mysql_info["user"],
@@ -276,7 +290,7 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
-        install_one_db(cursor, account, dbname.name, local_path, numprocs,
+        install_one_db(mysqlcfg, cursor, account, dbname.name, local_path, numprocs,
                        force_overwrite=force_overwrite, verbose=verbose,
                        debug=debug)
         cursor.close()
