@@ -6,6 +6,7 @@ import os
 import shutil
 from glob import glob, glob1
 import configparser
+from collections import defaultdict
 from pprint import pprint
 
 import click
@@ -165,11 +166,25 @@ def install_one_db(cursor, account, dbname, local_path, numprocs, force_overwrit
     
 
 ## can we get away with the ~/.my.cnf for the sql cursor?
-def read_msql_config(config_path, verbose=False):
-    """returns a dict with mysql config options"""
-    parser = configparser.ConfigParser()
+def read_mysql_config(config_path, section, verbose=False):
+    """returns a dict with mysql config options
+    
+    Parameters
+    ----------
+    config_path : str
+      path to mysql config file
+    section : str
+      section in config file to query
+    """
+    opts = defaultdict(lambda: None)
+    parser = configparser.ConfigParser(opts)
     parser.read_file(config_path)
-    opts = dict((k, parser.get("mysql", k)) for k in ["host", "user", "passwd"])
+    if not parser.has_section(section):
+        return opts
+    
+    for k in ["host", "user", "passwd", "command"]:
+        opts[k] = parser.get(section, k) or opts[k]
+    
     return opts
 
 def _drop_db(cursor, dbname):
@@ -241,9 +256,9 @@ def download(configpath, numprocs, verbose, debug):
 @_debug
 def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
     """install ensembl databases into a MySQL server"""
-    mysqlcfg = read_msql_config(mysql)
-    account = HostAccount(mysqlcfg["host"], mysqlcfg["user"],
-                          mysqlcfg["passwd"])
+    mysql_info = read_mysql_config(mysqlcfg, "mysql")
+    account = HostAccount(mysql_info["host"], mysql_info["user"],
+                          mysql_info["passwd"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     
     release, local_path, species_dbs = read_config(configpath)
@@ -280,7 +295,7 @@ def install(configpath, mysql, numprocs, force_overwrite, verbose, debug):
 @_debug
 def drop(configpath, mysql, verbose, debug):
     """drop databases from a MySQL server"""
-    mysqlcfg = read_msql_config(mysql)
+    mysqlcfg = read_mysql_config(mysql, "mysql")
     account = HostAccount(mysqlcfg["host"], mysqlcfg["user"],
                           mysqlcfg["passwd"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
