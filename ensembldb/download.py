@@ -17,7 +17,7 @@ from .util import exec_command, abspath, makedirs
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
-__credits__ = ["Gavin Huttley", "Jason Merkin"]
+__credits__ = ["Gavin Huttley"]
 __license__ = "BSD"
 __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"

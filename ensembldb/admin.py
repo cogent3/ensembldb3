@@ -17,7 +17,7 @@ from .download import download_dbs
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
-__credits__ = ["Gavin Huttley", "Hua Ying", "Jason Merkin"]
+__credits__ = ["Gavin Huttley"]
 __license__ = "BSD"
 __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
