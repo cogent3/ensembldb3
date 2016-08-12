@@ -78,7 +78,7 @@ def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport", verbose=F
             click.echo(cmnd)
         
         if verbose:
-            click.echo("\tinstalling %s" % tablename)
+            click.echo("  installing %s" % tablename)
         
         exec_args = {} if not debug else dict(stderr=None, stdout=None)
         r = exec_command(cmnd, **exec_args)
@@ -118,7 +118,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
     sql = "\n".join(sql)
     # select the database
     if verbose or debug:
-        click.echo("\tcreating table definitions for %s" % dbname)
+        click.echo("  Creating table definitions for %s" % dbname)
     r = cursor.execute("USE %s" % dbname)
     # make sure tables don't exist
     r = cursor.execute("SHOW TABLES")
