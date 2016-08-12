@@ -152,7 +152,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
             name = name[:-3]
             if name in tablenames:
                 if verbose:
-                    click.echo("\tWARN: Deleting %s, using compressed version" % name)
+                    click.echo("  WARN: Deleting %s, using compressed version" % name)
                 tablenames.remove(name)
                 os.remove(name)
     
@@ -319,7 +319,15 @@ def drop(configpath, mysqlcfg, verbose, debug):
     release, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
-    # todo: list db's to be dropped and user ask for confirmation
+    
+    click.echo("The following databases will be deleted:")
+    click.echo("\n".join(["  %s" % d for d in dbnames]))
+    try:
+        click.confirm("Confirm you want to delete the databases", abort=True)
+    except click.exceptions.Abort:
+        click.echo("EXITING")
+        exit(0)
+    
     for dbname in dbnames:
         click.echo("Dropping %s" % dbname)
         _drop_db(cursor, dbname)
