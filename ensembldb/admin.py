@@ -7,7 +7,6 @@ import shutil
 from glob import glob, glob1
 import configparser
 from collections import defaultdict
-from pprint import pprint
 
 import click
 from cogent3.util import parallel
@@ -72,14 +71,14 @@ def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport", verbose=F
         # then install
         kwargs["tablename"] = tablename
         if debug:
-            pprint(kwargs)
+            click.echo(str(kwargs))
         
         cmnd = cmnd_template % kwargs
         if debug:
-            print(cmnd)
+            click.echo(cmnd)
         
         if verbose:
-            print("\tinstalling %s" % tablename)
+            click.echo("\tinstalling %s" % tablename)
         
         exec_args = {} if not debug else dict(stderr=None, stdout=None)
         r = exec_command(cmnd, **exec_args)
@@ -106,7 +105,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
     # $ mysql -u uname dname < dbname.sql
     dbpath = os.path.join(local_path, dbname)
     if is_installed(local_path, dbname) and not force_overwrite:
-        print("ALREADY INSTALLED: %s, skipping" % dbname)
+        click.echo("ALREADY INSTALLED: %s, skipping" % dbname)
         return True
     
     sqlfile = listpaths(dbpath, "*.sql*")
@@ -119,13 +118,13 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
     sql = "\n".join(sql)
     # select the database
     if verbose or debug:
-        print("\tcreating table definitions for %s" % dbname)
+        click.echo("\tcreating table definitions for %s" % dbname)
     r = cursor.execute("USE %s" % dbname)
     # make sure tables don't exist
     r = cursor.execute("SHOW TABLES")
     result = cursor.fetchall()
     for table in result:
-        print(table)
+        click.echo(table)
         r = cursor.execute("DROP TABLE IF EXISTS %s" % table)
     
     # create the table definitions
@@ -137,12 +136,12 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
     # cursor.commit()
     r = cursor.execute("SHOW TABLES")
     if r != num_tables:
-        pprint(cursor.fetchall())
+        click.echo(str(cursor.fetchall()))
         raise RuntimeError("number of created tables doesn't match number in sql")
     
     if debug:
-        print(r)
-        print()
+        click.echo(r)
+        click.echo()
         display_dbs_tables(cursor, dbname)
     
     tablenames = listpaths(dbpath, "*.txt*")
@@ -153,12 +152,12 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
             name = name[:-3]
             if name in tablenames:
                 if verbose:
-                    print("\tWARN: Deleting %s, using compressed version" % name)
+                    click.echo("\tWARN: Deleting %s, using compressed version" % name)
                 tablenames.remove(name)
                 os.remove(name)
     
     if debug:
-        pprint(tablenames)
+        click.echo(str(tablenames))
     
     install_table = InstallTable(mysqlcfg, account, dbname, verbose=verbose, debug=debug)
     
@@ -217,7 +216,7 @@ def display_dbs(cursor, release):
             r = r[0]
         
         if release in r:
-            pprint(r)
+            click.echo(str(r))
     
 def display_dbs_tables(cursor, dbname):
     """shows what databases for the nominated release exist at the server"""
@@ -229,7 +228,7 @@ def display_dbs_tables(cursor, dbname):
         if isinstance(r, tuple):
             r = r[0]
         
-        pprint(r)
+        click.echo(str(r))
 
 # default mysql config    
 _mycfg = os.path.join(ENSEMBLDBRC, 'mysql.cfg')
@@ -281,10 +280,6 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     release, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
-    if verbose:
-        print("Installing db's in the following order:")
-        pprint(dbnames)
-    
     for dbname in dbnames:
         server.ping(reconnect=True) # reconnect if server not alive
         cursor = server.cursor()
@@ -292,7 +287,7 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
             _drop_db(cursor, dbname.name)
         
         if verbose:
-            print("Creating database %s" % dbname.name)
+            click.echo("Creating database %s" % dbname.name)
         
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
@@ -305,7 +300,7 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     
     if debug:
         display_dbs(cursor, release)
-        print(server)
+        click.echo(server)
     
     cursor.close()
 
@@ -326,7 +321,7 @@ def drop(configpath, mysqlcfg, verbose, debug):
     dbnames = reduce_dirnames(content, species_dbs)
     # todo: list db's to be dropped and user ask for confirmation
     for dbname in dbnames:
-        print("Dropping %s" % dbname)
+        click.echo("Dropping %s" % dbname)
         _drop_db(cursor, dbname)
 
     if verbose:
@@ -342,7 +337,7 @@ def exportrc(outpath):
     setting an environment variable ENSEMBLDBRC with this path
     will force it's contents to override the default ensembldb settings"""
     shutil.copytree(ENSEMBLDBRC, outpath)
-    print("Contents written to %s" % outpath)
+    click.echo("Contents written to %s" % outpath)
     
 
 if __name__ == "__main__":
