@@ -12,7 +12,7 @@ import click
 from cogent3.util import parallel
 
 from . import HostAccount
-from .host import DbConnection
+from .host import DbConnection, get_db_name
 from .util import exec_command, open_, abspath, ENSEMBLDBRC
 from .download import download_dbs, read_config, reduce_dirnames, _cfg
 
@@ -248,6 +248,7 @@ _debug = click.option('-d', '--debug', is_flag=True,
               help="maximum verbosity")
 _dbrc_out = click.option('-o', '--outpath', type=click.Path(),
                          help="path to directory to export all rc contents")
+_release = click.option("-r", "--release", type=int, help="Ensembl release number")
 
 @click.group()
 def main():
@@ -347,6 +348,22 @@ def exportrc(outpath):
     shutil.copytree(ENSEMBLDBRC, outpath)
     click.echo("Contents written to %s" % outpath)
     
+
+@main.command()
+@_release
+@_mysqlcfg
+def show(release, mysqlcfg):
+    """shows databases corresponding to release"""
+    mysql_info = read_mysql_config(mysqlcfg, "mysql")
+    account = HostAccount(mysql_info["host"], mysql_info["user"],
+                          mysql_info["passwd"])
+    names = get_db_name(account=account, release=str(release))
+    click.echo("Databases at host='%s' for release=%s" % (account.host, release))
+    if names:
+        click.echo("\n".join(["  %s" % n for n in names]))
+    else:
+        click.echo("  None")
+
 
 if __name__ == "__main__":
     main()
