@@ -128,8 +128,9 @@ def read_config(config_path, verbose=False):
         species_dbs[species] = dbs
     
     if verbose:
-        print("DOWNLOADING\nensembl release=%s\noutput path=%s\n" % (release, local_path))
-        pprint(species_dbs)
+        click.echo("DOWNLOADING\n  ensembl release=%s" % release)
+        click.echo("\n".join(["  %s" % d for d in species_dbs]))
+        click.echo("\nWRITING to output path=%s\n" % local_path)
     return release, local_path, species_dbs
 
 _cfg = os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg')
