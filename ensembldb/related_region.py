@@ -264,7 +264,7 @@ class SyntenicRegions(_RelatedRegions):
         assert ref_member is not None, "Can't match a member to ref_location"
         self.ref_member = ref_member
         self.members = tuple([ref_member] + mems)
-        self.NumMembers = len(self.members)
+        self.num_members = len(self.members)
         self.aln_loc = None
         self._do_rc = None
 
