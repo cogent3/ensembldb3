@@ -174,7 +174,7 @@ Look at all transcripts for a gene
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> for transcript in brca2.Transcripts:
+    >>> for transcript in brca2.transcripts:
     ...     print transcript
     Transcript(species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
     Transcript(species='Homo sapiens'; coord_name='13'; start=32315504; end=32333291; length=17787; strand='+')...

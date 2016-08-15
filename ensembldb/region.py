@@ -258,7 +258,7 @@ class _StableRegion(GenericRegion):
 
         Arguments:
             - member_types: the property to be searched, depends on self.type.
-              Transcripts for genes, Exons/TranslatedExons for Transcripts."""
+              transcripts for genes, Exons/TranslatedExons for transcripts."""
 
         member_types = member_types or self._member_types
         if type(member_types) == str:
@@ -278,7 +278,7 @@ class _StableRegion(GenericRegion):
 class Gene(_StableRegion):
     """a gene region"""
     type = 'gene'
-    _member_types = ['Transcripts']
+    _member_types = ['transcripts']
 
     def __init__(self, genome, db, stableid=None, symbol=None, location=None, data=None):
         """constructed by a genome instance"""
@@ -289,7 +289,7 @@ class Gene(_StableRegion):
                                             symbol='xref',
                                             description='gene', biotype='gene', location='gene',
                                             canonical_transcript='gene',
-                                            Transcripts='transcript',
+                                            transcripts='transcript',
                                             Exons='transcript')
 
         if data is None:
@@ -401,19 +401,19 @@ class Gene(_StableRegion):
                            transcript_table.c.gene_id == gene_id)
         records = query.execute().fetchall()
         if not records:
-            self._set_null_values(['Transcripts'], 'transcript')
+            self._set_null_values(['transcripts'], 'transcript')
             return
         transcripts = []
         for record in records:
             transcript_id = record['transcript_id']
             transcripts.append(Transcript(self.genome, self.db, transcript_id,
                                           data=record))
-        self._cached['Transcripts'] = tuple(transcripts)
+        self._cached['transcripts'] = tuple(transcripts)
 
     def _get_transcripts(self):
-        return self._get_cached_value('Transcripts', self._make_transcripts)
+        return self._get_cached_value('transcripts', self._make_transcripts)
 
-    Transcripts = property(_get_transcripts)
+    transcripts = property(_get_transcripts)
 
     def sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. These can be
@@ -421,7 +421,7 @@ class Gene(_StableRegion):
         Returns None if self lies outside parent's span.
         """
         features = []
-        for transcript in self.Transcripts:
+        for transcript in self.transcripts:
             transcript_data = transcript.feature_data(parent_map)
             if transcript_data:
                 features.append(transcript_data)
@@ -432,15 +432,15 @@ class Gene(_StableRegion):
     def get_cds_lengths(self):
         """returns the Cds lengths from transcripts with the same biotype.
         returns None if no transcripts."""
-        if self.Transcripts is self.NULL_VALUE:
+        if self.transcripts is self.NULL_VALUE:
             return None
-        l = [ts.get_cds_length() for ts in self.Transcripts
+        l = [ts.get_cds_length() for ts in self.transcripts
              if ts.biotype == self.biotype]
         return l
 
     def get_longest_cds_transcript(self):
         """returns the Transcript with the longest Cds and the same biotype"""
-        result = sorted([(ts.get_cds_length(), ts) for ts in self.Transcripts
+        result = sorted([(ts.get_cds_length(), ts) for ts in self.transcripts
                          if ts.biotype == self.biotype])
 
         if result:  # last result is longest

@@ -186,7 +186,7 @@ class TestGene(GenomeTestBase):
         self.assertTrue(len(transcript.ProteinSeq) > 0)
         # now one on the - strand
         gene = self.mouse.get_gene_by_stableid(stableid='ENSMUSG00000045912')
-        transcript = gene.Transcripts[0]
+        transcript = gene.transcripts[0]
         self.assertTrue(len(transcript.ProteinSeq) > 0)
 
     def test_failed_ensembl_annotation(self):
@@ -213,7 +213,7 @@ class TestGene(GenomeTestBase):
         """correctly identify phase for an exon"""
         stable_id = 'ENSG00000171408'
         gene = self.human.get_gene_by_stableid(stableid=stable_id)
-        exon1 = gene.Transcripts[1].Exons[0]
+        exon1 = gene.transcripts[1].Exons[0]
         # first two bases of codon missing
         self.assertEqual(exon1.phase_start, 2)
         # last two bases of codon missing
@@ -240,9 +240,9 @@ class TestGene(GenomeTestBase):
         """should return multiple transcripts"""
         stable_id = 'ENSG00000012048'
         gene = self.human.get_gene_by_stableid(stableid=stable_id)
-        self.assertTrue(len(gene.Transcripts) > 1)
+        self.assertTrue(len(gene.transcripts) > 1)
         # .. and correctly construct the Cds and location
-        for transcript in gene.Transcripts:
+        for transcript in gene.transcripts:
             self.assertTrue(transcript.get_cds_length() > 0)
             self.assertEqual(transcript.location.coord_name, '17')
 
@@ -266,7 +266,7 @@ class TestGene(GenomeTestBase):
     def test_rna_transcript_cds(self):
         """should return a Cds for an RNA gene too"""
         rna_gene = self.human.get_gene_by_stableid(stableid='ENSG00000210049')
-        self.assertTrue(rna_gene.Transcripts[0].get_cds_length() > 0)
+        self.assertTrue(rna_gene.transcripts[0].get_cds_length() > 0)
 
     def test_gene_annotation(self):
         """should correctly annotated a sequence"""
@@ -379,7 +379,7 @@ class TestGene(GenomeTestBase):
             ('ENSG00000132199', 'ENST00000340116', 14)]:
             gene = asserted_one(self.human.get_genes_matching(stableid=gene_id))
             transcript = asserted_one(
-                [t for t in gene.Transcripts if t.stableid == transcript_id])
+                [t for t in gene.transcripts if t.stableid == transcript_id])
             if exp_number == 0:
                 self.assertEqual(transcript.Introns, None)
             else:
@@ -403,7 +403,7 @@ class TestGene(GenomeTestBase):
             gene = asserted_one(self.human.get_genes_matching(symbol=symbol))
             strand = gene.location.strand
             transcript = asserted_one(
-                [t for t in gene.Transcripts if t.stableid == stable_id])
+                [t for t in gene.transcripts if t.stableid == stable_id])
             introns = transcript.Introns
             self.assertEqual(len(introns), len(exp_introns))
             idx = 0
