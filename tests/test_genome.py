@@ -213,7 +213,7 @@ class TestGene(GenomeTestBase):
         """correctly identify phase for an exon"""
         stable_id = 'ENSG00000171408'
         gene = self.human.get_gene_by_stableid(stableid=stable_id)
-        exon1 = gene.transcripts[1].Exons[0]
+        exon1 = gene.transcripts[1].exons[0]
         # first two bases of codon missing
         self.assertEqual(exon1.phase_start, 2)
         # last two bases of codon missing
@@ -308,7 +308,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(exon.stableid, exon_id)
         self.assertEqual(trans_exon.stableid, exon_id)
         # we check we got Exon in the first call and TranslatedExon in the
-        # second using the fact that the Exons entry is longer than the
+        # second using the fact that the exons entry is longer than the
         # TranslatedExons one
         self.assertGreaterThan(len(exon), len(trans_exon))
 

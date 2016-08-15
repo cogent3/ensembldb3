@@ -258,7 +258,7 @@ class _StableRegion(GenericRegion):
 
         Arguments:
             - member_types: the property to be searched, depends on self.type.
-              transcripts for genes, Exons/TranslatedExons for transcripts."""
+              transcripts for genes, exons/TranslatedExons for transcripts."""
 
         member_types = member_types or self._member_types
         if type(member_types) == str:
@@ -290,7 +290,7 @@ class Gene(_StableRegion):
                                             description='gene', biotype='gene', location='gene',
                                             canonical_transcript='gene',
                                             transcripts='transcript',
-                                            Exons='transcript')
+                                            exons='transcript')
 
         if data is None:
             args = [dict(stableid=stableid), dict(
@@ -451,7 +451,7 @@ class Gene(_StableRegion):
 
 class Transcript(_StableRegion):
     type = 'transcript'
-    _member_types = ['Exons', 'TranslatedExons']
+    _member_types = ['exons', 'TranslatedExons']
 
     def __init__(self, genome, db, transcript_id, data, location=None):
         """created by Gene"""
@@ -518,21 +518,21 @@ class Transcript(_StableRegion):
             exons.append(Exon(self.genome, self.db, record['exon_id'],
                               record['rank']))
         exons.sort()
-        self._cached['Exons'] = tuple(exons)
+        self._cached['exons'] = tuple(exons)
 
     def _get_exons(self):
-        return self._get_cached_value('Exons',
+        return self._get_cached_value('exons',
                                       self._get_exon_transcript_records)
 
-    Exons = property(_get_exons)
+    exons = property(_get_exons)
 
     def _get_intron_transcript_records(self):
-        if len(self.Exons) < 2:
+        if len(self.exons) < 2:
             self._set_null_values(["Introns"])
             return
 
         exon_positions = [(exon.location.start, exon.location.end)
-                          for exon in self.Exons]
+                          for exon in self.exons]
         exon_positions.sort()
         end = exon_positions[-1][-1]
         exon_map = Map(locations=exon_positions, parent_length=end)
@@ -588,11 +588,11 @@ class Transcript(_StableRegion):
         # the coord shifts need to be flipped
         seq_start = record['seq_start'] - 1
         seq_end = record['seq_end']
-        flip_coords = self.Exons[0].location.strand == -1
+        flip_coords = self.exons[0].location.strand == -1
 
         start_index = None
         end_index = None
-        for index, exon in enumerate(self.Exons):
+        for index, exon in enumerate(self.exons):
             if exon.exon_id == start_exon_id:
                 start_index = index
             if exon.exon_id == end_exon_id:
@@ -600,7 +600,7 @@ class Transcript(_StableRegion):
         assert None not in (start_index, end_index), \
             'Error in matching transcript and exons'
 
-        start_exon = self.Exons[start_index]
+        start_exon = self.exons[start_index]
 
         if start_index == end_index:
             shift_start = [seq_start, len(start_exon) - seq_end][flip_coords]
@@ -622,9 +622,9 @@ class Transcript(_StableRegion):
         new_start_exon = Exon(self.genome, self.db, start_exon.exon_id,
                               start_exon.rank, location=coord)
         translated_exons = (new_start_exon,) +\
-            self.Exons[start_index + 1:end_index]
+            self.exons[start_index + 1:end_index]
         if start_index != end_index:
-            end_exon = self.Exons[end_index]
+            end_exon = self.exons[end_index]
             shift_start = [0, len(end_exon) - seq_end][flip_coords]
             shift_end = [seq_end - len(end_exon), 0][flip_coords]
             coord = end_exon.location.resized(shift_start, shift_end)
@@ -640,9 +640,9 @@ class Transcript(_StableRegion):
 
     def _calculate_Utr_exons(self):
         # TODO clean up this code
-        exons = self.Exons
+        exons = self.exons
         translated_exons = self.TranslatedExons
-        num_exons = len(self.Exons)
+        num_exons = len(self.exons)
         if not translated_exons:
             self._set_null_values(["UntranslatedExons5", "UntranslatedExons3"])
             return
@@ -707,11 +707,11 @@ class Transcript(_StableRegion):
     Utr3 = property(_get_utr3_seq)
 
     def _make_cds_seq(self):
-        if self.Exons is self.NULL_VALUE:
+        if self.exons is self.NULL_VALUE:
             self._cached['Cds'] = self.NULL_VALUE
             return
 
-        exons = [self.Exons, self.TranslatedExons][self._am_prot_coding]
+        exons = [self.exons, self.TranslatedExons][self._am_prot_coding]
         full_seq = None
         for exon in exons:
             if full_seq is None:
@@ -742,7 +742,7 @@ class Transcript(_StableRegion):
         returns None."""
         if self.Cds is self.NULL_VALUE:
             return None
-        exons = [self.Exons, self.TranslatedExons][self._am_prot_coding]
+        exons = [self.exons, self.TranslatedExons][self._am_prot_coding]
         return sum(map(len, exons))
 
     def _make_protein_seq(self):
@@ -778,9 +778,9 @@ class Transcript(_StableRegion):
     def _get_exon_feature_data(self, parent_map):
         """returns the exon feature data"""
         features = []
-        if self.Exons is self.NULL_VALUE:
+        if self.exons is self.NULL_VALUE:
             return features
-        for exon in self.Exons:
+        for exon in self.exons:
             feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue

@@ -189,7 +189,7 @@ We show just for the canonical transcript.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> print brca2.canonical_transcript.Exons[0]
+    >>> print brca2.canonical_transcript.exons[0]
     Exon(stableid=ENSE00001184784, rank=1)
 
 Get the introns for a transcript
