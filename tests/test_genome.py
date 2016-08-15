@@ -133,7 +133,7 @@ class TestGenome(GenomeTestBase):
     def test_diff_strand_contig_chrom(self):
         """get correct sequence when contig and chromosome strands differ"""
         gene = self.gorilla.get_gene_by_stableid('ENSGGOG00000001953')
-        cds = gene.CanonicalTranscript.Cds
+        cds = gene.canonical_transcript.Cds
         self.assertEqual(str(cds), 'ATGGCCCAGGATCTCAGCGAGAAGGACCTGTTGAAGATG'
                          'GAGGTGGAGCAGCTGAAGAAAGAAGTGAAAAACACAAGAATTCCGATTTCCAAAGCGGGAAAGGAAAT'
                          'CAAAGAGTACGTGGAGGCCCAAGCAGGAAACGATCCTTTTCTCAAAGGCATCCCTGAGGACAAGAATC'
@@ -159,7 +159,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.biotype.lower(), 'protein_coding')
         self.assertContains(brca2.description.lower(), 'breast cancer')
         self.assertEqual(brca2.status, 'KNOWN')
-        self.assertEqual(brca2.CanonicalTranscript.stableid,
+        self.assertEqual(brca2.canonical_transcript.stableid,
                          'ENST00000380152')
         # note length can change between genome builds
         self.assertGreaterThan(len(brca2), 83700)
@@ -233,7 +233,7 @@ class TestGene(GenomeTestBase):
         canon_ids = 'ENSG00000111729 ENSG00000177151 ENSG00000237276 ENSG00000251184'.split()
         for index, stable_id in enumerate(canon_ids):
             gene = self.human.get_gene_by_stableid(stableid=stable_id)
-            transcript = gene.CanonicalTranscript
+            transcript = gene.canonical_transcript
             prot_seq = transcript.ProteinSeq
 
     def test_gene_transcripts(self):
@@ -351,15 +351,15 @@ class TestGene(GenomeTestBase):
         self.assertEqual(transcript.stableid, stable_id)
         gene = transcript.Gene
         brca2 = self.human.get_gene_by_stableid(stableid='ENSG00000139618')
-        self.assertEqual(brca2.CanonicalTranscript.stableid,
+        self.assertEqual(brca2.canonical_transcript.stableid,
                          transcript.stableid)
         self.assertEqual(
-            brca2.CanonicalTranscript.get_cds_length(), len(transcript.Cds))
-        self.assertEqual(str(brca2.CanonicalTranscript.Cds),
+            brca2.canonical_transcript.get_cds_length(), len(transcript.Cds))
+        self.assertEqual(str(brca2.canonical_transcript.Cds),
                          str(transcript.Cds))
-        self.assertEqual(str(brca2.CanonicalTranscript.Cds),
+        self.assertEqual(str(brca2.canonical_transcript.Cds),
                          str(transcript.Cds))
-        self.assertEqual(str(brca2.CanonicalTranscript.seq),
+        self.assertEqual(str(brca2.canonical_transcript.seq),
                          str(transcript.seq))
         self.assertEqual(brca2.stableid, gene.stableid)
         self.assertEqual(brca2.seq, gene.seq)

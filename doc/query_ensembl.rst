@@ -146,7 +146,7 @@ Gene's also have a location. The length of a gene is the difference between its 
     
 Each location is directly tied to the parent genome and the coordinate above also shows the coordinates' *type* (chromosome in this case), name (13), start, end and strand. The start and end positions are python indices and will differ from the Ensembl indices in that start will be the Ensembl index - 1. This is because python counts from 0, not 1. In querying for regions using a specific set of coordinates, it is possible to put in the Ensembl coordinates (demonstrated below).
 
-``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``CanonicalTranscript`` and ``Transcripts``. ``CanonicalTranscript`` is the characteristic transcript for a gene, as defined by Ensembl. ``Transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``Exons``, ``Introns``, a ``Cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
+``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``canonical_transcript`` and ``Transcripts``. ``canonical_transcript`` is the characteristic transcript for a gene, as defined by Ensembl. ``Transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``Exons``, ``Introns``, a ``Cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
 
 .. doctest::
 
@@ -154,9 +154,9 @@ Each location is directly tied to the parent genome and the coordinate above als
     protein_coding
     >>> print brca2.seq
     GGGCTTGTGGCGC...
-    >>> print brca2.CanonicalTranscript.Cds
+    >>> print brca2.canonical_transcript.Cds
     ATGCCTATTGGATC...
-    >>> print brca2.CanonicalTranscript.ProteinSeq
+    >>> print brca2.canonical_transcript.ProteinSeq
     MPIGSKERPTF...
 
 It is also possible to iterate over a transcript's exons, over their translated exons, or to obtain their coding DNA sequence. We grab the second transcript for this.
@@ -179,7 +179,7 @@ The ``Exons`` and ``TranslatedExons`` properties are tuples that are evaluated o
 
 .. doctest::
 
-    >>> for intron in brca2.CanonicalTranscript.Introns:
+    >>> for intron in brca2.canonical_transcript.Introns:
     ...     print intron
     Intron(TranscriptId=ENST00000380152, rank=1)
     Intron(TranscriptId=ENST00000380152, rank=2)

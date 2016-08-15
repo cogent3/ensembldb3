@@ -288,7 +288,7 @@ class Gene(_StableRegion):
                                                       'gene'][genome.general_release >= 65],
                                             symbol='xref',
                                             description='gene', biotype='gene', location='gene',
-                                            CanonicalTranscript='gene',
+                                            canonical_transcript='gene',
                                             Transcripts='transcript',
                                             Exons='transcript')
 
@@ -380,17 +380,17 @@ class Gene(_StableRegion):
                            transcript_table.c.transcript_id == canonical_id)
         records = query.execute().fetchall()
         assert len(records) == 1,\
-            "wrong number of records from CanonicalTranscript"
+            "wrong number of records from canonical_transcript"
         record = records[0]
         transcript = Transcript(self.genome, self.db, canonical_id,
                                 data=record)
-        self._cached['CanonicalTranscript'] = transcript
+        self._cached['canonical_transcript'] = transcript
 
     def _get_canonical_transcript(self):
-        return self._get_cached_value('CanonicalTranscript',
+        return self._get_cached_value('canonical_transcript',
                                       self._make_canonical_transcript)
 
-    CanonicalTranscript = property(_get_canonical_transcript)
+    canonical_transcript = property(_get_canonical_transcript)
 
     def _make_transcripts(self):
         if 'gene' not in self._table_rows:

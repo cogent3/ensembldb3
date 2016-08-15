@@ -147,7 +147,7 @@ We get the canonical transcripts for *BRCA2*.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> transcript = brca2.CanonicalTranscript
+    >>> transcript = brca2.canonical_transcript
     >>> print transcript
     Transcript(species='Homo sapiens'; coord_name='13'; start=32315473; end=32400266; length=84793; strand='+')
 
@@ -159,7 +159,7 @@ Get the CDS for a transcript
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> transcript = brca2.CanonicalTranscript
+    >>> transcript = brca2.canonical_transcript
     >>> cds = transcript.Cds
     >>> print type(cds)
     <class 'cogent.core.sequence.DnaSequence'>
@@ -189,7 +189,7 @@ We show just for the canonical transcript.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> print brca2.CanonicalTranscript.Exons[0]
+    >>> print brca2.canonical_transcript.Exons[0]
     Exon(stableid=ENSE00001184784, rank=1)
 
 Get the introns for a transcript
@@ -202,7 +202,7 @@ We show just for the canonical transcript.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> for intron in brca2.CanonicalTranscript.Introns:
+    >>> for intron in brca2.canonical_transcript.Introns:
     ...     print intron
     Intron(TranscriptId=ENST00000380152, rank=1)
     Intron(TranscriptId=ENST00000380152, rank=2)
@@ -271,7 +271,7 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> transcript = brca2.CanonicalTranscript
+    >>> transcript = brca2.canonical_transcript
     >>> print transcript.variants
     (<cogent.db.ensembl.region.Variation object at ...
     >>> for variant in transcript.variants:
@@ -457,7 +457,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     ...     for m in orthologs.members:
     ...         try: # if sequence can't be translated, we ignore it
     ...             # get the CDS without the ending stop
-    ...             seq = m.CanonicalTranscript.Cds.trim_stop_codon()
+    ...             seq = m.canonical_transcript.Cds.trim_stop_codon()
     ...             # make the sequence name
     ...             seq.name = '%s:%s:%s' % \
     ...         (latin_to_common[m.genome.species], m.stableid, m.location)
