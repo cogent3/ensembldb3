@@ -182,7 +182,7 @@ class SyntenicRegion(LazyRecord):
         record = self._cached
         try:
             aln_map, aln_loc = cigar.slice_cigar(self.cigar_line,
-                                                 self.parent.CigarStart,
+                                                 self.parent.cigar_start,
                                                  self.parent.CigarEnd,
                                                  by_align=True)
             self.aln_map = aln_map
@@ -283,7 +283,7 @@ class SyntenicRegions(_RelatedRegions):
         """near (don't actually get the sequence) completes construction of
         ref sequence"""
         self.ref_member._make_map_func()
-        self._cached['CigarStart'] = self.ref_member.aln_loc[0]
+        self._cached['cigar_start'] = self.ref_member.aln_loc[0]
         self._cached['CigarEnd'] = self.ref_member.aln_loc[1]
 
     def _get_rc_state(self):
@@ -300,12 +300,12 @@ class SyntenicRegions(_RelatedRegions):
     _rc = property(fget=_get_rc_state)
 
     def __len__(self):
-        return self.CigarEnd - self.CigarStart
+        return self.CigarEnd - self.cigar_start
 
     def _get_ref_start(self):
-        return self._get_cached_value('CigarStart', self._populate_ref)
+        return self._get_cached_value('cigar_start', self._populate_ref)
 
-    CigarStart = property(_get_ref_start)
+    cigar_start = property(_get_ref_start)
 
     def _get_ref_end(self):
         return self._get_cached_value('CigarEnd', self._populate_ref)
