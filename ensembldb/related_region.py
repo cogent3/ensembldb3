@@ -45,7 +45,7 @@ class _RelatedRegions(LazyRecord):
             if feature_types:
                 seq = member.get_annotated_seq(feature_types, where_feature)
             else:
-                seq = member.Seq
+                seq = member.seq
             if seq is None:
                 continue
             seqs.append((seq.name, seq))
@@ -221,9 +221,9 @@ class SyntenicRegion(LazyRecord):
         if feature_types:
             seq = region.get_annotated_seq(feature_types, where_feature)
         else:
-            seq = region.Seq
+            seq = region.seq
 
-        # we get the Seq objects to allow for copying of their annotations
+        # we get the seq objects to allow for copying of their annotations
         gapped_seq = Aligned(self.aln_map, seq)
 
         self._cached['aligned_seq'] = gapped_seq

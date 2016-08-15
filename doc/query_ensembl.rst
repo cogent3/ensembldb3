@@ -152,7 +152,7 @@ Each location is directly tied to the parent genome and the coordinate above als
 
     >>> print brca2.biotype
     protein_coding
-    >>> print brca2.Seq
+    >>> print brca2.seq
     GGGCTTGTGGCGC...
     >>> print brca2.CanonicalTranscript.Cds
     ATGCCTATTGGATC...
@@ -175,7 +175,7 @@ It is also possible to iterate over a transcript's exons, over their translated 
 
 The ``Cds`` sequence includes the stop-codon, if present. The reason for this is there are many annotated transcripts in the Ensembl database the length of whose transcribed exons are not divisible by 3. Hence we leave it to the user to decide how to deal with that, but mention here that determining the number of complete codons is trivial and you can slice the ``Cds`` so that it's length is divisible by 3.
 
-The ``Exons`` and ``TranslatedExons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``Seq`` attribute). Similar descriptions apply to the ``Introns`` property and ``Intron`` class. We show just for the canonical transcript.
+The ``Exons`` and ``TranslatedExons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``seq`` attribute). Similar descriptions apply to the ``Introns`` property and ``Intron`` class. We show just for the canonical transcript.
 
 .. doctest::
 
@@ -292,7 +292,7 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
     Homo sapiens:chromosome:1:69967-69968:1
     >>> assert nsyn_variant.NumAlleles == 2
 
-``Variation`` objects have ``FlankingSeq`` and ``Seq`` attributes which in the case of a SNP is a single nucleotide long and should correspond to one of the alleles. In the latter case, this property is a tuple with the 0th entry being the 5'- 300 nucleotides and the 1st entry being the 3' nucleotides.
+``Variation`` objects have ``FlankingSeq`` and ``seq`` attributes which in the case of a SNP is a single nucleotide long and should correspond to one of the alleles. In the latter case, this property is a tuple with the 0th entry being the 5'- 300 nucleotides and the 1st entry being the 3' nucleotides.
 
 .. note:: The flanking sequence is only returned when the SNPs flank matches reference (according to Ensembl).
 
@@ -302,7 +302,7 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
     TTGCTAACAGT...
     >>> print nsyn_variant.FlankingSeq[1]
     GCTGAGAAAAT...
-    >>> assert str(nsyn_variant.Seq) in nsyn_variant.Alleles, str(nsyn_variant.Seq)
+    >>> assert str(nsyn_variant.seq) in nsyn_variant.Alleles, str(nsyn_variant.seq)
 
 As a standard feature, ``Variation`` within a specific interval can also be obtained. Using the ``brca2`` gene region instance created above, we can find all the genetic variants using the ``Variants`` property of genome regions. We use this example to also demonstrate the ``PeptideAlleles`` and ``TranslationLocation`` attributes. ``PeptideAlleles`` is the amino-acid variation resulting from the nucleotide variation while ``TranslationLocation`` is the position in the translated peptide of the variant. If a variant does not affect protein coding sequence (either it's not exonic or it's a synonymous variant) then these properties have the value ``None``.
 We illustrate their use.

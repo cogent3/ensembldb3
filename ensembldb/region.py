@@ -86,7 +86,7 @@ class _Region(LazyRecord):
     location = property(_get_location)
 
     def _get_sequence(self):
-        if 'Seq' not in self._cached:
+        if 'seq' not in self._cached:
             try:
                 seq = get_sequence(self.location)
             except NoItemError:
@@ -96,10 +96,10 @@ class _Region(LazyRecord):
                 except NoItemError:
                     seq = DNA.make_seq("N" * len(self))
             seq.name = str(self.location)
-            self._cached['Seq'] = seq
-        return self._cached['Seq']
+            self._cached['seq'] = seq
+        return self._cached['seq']
 
-    Seq = property(_get_sequence)
+    seq = property(_get_sequence)
 
     def _get_symbol(self):
         # override in subclasses
@@ -155,7 +155,7 @@ class _Region(LazyRecord):
             # this will consider the strand information of actual sequence
             feature_map = [data[-1],
                            data[-1].nucleic_reversed()][self.location.strand == -1]
-            self.Seq.add_annotation(Feature, data[0], data[1], feature_map)
+            self.seq.add_annotation(Feature, data[0], data[1], feature_map)
 
             if region.type == 'gene':  # TODO: SHOULD be much simplified
                 sub_data = region.sub_feature_data(seq_map)
@@ -164,10 +164,10 @@ class _Region(LazyRecord):
                         # again, change feature map to -1 strand sequence if
                         # needed.
                         feature_map = feature_map.nucleic_reversed()
-                    self.Seq.add_annotation(Feature, feature_type,
+                    self.seq.add_annotation(Feature, feature_type,
                                            feature_name, feature_map)
 
-        return self.Seq
+        return self.seq
 
 
 class GenericRegion(_Region):
@@ -417,7 +417,7 @@ class Gene(_StableRegion):
 
     def sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. These can be
-        automatically applied to the Seq by the get_annotated_seq method.
+        automatically applied to the seq by the get_annotated_seq method.
         Returns None if self lies outside parent's span.
         """
         features = []
@@ -690,9 +690,9 @@ class Transcript(_StableRegion):
             return
         Utr5_seq, Utr3_seq = DNA.make_seq(""), DNA.make_seq("")
         for exon in self.UntranslatedExons5:
-            Utr5_seq += exon.Seq
+            Utr5_seq += exon.seq
         for exon in self.UntranslatedExons3:
-            Utr3_seq += exon.Seq
+            Utr3_seq += exon.seq
         self._cached["Utr5"] = Utr5_seq
         self._cached["Utr3"] = Utr3_seq
 
@@ -715,9 +715,9 @@ class Transcript(_StableRegion):
         full_seq = None
         for exon in exons:
             if full_seq is None:
-                full_seq = exon.Seq
+                full_seq = exon.seq
                 continue
-            full_seq += exon.Seq
+            full_seq += exon.seq
 
         # check first exon phase_start is 0 and last exon phase_end
         if exons[0].phase_start > 0:
@@ -764,7 +764,7 @@ class Transcript(_StableRegion):
             for exon in self.TranslatedExons:
                 out += ['TranslatedExon[rank=%d]\n' % exon.rank, exon,
                         exon.location,
-                        '%s ... %s' % (exon.Seq[:20], exon.Seq[-20:])]
+                        '%s ... %s' % (exon.seq[:20], exon.seq[-20:])]
                 sys.stderr.write('\n'.join(map(str, out)) + '\n')
             raise
 
@@ -843,7 +843,7 @@ class Transcript(_StableRegion):
 
     def sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. This can be automatically
-        applied to the Seq by the get_annotated_seq method. Returns None if
+        applied to the seq by the get_annotated_seq method. Returns None if
         self lies outside parent's span.
         """
         features = self._get_exon_feature_data(parent_map)
@@ -1086,7 +1086,7 @@ class Variation(_Region):
                 resized = [(1, 301), (-301, -1)][name == 'down']
             flank = self.location.resized(*resized)
             flanking = self.genome.get_region(region=flank)
-            seq = flanking.Seq
+            seq = flanking.seq
             seqs[name] = seq
 
         self._cached[('FlankingSeq')] = (seqs['up'][-300:], seqs['down'][:300])
@@ -1116,7 +1116,7 @@ class Variation(_Region):
                     resized = [(1, 301), (-301, -1)][name == 'down']
                 flank = self.location.resized(*resized)
                 flanking = self.genome.get_region(region=flank)
-                seq = flanking.Seq
+                seq = flanking.seq
             seqs[name] = seq
 
         self._cached[('FlankingSeq')] = (seqs['up'][-300:], seqs['down'][:300])

@@ -77,7 +77,7 @@ class TestGenome(GenomeTestBase):
         self.assertEqual(region.location.end, end)
         self.assertEqual(region.location.coord_name, str(chrom))
         self.assertEqual(region.location.CoordType, 'chromosome')
-        self.assertEqual(region.Seq, 'ACCTCAGTAATCCGAAAAGCC')
+        self.assertEqual(region.seq, 'ACCTCAGTAATCCGAAAAGCC')
 
     def test_get_assembly_exception_region(self):
         """should return correct sequence for region with an assembly
@@ -85,7 +85,7 @@ class TestGenome(GenomeTestBase):
         region = self.human.get_region(coord_name="Y", start=57211873,
                                       end=57211894, strand=1, ensembl_coord=True)
 
-        self.assertEqual(str(region.Seq), 'CGAGGACGACTGGGAATCCTAG')
+        self.assertEqual(str(region.seq), 'CGAGGACGACTGGGAATCCTAG')
 
     def test_no_assembly(self):
         """return N's for coordinates with no assembly"""
@@ -94,7 +94,7 @@ class TestGenome(GenomeTestBase):
         end = start + 100
         region = krat.get_region(coord_name='scaffold_13754', start=start,
                                 end=end)
-        self.assertEqual(str(region.Seq), 'N' * (end - start))
+        self.assertEqual(str(region.seq), 'N' * (end - start))
 
     def test_getting_annotated_seq(self):
         """a region should return a sequence with the correct annotation"""
@@ -128,7 +128,7 @@ class TestGenome(GenomeTestBase):
         self.gorilla = Genome(
             species="gorilla", release=release, account=account)
         gene = self.gorilla.get_gene_by_stableid('ENSGGOG00000005730')
-        self.assertEqual(str(gene.Seq[:10]), 'TGGGAGTCCA')
+        self.assertEqual(str(gene.seq[:10]), 'TGGGAGTCCA')
 
     def test_diff_strand_contig_chrom(self):
         """get correct sequence when contig and chromosome strands differ"""
@@ -219,7 +219,7 @@ class TestGene(GenomeTestBase):
         # last two bases of codon missing
         self.assertEqual(exon1.phase_end, 1)
         # can translate the sequence if we take those into account
-        seq = exon1.Seq[1:-1].get_translation()
+        seq = exon1.seq[1:-1].get_translation()
         self.assertEqual(str(seq), 'HMLSKVGMWDFDIFLFDRLTN')
 
     def test_cds_from_outofphase(self):
@@ -359,10 +359,10 @@ class TestGene(GenomeTestBase):
                          str(transcript.Cds))
         self.assertEqual(str(brca2.CanonicalTranscript.Cds),
                          str(transcript.Cds))
-        self.assertEqual(str(brca2.CanonicalTranscript.Seq),
-                         str(transcript.Seq))
+        self.assertEqual(str(brca2.CanonicalTranscript.seq),
+                         str(transcript.seq))
         self.assertEqual(brca2.stableid, gene.stableid)
-        self.assertEqual(brca2.Seq, gene.Seq)
+        self.assertEqual(brca2.seq, gene.seq)
 
     def test_gene_on_transcript(self):
         """Transcript instances Gene attribute should be complete"""
@@ -410,7 +410,7 @@ class TestGene(GenomeTestBase):
             for intron in introns:
                 loc = intron.location
                 start, end = loc.start, loc.end
-                seq = str(intron.Seq)
+                seq = str(intron.seq)
                 exp_rank, exp_start, exp_end, exp_seq5, \
                 exp_seq3 = exp_introns[idx]
                 self.assertEqual(loc.strand, strand)
@@ -535,7 +535,7 @@ class TestVariation(GenomeTestBase):
     def test_variation_seq(self):
         """should return the sequence for a Variation snp if asked"""
         snp = list(self.human.get_variation(symbol=self.snp_names[0]))[0]
-        self.assertContains(snp.Alleles, str(snp.Seq))
+        self.assertContains(snp.Alleles, str(snp.seq))
 
     def test_get_validation_condition(self):
         """simple test of SNP validation status"""
@@ -664,7 +664,7 @@ class TestFeatures(GenomeTestBase):
         coord = dict(coord_name=11, start=2143894, end=2144494)
         exp_coord = dict(coord_name=11, start=2143906, end=2144442)
         exp_loc = human.get_region(strand=1, ensembl_coord=True, **exp_coord)
-        exp = exp_loc.Seq
+        exp = exp_loc.seq
 
         ps_feat = human.get_region(strand=1, **coord)
         ms_feat = human.get_region(strand=-1, **coord)
@@ -672,7 +672,7 @@ class TestFeatures(GenomeTestBase):
         ps_seq = ps_feat.get_annotated_seq(feature_types='CpG')
         ps_cgi = ps_seq.get_annotations_matching('CpGisland')[0]
 
-        self.assertEqual(ps_feat.Seq, ms_feat.Seq.rc())
+        self.assertEqual(ps_feat.seq, ms_feat.seq.rc())
 
         self.assertEqual(ps_cgi.get_slice().rc(), exp)
         ms_seq = ms_feat.get_annotated_seq(feature_types='CpG')
@@ -691,7 +691,7 @@ class TestFeatures(GenomeTestBase):
                                'CCGGTGCCACTAGCCACATTAAGCACTCGAAACGTGGCTAGTGCGACTAGAGAAGAGGAT'
                                'TTTCATACGATTTAGTTTCAATCACGCTAACCAGTGACGCGTGGCTAGTGG')
 
-        self.assertEqual(ms_repeat.Seq, ps_repeat.Seq.rc())
+        self.assertEqual(ms_repeat.seq, ps_repeat.seq.rc())
 
         ps_annot_seq = ps_repeat.get_annotated_seq(feature_types='repeat')
         ms_annot_seq = ms_repeat.get_annotated_seq(feature_types='repeat')
