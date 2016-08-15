@@ -277,7 +277,7 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
     >>> for variant in transcript.Variants:
     ...     print variant
     ...     break
-    Variation(symbol='rs370721506'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', '5_prime...
+    Variation(symbol='rs370721506'; effect=['non_coding_exon_variant', 'nc_transcript_variant', '5_prime...
 
 Get a single SNP
 ^^^^^^^^^^^^^^^^

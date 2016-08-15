@@ -547,14 +547,14 @@ class Genome(object):
                                               other_coord, where_feature):
                         yield region
 
-    def get_variation(self, Effect=None, symbol=None, like=True,
+    def get_variation(self, effect=None, symbol=None, like=True,
                      validated=False, somatic=False, flanks_match_ref=False,
                      limit=None):
         """returns a generator of Variation instances
 
         Arguments:
-            - Effect: the coding impact, eg. nonsynonymous
-            - like: Effect is exactly matched against records like that
+            - effect: the coding impact, eg. nonsynonymous
+            - like: effect is exactly matched against records like that
               provided
             - symbol: the external or ensembl identifier - returns the exact
               match
@@ -564,20 +564,20 @@ class Genome(object):
             - limit: only return this number of hits"""
         var_feature_table = self.VarDb.get_table('variation_feature')
 
-        assert Effect or symbol, "No arguments provided"
-        #  if we don't have symbol, then we deal with Effect
+        assert effect or symbol, "No arguments provided"
+        #  if we don't have symbol, then we deal with effect
 
         consequence_type = 'consequence_type'
         if self.general_release > 67:
             consequence_type += 's'  # change to plural column name
 
-        if Effect is not None:
+        if effect is not None:
             if like:
                 query = \
                     var_feature_table.columns[
-                        consequence_type].like('%' + Effect + '%')
+                        consequence_type].like('%' + effect + '%')
             else:
-                query = var_feature_table.columns[consequence_type] == Effect
+                query = var_feature_table.columns[consequence_type] == effect
         else:
             query = var_feature_table.c.variation_name == symbol
 
@@ -604,7 +604,7 @@ class Genome(object):
             query = query.limit(limit)
 
         for record in query.execute():
-            yield Variation(self, self.CoreDb, Effect=Effect, symbol=symbol,
+            yield Variation(self, self.CoreDb, effect=effect, symbol=symbol,
                             data=record)
 
     def get_region(self, region=None, coord_name=None, start=None, end=None,

@@ -977,7 +977,7 @@ class Variation(_Region):
     """genomic variation"""
     type = 'variation'
 
-    def __init__(self, genome, db=None, Effect=None, symbol=None, data=None):
+    def __init__(self, genome, db=None, effect=None, symbol=None, data=None):
         self.genome = genome
 
         get_table = genome.VarDb.get_table
@@ -997,7 +997,7 @@ class Variation(_Region):
         else:
             self._get_flanking_seq_data = self._get_flanking_seq_data_ge_70
 
-        self._attr_ensembl_table_map = dict(Effect='variation_feature',
+        self._attr_ensembl_table_map = dict(effect='variation_feature',
                                             symbol='variation_feature',
                                             Validation='variation_feature',
                                             MapWeight='variation_feature',
@@ -1010,7 +1010,7 @@ class Variation(_Region):
 
         assert data is not None, 'Variation record created in an unusual way'
         for name, value, func in \
-            [('Effect', Effect, self._get_variation_table_record),
+            [('effect', effect, self._get_variation_table_record),
              ('symbol', symbol, self._get_variation_table_record)]:
             if value is not None:
                 self._table_rows[self._attr_ensembl_table_map[name]] = data
@@ -1026,8 +1026,8 @@ class Variation(_Region):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(symbol=%r; Effect=%r; Alleles=%r)" % \
-               (my_type, self.symbol, self.Effect, self.Alleles)
+        return "%s(symbol=%r; effect=%r; Alleles=%r)" % \
+               (my_type, self.symbol, self.effect, self.Alleles)
 
     def _get_variation_table_record(self):
         # this is actually the variation_feature table
@@ -1035,7 +1035,7 @@ class Variation(_Region):
         if self.genome.general_release > 67:
             consequence_type += 's'  # change to plural column name
 
-        attr_name_map = [('Effect', consequence_type, _set_to_string),
+        attr_name_map = [('effect', consequence_type, _set_to_string),
                          ('Alleles', 'allele_string', _quoted),
                          ('symbol', 'variation_name', _quoted),
                          ('Validation', 'validation_status', _set_to_string),
@@ -1043,7 +1043,7 @@ class Variation(_Region):
                          ('Somatic', 'somatic', bool)]
         self._populate_cache_from_record(attr_name_map, 'variation_feature')
         # TODO handle obtaining the variation_feature if we were created in
-        # any way other than through the symbol or Effect
+        # any way other than through the symbol or effect
 
     def _get_ancestral_data(self):
         # actually the variation table
@@ -1128,10 +1128,10 @@ class Variation(_Region):
     FlankingSeq = property(_get_flanking_seq)
 
     def _get_effect(self):
-        return self._get_cached_value('Effect',
+        return self._get_cached_value('effect',
                                       self._get_variation_table_record)
 
-    Effect = property(_get_effect)
+    effect = property(_get_effect)
 
     def _get_somatic(self):
         return self._get_cached_value('Somatic',
@@ -1222,9 +1222,9 @@ class Variation(_Region):
             raise NotImplementedError
 
         try:
-            effects = [self.Effect.lower()]
+            effects = [self.effect.lower()]
         except AttributeError:
-            effects = [v.lower() for v in self.Effect]
+            effects = [v.lower() for v in self.effect]
 
         effects = set(effects)
         # TODO swap what we use for nysn by Ensembl version, thanks Ensembl!
@@ -1261,8 +1261,8 @@ class Variation(_Region):
         var_feature_record = self._table_rows['variation_feature']
         var_feature_id = var_feature_record['variation_feature_id']
         table = self.genome.VarDb.get_table(table_name)
-        self_effect = set([self.Effect, [self.Effect]]
-                          [type(self.Effect) == str])
+        self_effect = set([self.effect, [self.effect]]
+                          [type(self.effect) == str])
         query = sql.select([table.c.variation_feature_id,
                             table.columns[pep_allele_string],
                             table.c.translation_start,

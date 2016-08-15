@@ -470,7 +470,7 @@ class TestVariation(GenomeTestBase):
             snp = list(self.human.get_variation(symbol=self.snp_names[i]))[0]
             self.assertEqual(snp.Ancestral, self.ancestral[i])
             self.assertEqual(snp.symbol, self.snp_names[i])
-            self.assertEqual(set(snp.Effect), set(self.snp_effects[i]))
+            self.assertEqual(set(snp.effect), set(self.snp_effects[i]))
             self.assertEqual(snp.Alleles, self.snp_nt_alleles[i])
             self.assertEqual(snp.MapWeight, self.map_weights[i])
 
@@ -492,7 +492,7 @@ class TestVariation(GenomeTestBase):
         """should correctly infer the peptide alleles"""
         for i in range(4):
             snp = list(self.human.get_variation(symbol=self.snp_names[i]))[0]
-            if 'missense_variant' not in snp.Effect:
+            if 'missense_variant' not in snp.effect:
                 continue
 
             self.assertEqual(snp.PeptideAlleles, self.snp_aa_alleles[i])
@@ -555,18 +555,18 @@ class TestVariation(GenomeTestBase):
 
     def test_by_effect(self):
         """excercising select SNPs by effect"""
-        for snp in self.human.get_variation(Effect='missense_variant', limit=1):
+        for snp in self.human.get_variation(effect='missense_variant', limit=1):
             break
 
     def test_complex_query(self):
         """only return non-somatic SNPs that are validated and match reference"""
         i = 0
         limit = 10
-        for snp in self.human.get_variation(Effect='missense_variant', like=False,
+        for snp in self.human.get_variation(effect='missense_variant', like=False,
                                            validated=True, somatic=False,
                                            flanks_match_ref=True, limit=limit):
             self.assertEqual(snp.Somatic, False)
-            self.assertEqual('missense_variant', snp.Effect)
+            self.assertEqual('missense_variant', snp.effect)
             self.assertNotEqual(snp.FlankingSeq, NULL_VALUE)
             self.assertNotEqual(snp.Validation, NULL_VALUE)
             i += 1

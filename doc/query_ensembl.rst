@@ -256,7 +256,7 @@ Getting Variation
 
 .. doctest::
 
-    >>> print human.get_distinct('Effect')
+    >>> print human.get_distinct('effect')
     ['3_prime_UTR_variant', 'splice_acceptor_variant', 'intergenic_variant'...
 
 and that information can be used to query the genome for all variation of that effect. 
@@ -267,14 +267,14 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
 
 .. doctest::
 
-    >>> nsyn_variants = human.get_variation(Effect='missense_variant')
+    >>> nsyn_variants = human.get_variation(effect='missense_variant')
     >>> for i, nsyn_variant in enumerate(nsyn_variants):
-    ...     if nsyn_variant.Effect == 'missense_variant' and\
+    ...     if nsyn_variant.effect == 'missense_variant' and\
     ...                          nsyn_variant.AlleleFreqs:
     ...         break
     ...     
     >>> print nsyn_variant
-    Variation(symbol='rs1638319'; Effect='missense_variant'; Alleles='A/G')
+    Variation(symbol='rs1638319'; effect='missense_variant'; Alleles='A/G')
     >>> print nsyn_variant.AlleleFreqs
     =================================
     allele      freq    population_id
@@ -324,10 +324,10 @@ We can also use a slightly more involved query to find all variants within the g
     >>> brca2_snps = human.get_features(feature_types='variation',
     ...                      region=brca2)
     >>> for snp in brca2_snps:
-    ...     if 'missense_variant' in snp.Effect:
+    ...     if 'missense_variant' in snp.effect:
     ...         break
     >>> print snp
-    Variation(symbol='rs80358836'; Effect=['non_coding_exon_variant', 'nc_transcript_variant', 'upstream_gene_variant', 'missense_variant'...
+    Variation(symbol='rs80358836'; effect=['non_coding_exon_variant', 'nc_transcript_variant', 'upstream_gene_variant', 'missense_variant'...
     >>> print snp.location
     Homo sapiens:chromosome:13:32316464-32316465:1
 
