@@ -183,7 +183,7 @@ class SyntenicRegion(LazyRecord):
         try:
             aln_map, aln_loc = cigar.slice_cigar(self.cigar_line,
                                                  self.parent.cigar_start,
-                                                 self.parent.CigarEnd,
+                                                 self.parent.cigar_end,
                                                  by_align=True)
             self.aln_map = aln_map
             self.aln_loc = aln_loc  # probably unnecesary to store??
@@ -284,7 +284,7 @@ class SyntenicRegions(_RelatedRegions):
         ref sequence"""
         self.ref_member._make_map_func()
         self._cached['cigar_start'] = self.ref_member.aln_loc[0]
-        self._cached['CigarEnd'] = self.ref_member.aln_loc[1]
+        self._cached['cigar_end'] = self.ref_member.aln_loc[1]
 
     def _get_rc_state(self):
         """determines whether the ref_member strand is the same as that from
@@ -300,7 +300,7 @@ class SyntenicRegions(_RelatedRegions):
     _rc = property(fget=_get_rc_state)
 
     def __len__(self):
-        return self.CigarEnd - self.cigar_start
+        return self.cigar_end - self.cigar_start
 
     def _get_ref_start(self):
         return self._get_cached_value('cigar_start', self._populate_ref)
@@ -308,9 +308,9 @@ class SyntenicRegions(_RelatedRegions):
     cigar_start = property(_get_ref_start)
 
     def _get_ref_end(self):
-        return self._get_cached_value('CigarEnd', self._populate_ref)
+        return self._get_cached_value('cigar_end', self._populate_ref)
 
-    CigarEnd = property(_get_ref_end)
+    cigar_end = property(_get_ref_end)
 
     def get_alignment(self, feature_types=None, where_feature=None,
                      omit_redundant=True):
