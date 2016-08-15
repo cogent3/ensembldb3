@@ -216,7 +216,7 @@ class SyntenicRegion(LazyRecord):
             self._make_map_func()
         region = self._cached['region']
         if region is None:
-            self._cached['AlignedSeq'] = None
+            self._cached['aligned_seq'] = None
             return
         if feature_types:
             seq = region.get_annotated_seq(feature_types, where_feature)
@@ -226,13 +226,13 @@ class SyntenicRegion(LazyRecord):
         # we get the Seq objects to allow for copying of their annotations
         gapped_seq = Aligned(self.aln_map, seq)
 
-        self._cached['AlignedSeq'] = gapped_seq
+        self._cached['aligned_seq'] = gapped_seq
 
     def _get_aligned_seq(self):
-        aligned = self._get_cached_value('AlignedSeq', self._make_aligned)
+        aligned = self._get_cached_value('aligned_seq', self._make_aligned)
         return aligned
 
-    AlignedSeq = property(_get_aligned_seq)
+    aligned_seq = property(_get_aligned_seq)
 
     def get_annotated_aligned(self, feature_types, where_feature=None):
         """returns aligned seq annotated for the specified feature types"""
@@ -241,7 +241,7 @@ class SyntenicRegion(LazyRecord):
             return None
         self._make_aligned(feature_types=feature_types,
                            where_feature=where_feature)
-        return self.AlignedSeq
+        return self.aligned_seq
 
 
 class SyntenicRegions(_RelatedRegions):
@@ -325,7 +325,7 @@ class SyntenicRegions(_RelatedRegions):
             if feature_types:
                 seq = member.get_annotated_aligned(feature_types, where_feature)
             else:
-                seq = member.AlignedSeq
+                seq = member.aligned_seq
             if seq is None:
                 continue
             name = seq.name
