@@ -157,7 +157,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.symbol.lower(), 'brca2')
         self.assertEqual(brca2.StableId, 'ENSG00000139618')
         self.assertEqual(brca2.biotype.lower(), 'protein_coding')
-        self.assertContains(brca2.Description.lower(), 'breast cancer')
+        self.assertContains(brca2.description.lower(), 'breast cancer')
         self.assertEqual(brca2.Status, 'KNOWN')
         self.assertEqual(brca2.CanonicalTranscript.StableId,
                          'ENST00000380152')
@@ -295,7 +295,7 @@ class TestGene(GenomeTestBase):
         """if get by description, all attributes should be correctly
         constructed"""
         description = 'breast cancer 2'
-        results = list(self.human.get_genes_matching(Description=description))
+        results = list(self.human.get_genes_matching(description=description))
         self._eval_brca2(results[0])
 
     def test_get_member(self):
@@ -320,7 +320,7 @@ class TestGene(GenomeTestBase):
     def test_get_by_decsr_biotype(self):
         """combining the description and biotype should return a result"""
         results = list(self.human.get_genes_matching(biotype="protein_coding",
-                                                   Description="cancer"))
+                                                   description="cancer"))
         self.assertTrue(len(results) > 50)
 
     def test_variant(self):

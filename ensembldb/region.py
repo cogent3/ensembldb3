@@ -287,7 +287,7 @@ class Gene(_StableRegion):
         self._attr_ensembl_table_map = dict(StableId=['gene_stable_id',
                                                       'gene'][genome.general_release >= 65],
                                             symbol='xref',
-                                            Description='gene', biotype='gene', location='gene',
+                                            description='gene', biotype='gene', location='gene',
                                             CanonicalTranscript='gene',
                                             Transcripts='transcript',
                                             Exons='transcript')
@@ -302,7 +302,7 @@ class Gene(_StableRegion):
         for name, func in \
             [('StableId', self._get_gene_stable_id_record),
              ('biotype', self._get_gene_record),
-             ('Description', self._get_gene_record),
+             ('description', self._get_gene_record),
              ('symbol', self._get_xref_record),
              ('location', self._get_gene_record)]:
             # For EST
@@ -331,7 +331,7 @@ class Gene(_StableRegion):
         """adds the gene data to self._table_rows"""
         attr_column_map = [('biotype', 'biotype', _quoted),
                            ('Status', 'status', _quoted),
-                           ('Description', 'description', _limit_words)]
+                           ('description', 'description', _limit_words)]
         # we set all the attributes that derive from this
         self._populate_cache_from_record(attr_column_map, 'gene')
         return
@@ -362,9 +362,9 @@ class Gene(_StableRegion):
     symbol = property(_get_symbol)
 
     def _get_description(self):
-        return self._get_cached_value('Description', self._get_gene_record)
+        return self._get_cached_value('description', self._get_gene_record)
 
-    Description = property(_get_description)
+    description = property(_get_description)
 
     def _get_status(self):
         return self._get_cached_value('Status', self._get_gene_record)

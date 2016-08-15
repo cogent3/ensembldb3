@@ -98,7 +98,7 @@ We query for the *BRCA2* gene for humans.
     ...     if gene.symbol == 'BRCA2':
     ...         print gene
     ...         break
-    Gene(species='Homo sapiens'; biotype='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
+    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
 
 Find a gene by Ensembl Stable ID
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +111,7 @@ We use the stable ID for *BRCA2*.
     >>> human = Genome('human', release=76, account=account)
     >>> gene = human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print gene
-    Gene(species='Homo sapiens'; biotype='protein_coding'; Description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
+    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast cancer 2,...'; StableId='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
 
 Find genes matching a description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -122,20 +122,20 @@ We look for breast cancer related genes that are estrogen induced.
 
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
-    >>> genes = human.get_genes_matching(Description='breast cancer anti-estrogen')
+    >>> genes = human.get_genes_matching(description='breast cancer anti-estrogen')
     >>> for gene in genes:
     ...     print gene
-    Gene(species='Homo sapiens'; biotype='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
+    Gene(species='Homo sapiens'; biotype='lincRNA'; description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
 
 We can also require that an exact (case insensitive) match to the word(s) occurs within the description by setting ``like=False``.
 
 .. doctest::
     
-    >>> genes = human.get_genes_matching(Description='breast cancer anti-estrogen',
+    >>> genes = human.get_genes_matching(description='breast cancer anti-estrogen',
     ...                                  like=False)
     >>> for gene in genes:
     ...     print gene
-    Gene(species='Homo sapiens'; biotype='lincRNA'; Description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
+    Gene(species='Homo sapiens'; biotype='lincRNA'; description='breast cancer anti-estrogen...'; StableId='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
 
 Get canonical transcript for a gene
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -412,7 +412,7 @@ We get the one-to-one orthologs for *BRCA2*.
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(species='Macaca mulatta'; biotype='protein_coding'; Description=...
+      Gene(species='Macaca mulatta'; biotype='protein_coding'; description=...
 
 We iterate over the related members.
 
@@ -420,7 +420,7 @@ We iterate over the related members.
     
     >>> for ortholog in orthologs.Members:
     ...     print ortholog
-    Gene(species='Macaca mulatta'; biotype='protein_coding'; Description=...
+    Gene(species='Macaca mulatta'; biotype='protein_coding'; description=...
 
 We get statistics on the ortholog CDS lengths.
 
@@ -480,5 +480,5 @@ Get within species paralogs
     >>> print paralogs
     RelatedGenes:
      Relationships=within_species_paralog
-      Gene(species='Homo sapiens'; biotype='protein_coding'; Description='H2A histone...
+      Gene(species='Homo sapiens'; biotype='protein_coding'; description='H2A histone...
 

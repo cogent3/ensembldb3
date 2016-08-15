@@ -102,7 +102,7 @@ The genome can be queried for gene's in a number of ways. You can search for gen
 .. doctest::
     
     >>> brca1 = human.get_gene_by_stableid(StableId='ENSG00000012048')
-    >>> print brca1.Description
+    >>> print brca1.description
     breast cancer 1, early onset...
 
 Alternatively, you can query using the ``Genome.get_genes_matching`` method. This method allows querying for gene(s) by the following identifiers: HGNC symbol; Ensembl ``stable_id``; description; or coding type.
@@ -126,10 +126,10 @@ Because there can be multiple hits from a ``get_genes_matching`` query, and beca
     >>> brca2 = gene # so we keep track of this reference for later on
     >>> print brca2.symbol
     BRCA2
-    >>> print brca2.Description
+    >>> print brca2.description
     breast cancer 2...
     >>> print brca2
-    Gene(species='Homo sapiens'; biotype='protein_coding'; Description='breast...
+    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast...
 
 This code serves to illustrate a few things. First, the sorts of properties that exist on the object. These can be directly accessed as illustrated above. Secondly, that the argument names to ``get_genes_matching`` match the properties.
 
@@ -226,7 +226,7 @@ The genome can be queried for any of these types, for instance we'll query for `
     ...     if count == 1:
     ...         break
     ...
-    Gene(species='Homo sapiens'; biotype='rRNA'; Description='RNA, 5S...
+    Gene(species='Homo sapiens'; biotype='rRNA'; description='RNA, 5S...
 
 This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``Transcripts`` will have ``ProteinSeq==None`` and ``TranslatedExons==None``, but it will have ``Exons`` and a ``Cds``.
 
@@ -247,7 +247,7 @@ Ensembl's ``otherfeatures`` database mirrors the structure of the ``core`` datab
     >>> ests = human.get_features(feature_types='est', region=brca2)
     >>> for est in ests:
     ...     print est
-    Est(species='Homo sapiens'; biotype='protein_coding'; Description='None';...
+    Est(species='Homo sapiens'; biotype='protein_coding'; description='None';...
 
 Getting Variation
 ^^^^^^^^^^^^^^^^^
@@ -375,7 +375,7 @@ The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to
 
     >>> brca2 = compara.Human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print brca2
-    Gene(species='Homo sapiens'; biotype='protein_coding'; Description='breast...
+    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast...
 
 We can now use this result to search compara for related genes. We note here that like ``Genome``, ``Compara`` has the ``get_distinct`` method to assist in identifying appropriate search criteria. What are the distinct types of gene relationships recorded in Ensembl, for instance?
 
@@ -394,7 +394,7 @@ So we use the ``brca2`` instance above and search for orthologs among the human,
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(species='Rattus norvegicus'; biotype='protein_coding'; Description='breast cancer ...
+      Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer ...
 
 I could also have done that query using a ``StableId``, which I now do using the Ensembl mouse identifier for *Brca2*.
 
@@ -405,7 +405,7 @@ I could also have done that query using a ``StableId``, which I now do using the
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(species='Rattus norvegicus'; biotype='protein_coding'; Description='breast cancer...
+      Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer...
 
 The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``Members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
 
@@ -440,7 +440,7 @@ We can also search for other relationship types, which we do here for a histone.
     >>> print paralogs
     RelatedGenes:
      Relationships=within_species_paralog
-      Gene(species='Homo sapiens'; biotype='protein_coding'; Description='H2A...
+      Gene(species='Homo sapiens'; biotype='protein_coding'; description='H2A...
 
 Getting Comparative Alignments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

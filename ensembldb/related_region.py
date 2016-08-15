@@ -30,7 +30,7 @@ class _RelatedRegions(LazyRecord):
 
     def __str__(self):
         # temporary string method, just to demo correct assembly
-        # TODO StableID and Description
+        # TODO StableID and description
         my_type = self.__class__.__name__
 
         data = list(map(repr, self.Members))
