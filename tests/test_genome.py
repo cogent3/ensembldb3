@@ -381,9 +381,9 @@ class TestGene(GenomeTestBase):
             transcript = asserted_one(
                 [t for t in gene.transcripts if t.stableid == transcript_id])
             if exp_number == 0:
-                self.assertEqual(transcript.Introns, None)
+                self.assertEqual(transcript.introns, None)
             else:
-                self.assertEqual(len(transcript.Introns), exp_number)
+                self.assertEqual(len(transcript.introns), exp_number)
 
     def test_intron(self):
         """should get correct Intron sequence, regardless of strand"""
@@ -404,7 +404,7 @@ class TestGene(GenomeTestBase):
             strand = gene.location.strand
             transcript = asserted_one(
                 [t for t in gene.transcripts if t.stableid == stable_id])
-            introns = transcript.Introns
+            introns = transcript.introns
             self.assertEqual(len(introns), len(exp_introns))
             idx = 0
             for intron in introns:
@@ -425,7 +425,7 @@ class TestGene(GenomeTestBase):
                 idx += 1
 
     def test_intron_annotation(self):
-        """sequences annotated with Introns should return correct seq"""
+        """sequences annotated with introns should return correct seq"""
         for symbol, stable_id, rank, exp_seq5, exp_seq3 in [
                 ('IL2', 'ENST00000226730', 1, 'gtaagtatat', 'actttcttag'),
                 ('IL13', 'ENST00000304506', 3, 'gtaaggcatc', 'tgtcctgcag')]:

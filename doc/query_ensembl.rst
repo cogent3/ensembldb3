@@ -146,7 +146,7 @@ Gene's also have a location. The length of a gene is the difference between its 
     
 Each location is directly tied to the parent genome and the coordinate above also shows the coordinates' *type* (chromosome in this case), name (13), start, end and strand. The start and end positions are python indices and will differ from the Ensembl indices in that start will be the Ensembl index - 1. This is because python counts from 0, not 1. In querying for regions using a specific set of coordinates, it is possible to put in the Ensembl coordinates (demonstrated below).
 
-``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``canonical_transcript`` and ``transcripts``. ``canonical_transcript`` is the characteristic transcript for a gene, as defined by Ensembl. ``transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``exons``, ``Introns``, a ``Cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
+``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``canonical_transcript`` and ``transcripts``. ``canonical_transcript`` is the characteristic transcript for a gene, as defined by Ensembl. ``transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``exons``, ``introns``, a ``Cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
 
 .. doctest::
 
@@ -175,11 +175,11 @@ It is also possible to iterate over a transcript's exons, over their translated 
 
 The ``Cds`` sequence includes the stop-codon, if present. The reason for this is there are many annotated transcripts in the Ensembl database the length of whose transcribed exons are not divisible by 3. Hence we leave it to the user to decide how to deal with that, but mention here that determining the number of complete codons is trivial and you can slice the ``Cds`` so that it's length is divisible by 3.
 
-The ``exons`` and ``TranslatedExons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``seq`` attribute). Similar descriptions apply to the ``Introns`` property and ``Intron`` class. We show just for the canonical transcript.
+The ``exons`` and ``TranslatedExons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``seq`` attribute). Similar descriptions apply to the ``introns`` property and ``Intron`` class. We show just for the canonical transcript.
 
 .. doctest::
 
-    >>> for intron in brca2.canonical_transcript.Introns:
+    >>> for intron in brca2.canonical_transcript.introns:
     ...     print intron
     Intron(TranscriptId=ENST00000380152, rank=1)
     Intron(TranscriptId=ENST00000380152, rank=2)

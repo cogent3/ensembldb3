@@ -202,7 +202,7 @@ We show just for the canonical transcript.
     >>> from ensembldb import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
-    >>> for intron in brca2.canonical_transcript.Introns:
+    >>> for intron in brca2.canonical_transcript.introns:
     ...     print intron
     Intron(TranscriptId=ENST00000380152, rank=1)
     Intron(TranscriptId=ENST00000380152, rank=2)

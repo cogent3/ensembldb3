@@ -528,7 +528,7 @@ class Transcript(_StableRegion):
 
     def _get_intron_transcript_records(self):
         if len(self.exons) < 2:
-            self._set_null_values(["Introns"])
+            self._set_null_values(["introns"])
             return
 
         exon_positions = [(exon.location.start, exon.location.end)
@@ -554,13 +554,13 @@ class Transcript(_StableRegion):
                                   coord))
             rank += 1
 
-        self._cached['Introns'] = tuple(introns)
+        self._cached['introns'] = tuple(introns)
 
     def _get_introns(self):
-        return self._get_cached_value('Introns',
+        return self._get_cached_value('introns',
                                       self._get_intron_transcript_records)
 
-    Introns = property(_get_introns)
+    introns = property(_get_introns)
 
     def _get_translation_record(self):
         transcript_id = self.transcript_id
@@ -790,9 +790,9 @@ class Transcript(_StableRegion):
     def _get_intron_feature_data(self, parent_map):
         """return the intron feature data"""
         features = []
-        if self.Introns is self.NULL_VALUE:
+        if self.introns is self.NULL_VALUE:
             return features
-        for intron in self.Introns:
+        for intron in self.introns:
             feature_data = intron.feature_data(parent_map)
             if feature_data is None:
                 continue
