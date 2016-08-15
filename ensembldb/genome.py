@@ -216,7 +216,7 @@ class Genome(object):
             symbol = None
         return symbol
 
-    def _get_gene_query(self, db, symbol=None, description=None, StableId=None,
+    def _get_gene_query(self, db, symbol=None, description=None, stableid=None,
                         biotype=None, synonym=None, like=True):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
@@ -229,13 +229,13 @@ class Genome(object):
         else:
             gene_id_table = db.get_table('gene_stable_id')
 
-        assert symbol or description or StableId or biotype, "no valid argument provided"
+        assert symbol or description or stableid or biotype, "no valid argument provided"
         if symbol:
             condition = xref_table.c.display_label == symbol
-        elif StableId and release_ge_65:
-            condition = gene_table.c.stable_id == StableId
-        elif StableId:
-            condition = gene_id_table.c.stable_id == StableId
+        elif stableid and release_ge_65:
+            condition = gene_table.c.stable_id == stableid
+        elif stableid:
+            condition = gene_id_table.c.stable_id == stableid
         else:
             condition = self._get_biotype_description_condition(
                 gene_table, description, biotype, like)
@@ -251,9 +251,9 @@ class Genome(object):
         return Coordinate(self, coord_name=coord_name, start=start, end=end,
                           strand=strand, ensembl_coord=ensembl_coord)
 
-    def get_gene_by_stableid(self, StableId):
-        """returns the gene matching StableId, or None if no record found"""
-        query = self._get_gene_query(self.CoreDb, StableId=StableId)
+    def get_gene_by_stableid(self, stableid):
+        """returns the gene matching stableid, or None if no record found"""
+        query = self._get_gene_query(self.CoreDb, stableid=stableid)
         try:
             record = list(query.execute())[0]
             gene = Gene(self, self.CoreDb, data=record)
@@ -261,11 +261,11 @@ class Genome(object):
             gene = None
         return gene
 
-    def get_genes_matching(self, symbol=None, description=None, StableId=None,
+    def get_genes_matching(self, symbol=None, description=None, stableid=None,
                          biotype=None, like=True):
         """symbol: HGC gene symbol, case doesn't matter
         description: a functional description
-        StableId: the ensebl identifier
+        stableid: the ensebl identifier
         biotype: the biological encoding type"""
         # TODO additional arguments to satisfy: external_ref, go_terms
         if symbol is not None:
@@ -273,7 +273,7 @@ class Genome(object):
         # biotype -> gene
         # description -> gene
         # Symbols -> xref
-        # StableId -> gene_stable_id
+        # stableid -> gene_stable_id
         # XREF table calls
         # for gene symbols, these need to be matched against the display_label
         # attribute of core.xref table
@@ -283,7 +283,7 @@ class Genome(object):
         # TODO catch conditions where user passes in both a symbol and a
         # biotype
         args = dict(symbol=symbol, description=description,
-                    StableId=StableId, biotype=biotype, like=like)
+                    stableid=stableid, biotype=biotype, like=like)
         query = self._get_gene_query(self.CoreDb, **args)
         records = query.execute()
         if records.rowcount == 0 and symbol is not None:
@@ -299,9 +299,9 @@ class Genome(object):
             gene = Gene(self, self.CoreDb, data=record)
             yield gene
 
-    def get_transcript_by_stableid(self, StableId):
-        """returns the transcript matching StableId, or None if no record found"""
-        query = self._get_transcript_query(self.CoreDb, StableId=StableId)
+    def get_transcript_by_stableid(self, stableid):
+        """returns the transcript matching stableid, or None if no record found"""
+        query = self._get_transcript_query(self.CoreDb, stableid=stableid)
         try:
             record = list(query.execute())[0]
             transcript_id = record[0]
@@ -311,7 +311,7 @@ class Genome(object):
             transcript = None
         return transcript
 
-    def _get_transcript_query(self, db, symbol=None, description=None, StableId=None,
+    def _get_transcript_query(self, db, symbol=None, description=None, stableid=None,
                               biotype=None, synonym=None, like=True):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         transcript_table = db.get_table('transcript')
@@ -324,13 +324,13 @@ class Genome(object):
         else:
             transcript_id_table = db.get_table('transcript_stable_id')
 
-        assert symbol or description or StableId or biotype, "no valid argument provided"
+        assert symbol or description or stableid or biotype, "no valid argument provided"
         if symbol:
             condition = xref_table.c.display_label == symbol
-        elif StableId and release_ge_65:
-            condition = transcript_table.c.stable_id == StableId
-        elif StableId:
-            condition = transcript_id_table.c.stable_id == StableId
+        elif stableid and release_ge_65:
+            condition = transcript_table.c.stable_id == stableid
+        elif stableid:
+            condition = transcript_id_table.c.stable_id == stableid
         else:
             condition = self._get_biotype_description_condition(
                 transcript_table, description, biotype, like)
@@ -357,12 +357,12 @@ class Genome(object):
                            join_obj], whereclause=condition)
         return query
 
-    def get_est_matching(self, StableId):
-        """returns an Est object from the otherfeatures db with the StableId"""
-        query = self._get_gene_query(self.OtherFeaturesDb, StableId=StableId)
+    def get_est_matching(self, stableid):
+        """returns an Est object from the otherfeatures db with the stableid"""
+        query = self._get_gene_query(self.OtherFeaturesDb, stableid=stableid)
         records = query.execute()
         for record in records:
-            yield Est(self, self.OtherFeaturesDb, StableId=StableId, data=record)
+            yield Est(self, self.OtherFeaturesDb, stableid=stableid, data=record)
 
     def _get_seq_region_id(self, coord_name):
         """returns the seq_region_id for the provided coord_name"""

@@ -101,7 +101,7 @@ The genome can be queried for gene's in a number of ways. You can search for gen
 
 .. doctest::
     
-    >>> brca1 = human.get_gene_by_stableid(StableId='ENSG00000012048')
+    >>> brca1 = human.get_gene_by_stableid(stableid='ENSG00000012048')
     >>> print brca1.description
     breast cancer 1, early onset...
 
@@ -166,10 +166,10 @@ It is also possible to iterate over a transcript's exons, over their translated 
     >>> transcript = brca2.Transcripts[0]
     >>> for exon in transcript.Exons:
     ...     print exon, exon.location
-    Exon(StableId=ENSE00001184784, Rank=1) Homo sapiens:chromosome:13:...
+    Exon(stableid=ENSE00001184784, Rank=1) Homo sapiens:chromosome:13:...
     >>> for exon in transcript.TranslatedExons:
     ...     print exon, exon.location
-    Exon(StableId=ENSE00001484009, Rank=2) Homo sapiens:chromosome:13:...
+    Exon(stableid=ENSE00001484009, Rank=2) Homo sapiens:chromosome:13:...
     >>> print transcript.Cds
     ATGCCTATTGGATCCAAA...
 
@@ -373,7 +373,7 @@ The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to
 
 .. doctest::
 
-    >>> brca2 = compara.Human.get_gene_by_stableid(StableId='ENSG00000139618')
+    >>> brca2 = compara.Human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> print brca2
     Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast...
 
@@ -396,11 +396,11 @@ So we use the ``brca2`` instance above and search for orthologs among the human,
      Relationships=ortholog_one2one
       Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer ...
 
-I could also have done that query using a ``StableId``, which I now do using the Ensembl mouse identifier for *Brca2*.
+I could also have done that query using a ``stableid``, which I now do using the Ensembl mouse identifier for *Brca2*.
 
 .. doctest::
 
-    >>> orthologs = compara.get_related_genes(StableId='ENSMUSG00000041147',
+    >>> orthologs = compara.get_related_genes(stableid='ENSMUSG00000041147',
     ...                 Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
@@ -435,7 +435,7 @@ We can also search for other relationship types, which we do here for a histone.
 
 .. doctest::
 
-    >>> paralogs = compara.get_related_genes(StableId='ENSG00000164032',
+    >>> paralogs = compara.get_related_genes(stableid='ENSG00000164032',
     ...             Relationship='within_species_paralog')
     >>> print paralogs
     RelatedGenes:
@@ -500,7 +500,7 @@ Printing the ``method_species_links`` table provides all the necessary informati
 .. doctest::
     
     >>> gene = compara_pair.Bushbaby.get_gene_by_stableid(
-    ...                             StableId='ENSOGAG00000003166')
+    ...                             stableid='ENSOGAG00000003166')
     ...
     >>> print gene
     Gene(species='Otolemur garnettii'; biotype='protein_coding'...

@@ -59,13 +59,13 @@ class TestCompara(ComparaTestBase):
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""
         clec2d = self.comp.Mouse.get_gene_by_stableid(
-            StableId='ENSMUSG00000030157')
+            stableid='ENSMUSG00000030157')
         orthologs = self.comp.get_related_genes(gene_region=clec2d,
                                               Relationship='ortholog_one2many')
         self.assertTrue(len(orthologs.Members) < 4)
 
     def test_get_collection(self):
-        brca2 = self.comp.Human.get_gene_by_stableid(StableId="ENSG00000139618")
+        brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship="ortholog_one2one")
         collection = Orthologs.get_seq_collection()
@@ -73,7 +73,7 @@ class TestCompara(ComparaTestBase):
 
     def test_getting_alignment(self):
         mid = "ENSMUSG00000041147"
-        brca2 = self.comp.Mouse.get_gene_by_stableid(StableId=mid)
+        brca2 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
         result = list(self.comp.get_syntenic_regions(region=brca2,
                                                    align_method='PECAN', align_clade='vertebrates'))[0]
         aln = result.get_alignment(feature_types='gene')
@@ -119,7 +119,7 @@ class TestCompara(ComparaTestBase):
         """should return the correct set of species"""
         expect = set(['Homo sapiens', 'Ornithorhynchus anatinus',
                       'Mus musculus', 'Rattus norvegicus'])
-        brca1 = self.comp.Human.get_gene_by_stableid(StableId="ENSG00000012048")
+        brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
         Orthologs = self.comp.get_related_genes(gene_region=brca1,
                                               Relationship="ortholog_one2one")
         self.assertEqual(Orthologs.get_species_set(), expect)
@@ -208,7 +208,7 @@ class TestSyntenicRegions(TestCase):
     def test_failing_region(self):
         """should correctly handle queries where multiple Ensembl have
         genome block associations for multiple coord systems"""
-        gene = self.comp.Human.get_gene_by_stableid(StableId='ENSG00000188554')
+        gene = self.comp.Human.get_gene_by_stableid(stableid='ENSG00000188554')
         # this should simply not raise any exceptions
         syntenic_regions = list(self.comp.get_syntenic_regions(region=gene,
                                                              align_method='PECAN',

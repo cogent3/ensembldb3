@@ -128,7 +128,7 @@ class _Region(LazyRecord):
     Variants = property(_get_variants)
 
     def feature_data(self, parent_map):
-        symbol = self.symbol or getattr(self, 'StableId', '')
+        symbol = self.symbol or getattr(self, 'stableid', '')
         assert not parent_map.reverse
         feat_map = parent_map[self.location.start:self.location.end]
         if feat_map.useful:
@@ -228,12 +228,12 @@ class _StableRegion(GenericRegion):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return '%s(%s; %s)' % (my_type, self.genome.species, self.StableId)
+        return '%s(%s; %s)' % (my_type, self.genome.species, self.stableid)
 
     def _get_record_for_stable_id(self):
         # subclasses need to provide a function for loading the correct
         # record for obtaining a stable_id
-        table_name = self._attr_ensembl_table_map['StableId']
+        table_name = self._attr_ensembl_table_map['stableid']
 
         if self.genome.general_release >= 65:
             func_name = '_get_%s_record' % (table_name + '_stable_id')
@@ -242,18 +242,18 @@ class _StableRegion(GenericRegion):
 
         func = getattr(self, func_name)
         func()
-        attr_column_map = [('StableId', 'stable_id', _quoted)]
+        attr_column_map = [('stableid', 'stable_id', _quoted)]
 
         self._populate_cache_from_record(attr_column_map, table_name)
 
     def _get_stable_id(self):
-        return self._get_cached_value('StableId',
+        return self._get_cached_value('stableid',
                                       self._get_record_for_stable_id)
 
-    StableId = property(_get_stable_id)
+    stableid = property(_get_stable_id)
 
-    def get_member(self, StableId, member_types=None):
-        """returns the associated member with matching StableId or None if not
+    def get_member(self, stableid, member_types=None):
+        """returns the associated member with matching stableid or None if not
         found.
 
         Arguments:
@@ -270,7 +270,7 @@ class _StableRegion(GenericRegion):
                 raise AttributeError(
                     "%s doesn't have property %s" % (self.type, member_type))
             for element in member:
-                if element.StableId == StableId:
+                if element.stableid == stableid:
                     return element
         return None
 
@@ -280,11 +280,11 @@ class Gene(_StableRegion):
     type = 'gene'
     _member_types = ['Transcripts']
 
-    def __init__(self, genome, db, StableId=None, symbol=None, location=None, data=None):
+    def __init__(self, genome, db, stableid=None, symbol=None, location=None, data=None):
         """constructed by a genome instance"""
         super(Gene, self).__init__(genome, db, location=location)
 
-        self._attr_ensembl_table_map = dict(StableId=['gene_stable_id',
+        self._attr_ensembl_table_map = dict(stableid=['gene_stable_id',
                                                       'gene'][genome.general_release >= 65],
                                             symbol='xref',
                                             description='gene', biotype='gene', location='gene',
@@ -293,14 +293,14 @@ class Gene(_StableRegion):
                                             Exons='transcript')
 
         if data is None:
-            args = [dict(StableId=StableId), dict(
-                symbol=symbol)][StableId is None]
+            args = [dict(stableid=stableid), dict(
+                symbol=symbol)][stableid is None]
             assert args
             data = asserted_one(
                 list(self.genome._get_gene_query(db, **args).execute()))
 
         for name, func in \
-            [('StableId', self._get_gene_stable_id_record),
+            [('stableid', self._get_gene_stable_id_record),
              ('biotype', self._get_gene_record),
              ('description', self._get_gene_record),
              ('symbol', self._get_xref_record),
@@ -338,9 +338,9 @@ class Gene(_StableRegion):
 
     def _get_gene_stable_id_record(self):
         """adds the gene_stable_id data to self._table_rows"""
-        attr_column_map = [('StableId', 'stable_id', _quoted)]
+        attr_column_map = [('stableid', 'stable_id', _quoted)]
         self._populate_cache_from_record(attr_column_map,
-                                         self._attr_ensembl_table_map['StableId'])
+                                         self._attr_ensembl_table_map['stableid'])
         return
 
     def _get_xref_record(self):
@@ -457,7 +457,7 @@ class Transcript(_StableRegion):
         """created by Gene"""
         super(Transcript, self).__init__(genome, db, location=location)
 
-        self._attr_ensembl_table_map = dict(StableId=['transcript_stable_id',
+        self._attr_ensembl_table_map = dict(stableid=['transcript_stable_id',
                                                       'transcript'][genome.general_release >= 65],
                                             location='transcript',
                                             Status='transcript',
@@ -498,7 +498,7 @@ class Transcript(_StableRegion):
     Gene = property(_get_gene)
 
     def _get_transcript_stable_id_record(self):
-        table_name = self._attr_ensembl_table_map['StableId']
+        table_name = self._attr_ensembl_table_map['stableid']
         if table_name in self._table_rows:
             return
         transcript_id = self.transcript_id
@@ -550,7 +550,7 @@ class Transcript(_StableRegion):
         for s, e in intron_positions:
             coord = self.genome.make_location(coord_name=chrom, start=s, end=e,
                                              strand=strand, ensembl_coord=False)
-            introns.append(Intron(self.genome, self.db, rank, self.StableId,
+            introns.append(Intron(self.genome, self.db, rank, self.stableid,
                                   coord))
             rank += 1
 
@@ -652,7 +652,7 @@ class Transcript(_StableRegion):
 
         for exon in exons[0:start_exon.Rank]:   # get 5'UTR
             coord = exon.location.copy()
-            if exon.StableId == start_exon.StableId:
+            if exon.stableid == start_exon.stableid:
                 coord.start = [coord.start,
                                start_exon.location.end][flip_coords]
                 coord.end = [start_exon.location.start, coord.end][flip_coords]
@@ -661,7 +661,7 @@ class Transcript(_StableRegion):
                                                 exon.exon_id, exon.Rank, location=coord))
         for exon in exons[end_exon.Rank - 1: num_exons]:  # get 3'UTR
             coord = exon.location.copy()
-            if exon.StableId == end_exon.StableId:
+            if exon.stableid == end_exon.stableid:
                 coord.start = [end_exon.location.end, coord.start][flip_coords]
                 coord.end = [coord.end, end_exon.location.start][flip_coords]
             if len(coord) != 0:
@@ -760,7 +760,7 @@ class Transcript(_StableRegion):
         except AssertionError:
             if not DEBUG:
                 raise
-            out = ['\n****\nFAILED=%s' % self.StableId]
+            out = ['\n****\nFAILED=%s' % self.stableid]
             for exon in self.TranslatedExons:
                 out += ['TranslatedExon[rank=%d]\n' % exon.Rank, exon,
                         exon.location,
@@ -814,7 +814,7 @@ class Transcript(_StableRegion):
             # TODO: check strand
             cds_map = Map(spans=cds_spans,
                           parent_length=parent_map.parent_length)
-            features.append(('CDS', str(self.StableId), cds_map))
+            features.append(('CDS', str(self.stableid), cds_map))
         return features
 
     def _get_Utr_feature_data(self, parent_map):
@@ -834,11 +834,11 @@ class Transcript(_StableRegion):
         if utr5_spans:
             utr5_map = Map(spans=utr5_spans,
                            parent_length=parent_map.parent_length)
-            features.append(("5'UTR", str(self.StableId), utr5_map))
+            features.append(("5'UTR", str(self.stableid), utr5_map))
         if utr3_spans:
             utr3_map = Map(spans=utr3_spans,
                            parent_length=parent_map.parent_length)
-            features.append(("3'UTR", str(self.StableId), utr3_map))
+            features.append(("3'UTR", str(self.stableid), utr3_map))
         return features
 
     def sub_feature_data(self, parent_map):
@@ -861,7 +861,7 @@ class Exon(_StableRegion):
         """created by a Gene"""
         _StableRegion.__init__(self, genome, db, location=location)
 
-        self._attr_ensembl_table_map = dict(StableId=['exon_stable_id',
+        self._attr_ensembl_table_map = dict(stableid=['exon_stable_id',
                                                       'exon'][genome.general_release >= 65],
                                             location='exon')
 
@@ -873,7 +873,7 @@ class Exon(_StableRegion):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return '%s(StableId=%s, Rank=%s)' % (my_type, self.StableId, self.Rank)
+        return '%s(stableid=%s, Rank=%s)' % (my_type, self.stableid, self.Rank)
 
     def __lt__(self, other):
         return self.Rank < other.Rank
@@ -890,7 +890,7 @@ class Exon(_StableRegion):
             self._get_exon_record()
             return
 
-        table_name = self._attr_ensembl_table_map['StableId']
+        table_name = self._attr_ensembl_table_map['stableid']
         exon_stable_id_table = self.db.get_table(table_name)
         query = sql.select([exon_stable_id_table.c.stable_id],
                            exon_stable_id_table.c.exon_id == self.exon_id)
@@ -907,7 +907,7 @@ class Exon(_StableRegion):
         self._table_rows['exon'] = record
 
     def _make_symbol(self):
-        self._cached['symbol'] = '%s-%s' % (self.StableId, self.Rank)
+        self._cached['symbol'] = '%s-%s' % (self.stableid, self.Rank)
 
     def _get_symbol(self):
         return self._get_cached_value('symbol', self._make_symbol)

@@ -174,15 +174,15 @@ class Compara(object):
 
     method_species_links = property(_get_method_link_species_set)
 
-    def get_related_genes(self, gene_region=None, StableId=None,
+    def get_related_genes(self, gene_region=None, stableid=None,
                         Relationship=None, DEBUG=False):
         """returns a RelatedGenes instance.
 
         Arguments:
             - gene_region: a Gene instance
-            - StableId: ensembl stable_id identifier
+            - stableid: ensembl stable_id identifier
             - Relationship: the types of related genes sought"""
-        assert gene_region is not None or StableId is not None,\
+        assert gene_region is not None or stableid is not None,\
             "No identifier provided"
         assert Relationship is not None, "No Relationship specified"
 
@@ -190,7 +190,7 @@ class Compara(object):
         # in SQLAlchemy 0.6
         Relationship = '%s' % Relationship
 
-        StableId = StableId or gene_region.StableId
+        stableid = stableid or gene_region.stableid
 
         if list(self._genomes.values())[0].general_release > 75:
             mem_name = 'gene_member'
@@ -206,7 +206,7 @@ class Compara(object):
         homology_table = self.ComparaDb.get_table('homology')
 
         member_ids = sql.select([member_table.c[mem_id]],
-                                member_table.c.stable_id == str(StableId))
+                                member_table.c.stable_id == str(stableid))
 
         member_ids = [r[mem_id] for r in member_ids.execute()]
         if not member_ids:
@@ -267,8 +267,8 @@ class Compara(object):
         data = []
         for record in gene_set.execute():
             genome = self.taxon_id_species[record['taxon_id']]
-            StableId = record['stable_id']
-            gene = list(genome.get_genes_matching(StableId=StableId))
+            stableid = record['stable_id']
+            gene = list(genome.get_genes_matching(stableid=stableid))
             assert len(gene) == 1, "Error in selecting genes: %s" % gene
             gene = gene[0]
             gene.location.strand = record[frag_strand]
