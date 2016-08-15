@@ -62,7 +62,7 @@ class TestCompara(ComparaTestBase):
             stableid='ENSMUSG00000030157')
         orthologs = self.comp.get_related_genes(gene_region=clec2d,
                                               Relationship='ortholog_one2many')
-        self.assertTrue(len(orthologs.Members) < 4)
+        self.assertTrue(len(orthologs.members) < 4)
 
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")

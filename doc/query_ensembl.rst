@@ -407,11 +407,11 @@ I could also have done that query using a ``stableid``, which I now do using the
      Relationships=ortholog_one2one
       Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer...
 
-The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``Members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
+The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
 
 .. doctest::
 
-    >>> print orthologs.Members
+    >>> print orthologs.members
     (Gene(species='Rattus norvegicus'; biotype='protein_coding'; Descr...
     >>> print orthologs.get_seqLengths()
     [40748, 84793, 47117]

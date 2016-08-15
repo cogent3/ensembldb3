@@ -33,7 +33,7 @@ class _RelatedRegions(LazyRecord):
         # TODO StableID and description
         my_type = self.__class__.__name__
 
-        data = list(map(repr, self.Members))
+        data = list(map(repr, self.members))
         data.insert(0, '%s(' % my_type)
         data.append(')')
         return "\n\t".join(data)
@@ -41,7 +41,7 @@ class _RelatedRegions(LazyRecord):
     def get_seq_collection(self, feature_types=None, where_feature=None):
         """returns a SequenceCollection instance of the unaligned sequences"""
         seqs = []
-        for member in self.Members:
+        for member in self.members:
             if feature_types:
                 seq = member.get_annotated_seq(feature_types, where_feature)
             else:
@@ -53,20 +53,20 @@ class _RelatedRegions(LazyRecord):
 
     def getseq_lengths(self):
         """returns a vector of lengths"""
-        return [len(member) for member in self.Members]
+        return [len(member) for member in self.members]
 
     def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.location.species for m in self.Members])
+        return set([m.location.species for m in self.members])
 
 
 class RelatedGenes(_RelatedRegions):
     type = 'related_genes'
 
-    def __init__(self, compara, Members, Relationships):
+    def __init__(self, compara, members, Relationships):
         super(RelatedGenes, self).__init__()
         self.compara = compara
-        self.Members = tuple(Members)
+        self.members = tuple(members)
         self.Relationships = Relationships
 
     def __str__(self):
@@ -74,7 +74,7 @@ class RelatedGenes(_RelatedRegions):
 
         display = ['%s:' % my_type,
                    ' Relationships=%s' % self.Relationships]
-        display += ['  %s' % m for m in self.Members]
+        display += ['  %s' % m for m in self.members]
         return '\n'.join(display)
 
     def __repr__(self):
@@ -82,7 +82,7 @@ class RelatedGenes(_RelatedRegions):
 
     def get_max_cds_lengths(self):
         """returns the vector of maximum Cds lengths from member transcripts"""
-        return [max(member.get_cds_lengths()) for member in self.Members]
+        return [max(member.get_cds_lengths()) for member in self.members]
 
 
 class SyntenicRegion(LazyRecord):
@@ -247,24 +247,24 @@ class SyntenicRegion(LazyRecord):
 class SyntenicRegions(_RelatedRegions):
     type = 'syntenic_regions'
 
-    def __init__(self, compara, Members, ref_location):
+    def __init__(self, compara, members, ref_location):
         super(SyntenicRegions, self).__init__()
         self.compara = compara
-        members = []
+        mems = []
         ref_member = None
         self.ref_location = ref_location
-        for genome, data in Members:
+        for genome, data in members:
             if genome is ref_location.genome:
                 ref_member = SyntenicRegion(self, genome, dict(data),
                                             am_ref_member=True, location=ref_location)
             else:
-                members += [SyntenicRegion(self, genome, dict(data),
+                mems += [SyntenicRegion(self, genome, dict(data),
                                            am_ref_member=False)]
 
         assert ref_member is not None, "Can't match a member to ref_location"
         self.ref_member = ref_member
-        self.Members = tuple([ref_member] + members)
-        self.NumMembers = len(self.Members)
+        self.members = tuple([ref_member] + mems)
+        self.NumMembers = len(self.members)
         self.aln_loc = None
         self._do_rc = None
 
@@ -272,7 +272,7 @@ class SyntenicRegions(_RelatedRegions):
         my_type = self.__class__.__name__
 
         display = ['%s:' % my_type]
-        display += ['  %r' % m.location for m in self.Members
+        display += ['  %r' % m.location for m in self.members
                     if m.Region is not None]
         return '\n'.join(display)
 
@@ -321,7 +321,7 @@ class SyntenicRegions(_RelatedRegions):
         seqs = []
         annotations = {}
 
-        for member in self.Members:
+        for member in self.members:
             if feature_types:
                 seq = member.get_annotated_aligned(feature_types, where_feature)
             else:

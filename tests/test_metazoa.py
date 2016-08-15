@@ -44,7 +44,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
             stableid='FBgn0050169')
         orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship='ortholog_one2one')
-        self.assertEqual(len(orthologs.Members), 2)
+        self.assertEqual(len(orthologs.members), 2)
 
     def test_get_collection(self):
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid(

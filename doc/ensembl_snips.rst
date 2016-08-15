@@ -364,7 +364,7 @@ alignment method in the vertebrates clade:
     ...                                      align_clade=clade, strand=strand)     
     >>> aligned_pairs = [r for r in regions]
     >>> alignment = aligned_pairs[0]                                                            
-    >>> aligned_regions = [m for m in alignment.Members
+    >>> aligned_regions = [m for m in alignment.members
     ...                    if m.Region is not None]
     >>> source_region, target_region = aligned_regions
     >>> print source_region.location.coord_name, source_region.location.start, source_region.location.end
@@ -376,7 +376,7 @@ alignment method in the vertebrates clade:
 
 If there are no regions returned (i.e. ``num_pairs`` is zero), then no alignment could be found. In the case of 
 the above region, an exon in the *Hccs* gene, there is only one alignment. We then accessed the coordinates of the 
-alignment using the ``Members`` attribute of the region. Each element of ``aligned_regions`` is a ``SyntenicRegion``
+alignment using the ``members`` attribute of the region. Each element of ``aligned_regions`` is a ``SyntenicRegion``
 instance, whose coordinates can be pulled from the ``location`` attribute.
 
 This example shows that mouse region ``X:155754928-155755079`` aligns only to human region ``X:20222659-20223163``.
@@ -418,7 +418,7 @@ We iterate over the related members.
 
 .. doctest::
     
-    >>> for ortholog in orthologs.Members:
+    >>> for ortholog in orthologs.members:
     ...     print ortholog
     Gene(species='Macaca mulatta'; biotype='protein_coding'; description=...
 
@@ -454,7 +454,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     ...     if orthologs is None or orthologs.get_species_set() != latin_names:
     ...         continue
     ...     seqs = []
-    ...     for m in orthologs.Members:
+    ...     for m in orthologs.members:
     ...         try: # if sequence can't be translated, we ignore it
     ...             # get the CDS without the ending stop
     ...             seq = m.CanonicalTranscript.Cds.trim_stop_codon()
