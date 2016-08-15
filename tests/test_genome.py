@@ -158,7 +158,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.stableid, 'ENSG00000139618')
         self.assertEqual(brca2.biotype.lower(), 'protein_coding')
         self.assertContains(brca2.description.lower(), 'breast cancer')
-        self.assertEqual(brca2.Status, 'KNOWN')
+        self.assertEqual(brca2.status, 'KNOWN')
         self.assertEqual(brca2.CanonicalTranscript.stableid,
                          'ENST00000380152')
         # note length can change between genome builds

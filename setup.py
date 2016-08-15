@@ -38,7 +38,7 @@ setup(
     license=["BSD"],
     keywords=["biology", "genomics", "bioinformatics"],
     classifiers=[
-            "Development Status :: 5 - Production/Stable",
+            "Development status :: 5 - Production/Stable",
             "Intended Audience :: Science/Research",
             "License :: OSI Approved :: BSD",
             "Topic :: Scientific/Engineering :: Bio-Informatics",

@@ -330,7 +330,7 @@ class Gene(_StableRegion):
     def _get_gene_record(self):
         """adds the gene data to self._table_rows"""
         attr_column_map = [('biotype', 'biotype', _quoted),
-                           ('Status', 'status', _quoted),
+                           ('status', 'status', _quoted),
                            ('description', 'description', _limit_words)]
         # we set all the attributes that derive from this
         self._populate_cache_from_record(attr_column_map, 'gene')
@@ -367,9 +367,9 @@ class Gene(_StableRegion):
     description = property(_get_description)
 
     def _get_status(self):
-        return self._get_cached_value('Status', self._get_gene_record)
+        return self._get_cached_value('status', self._get_gene_record)
 
-    Status = property(_get_status)
+    status = property(_get_status)
 
     def _make_canonical_transcript(self):
         if 'gene' not in self._table_rows:
@@ -460,7 +460,7 @@ class Transcript(_StableRegion):
         self._attr_ensembl_table_map = dict(stableid=['transcript_stable_id',
                                                       'transcript'][genome.general_release >= 65],
                                             location='transcript',
-                                            Status='transcript',
+                                            status='transcript',
                                             TranslatedExons='translation')
 
         self._am_prot_coding = None
@@ -471,15 +471,15 @@ class Transcript(_StableRegion):
 
     def _set_transcript_record(self):
         attr_column_map = [('biotype', 'biotype', _quoted),
-                           ('Status', 'status', _quoted)]
+                           ('status', 'status', _quoted)]
         self._populate_cache_from_record(attr_column_map, 'transcript')
         self._am_prot_coding = self._cached[
             'biotype'].lower() == 'protein_coding'
 
     def _get_status(self):
-        return self._cached['Status']
+        return self._cached['status']
 
-    Status = property(_get_status)
+    status = property(_get_status)
 
     def _get_biotype(self):
         return self._cached['biotype']

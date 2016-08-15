@@ -98,7 +98,7 @@ We query for the *BRCA2* gene for humans.
     ...     if gene.symbol == 'BRCA2':
     ...         print gene
     ...         break
-    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast cancer 2,...'; stableid='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
+    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast cancer 2,...'; stableid='ENSG00000139618'; status='KNOWN'; symbol='BRCA2')
 
 Find a gene by Ensembl Stable ID
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +111,7 @@ We use the stable ID for *BRCA2*.
     >>> human = Genome('human', release=76, account=account)
     >>> gene = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> print gene
-    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast cancer 2,...'; stableid='ENSG00000139618'; Status='KNOWN'; symbol='BRCA2')
+    Gene(species='Homo sapiens'; biotype='protein_coding'; description='breast cancer 2,...'; stableid='ENSG00000139618'; status='KNOWN'; symbol='BRCA2')
 
 Find genes matching a description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -125,7 +125,7 @@ We look for breast cancer related genes that are estrogen induced.
     >>> genes = human.get_genes_matching(description='breast cancer anti-estrogen')
     >>> for gene in genes:
     ...     print gene
-    Gene(species='Homo sapiens'; biotype='lincRNA'; description='breast cancer anti-estrogen...'; stableid='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
+    Gene(species='Homo sapiens'; biotype='lincRNA'; description='breast cancer anti-estrogen...'; stableid='ENSG00000262117'; status='NOVEL'; symbol='BCAR4')...
 
 We can also require that an exact (case insensitive) match to the word(s) occurs within the description by setting ``like=False``.
 
@@ -135,7 +135,7 @@ We can also require that an exact (case insensitive) match to the word(s) occurs
     ...                                  like=False)
     >>> for gene in genes:
     ...     print gene
-    Gene(species='Homo sapiens'; biotype='lincRNA'; description='breast cancer anti-estrogen...'; stableid='ENSG00000262117'; Status='NOVEL'; symbol='BCAR4')...
+    Gene(species='Homo sapiens'; biotype='lincRNA'; description='breast cancer anti-estrogen...'; stableid='ENSG00000262117'; status='NOVEL'; symbol='BCAR4')...
 
 Get canonical transcript for a gene
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
