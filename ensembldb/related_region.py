@@ -348,6 +348,6 @@ class SyntenicRegions(_RelatedRegions):
             aln = aln.rc()
 
         if omit_redundant:
-            aln = aln.filtered(lambda x: set(x) != set('-'))
+            aln = aln.omit_gap_pos()
 
         return aln
