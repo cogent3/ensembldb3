@@ -270,12 +270,12 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
     >>> nsyn_variants = human.get_variation(effect='missense_variant')
     >>> for i, nsyn_variant in enumerate(nsyn_variants):
     ...     if nsyn_variant.effect == 'missense_variant' and\
-    ...                          nsyn_variant.AlleleFreqs:
+    ...                          nsyn_variant.allele_freqs:
     ...         break
     ...     
     >>> print nsyn_variant
-    Variation(symbol='rs1638319'; effect='missense_variant'; Alleles='A/G')
-    >>> print nsyn_variant.AlleleFreqs
+    Variation(symbol='rs1638319'; effect='missense_variant'; alleles='A/G')
+    >>> print nsyn_variant.allele_freqs
     =================================
     allele      freq    population_id
     ---------------------------------
@@ -290,29 +290,29 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
     >>> assert len(nsyn_variant) == 1
     >>> print nsyn_variant.location
     Homo sapiens:chromosome:1:69967-69968:1
-    >>> assert nsyn_variant.NumAlleles == 2
+    >>> assert nsyn_variant.num_alleles == 2
 
-``Variation`` objects have ``FlankingSeq`` and ``seq`` attributes which in the case of a SNP is a single nucleotide long and should correspond to one of the alleles. In the latter case, this property is a tuple with the 0th entry being the 5'- 300 nucleotides and the 1st entry being the 3' nucleotides.
+``Variation`` objects have ``flanking_seq`` and ``seq`` attributes which in the case of a SNP is a single nucleotide long and should correspond to one of the alleles. In the latter case, this property is a tuple with the 0th entry being the 5'- 300 nucleotides and the 1st entry being the 3' nucleotides.
 
 .. note:: The flanking sequence is only returned when the SNPs flank matches reference (according to Ensembl).
 
 .. doctest::
 
-    >>> print nsyn_variant.FlankingSeq[0]
+    >>> print nsyn_variant.flanking_seq[0]
     TTGCTAACAGT...
-    >>> print nsyn_variant.FlankingSeq[1]
+    >>> print nsyn_variant.flanking_seq[1]
     GCTGAGAAAAT...
-    >>> assert str(nsyn_variant.seq) in nsyn_variant.Alleles, str(nsyn_variant.seq)
+    >>> assert str(nsyn_variant.seq) in nsyn_variant.alleles, str(nsyn_variant.seq)
 
-As a standard feature, ``Variation`` within a specific interval can also be obtained. Using the ``brca2`` gene region instance created above, we can find all the genetic variants using the ``variants`` property of genome regions. We use this example to also demonstrate the ``PeptideAlleles`` and ``TranslationLocation`` attributes. ``PeptideAlleles`` is the amino-acid variation resulting from the nucleotide variation while ``TranslationLocation`` is the position in the translated peptide of the variant. If a variant does not affect protein coding sequence (either it's not exonic or it's a synonymous variant) then these properties have the value ``None``.
+As a standard feature, ``Variation`` within a specific interval can also be obtained. Using the ``brca2`` gene region instance created above, we can find all the genetic variants using the ``variants`` property of genome regions. We use this example to also demonstrate the ``peptide_alleles`` and ``translation_location`` attributes. ``peptide_alleles`` is the amino-acid variation resulting from the nucleotide variation while ``translation_location`` is the position in the translated peptide of the variant. If a variant does not affect protein coding sequence (either it's not exonic or it's a synonymous variant) then these properties have the value ``None``.
 We illustrate their use.
 
 .. doctest::
 
     >>> for variant in brca2.variants:
-    ...     if variant.PeptideAlleles is None:
+    ...     if variant.peptide_alleles is None:
     ...         continue
-    ...     print variant.PeptideAlleles, variant.TranslationLocation
+    ...     print variant.peptide_alleles, variant.translation_location
     P/L 1...
 
 .. note:: These are Python coordinates, add 1 to get the Ensembl value.

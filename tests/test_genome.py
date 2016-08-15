@@ -468,19 +468,19 @@ class TestVariation(GenomeTestBase):
         # peptide alleles
         for i in range(4):
             snp = list(self.human.get_variation(symbol=self.snp_names[i]))[0]
-            self.assertEqual(snp.Ancestral, self.ancestral[i])
+            self.assertEqual(snp.ancestral, self.ancestral[i])
             self.assertEqual(snp.symbol, self.snp_names[i])
             self.assertEqual(set(snp.effect), set(self.snp_effects[i]))
-            self.assertEqual(snp.Alleles, self.snp_nt_alleles[i])
-            self.assertEqual(snp.MapWeight, self.map_weights[i])
+            self.assertEqual(snp.alleles, self.snp_nt_alleles[i])
+            self.assertEqual(snp.map_weight, self.map_weights[i])
 
     def test_somatic_attribute_correct(self):
-        """Somatic attribute of variants should be correct"""
+        """somatic attribute of variants should be correct"""
         symbols_somatic = [('COSM256414', True), ('rs80359189', False)]
         for symbol, expect in symbols_somatic:
             snp = list(self.human.get_variation(symbol=symbol, somatic=True,
                                                flanks_match_ref=False))[0]
-            self.assertEqual(snp.Somatic, expect)
+            self.assertEqual(snp.somatic, expect)
 
     def test_num_alleles(self):
         """should correctly infer the number of alleles"""
@@ -495,18 +495,18 @@ class TestVariation(GenomeTestBase):
             if 'missense_variant' not in snp.effect:
                 continue
 
-            self.assertEqual(snp.PeptideAlleles, self.snp_aa_alleles[i])
+            self.assertEqual(snp.peptide_alleles, self.snp_aa_alleles[i])
 
     def test_no_pep_alleles(self):
         """handle case where coding_sequence_variant has no peptide alleles"""
         snp = list(self.human.get_variation(symbol='CM033341'))[0]
-        self.assertTrue(snp.PeptideAlleles is None)
+        self.assertTrue(snp.peptide_alleles is None)
 
     def test_get_peptide_location(self):
         """should return correct location for aa variants"""
         index = self.snp_names.index('rs11545807')
         snp = list(self.human.get_variation(symbol=self.snp_names[index]))[0]
-        self.assertEqual(snp.TranslationLocation, 95)
+        self.assertEqual(snp.translation_location, 95)
 
     def test_validation_status(self):
         """should return correct validation status"""
@@ -521,7 +521,7 @@ class TestVariation(GenomeTestBase):
                                     'hapmap', 'doublehit']), func))
         for name, status, conv in data:
             snp = list(self.human.get_variation(symbol=name))[0]
-            got = conv(snp.Validation)
+            got = conv(snp.validation)
             self.assertTrue(status & got)
 
     def test_get_flanking_seq(self):
@@ -530,12 +530,12 @@ class TestVariation(GenomeTestBase):
         for i in range(4):  # only have flanking sequence for 3
             snp = list(self.human.get_variation(symbol=self.snp_names[i],
                                                flanks_match_ref=False))[0]
-            self.assertEqual(snp.FlankingSeq, self.snp_flanks[i])
+            self.assertEqual(snp.flanking_seq, self.snp_flanks[i])
 
     def test_variation_seq(self):
         """should return the sequence for a Variation snp if asked"""
         snp = list(self.human.get_variation(symbol=self.snp_names[0]))[0]
-        self.assertContains(snp.Alleles, str(snp.seq))
+        self.assertContains(snp.alleles, str(snp.seq))
 
     def test_get_validation_condition(self):
         """simple test of SNP validation status"""
@@ -548,7 +548,7 @@ class TestVariation(GenomeTestBase):
         """exercising getting AlleleFreq data"""
         snp = list(self.human.get_variation(symbol='rs34213141'))[0]
         expect = set([('A', '0.0303'), ('G', '0.9697')])
-        allele_freqs = snp.AlleleFreqs
+        allele_freqs = snp.allele_freqs
         allele_freqs = set((a, '%.4f' % f)
                            for a, f in allele_freqs.tolist(['allele', 'freq']) if f)
         self.assertTrue(expect.issubset(allele_freqs))
@@ -565,10 +565,10 @@ class TestVariation(GenomeTestBase):
         for snp in self.human.get_variation(effect='missense_variant', like=False,
                                            validated=True, somatic=False,
                                            flanks_match_ref=True, limit=limit):
-            self.assertEqual(snp.Somatic, False)
+            self.assertEqual(snp.somatic, False)
             self.assertEqual('missense_variant', snp.effect)
-            self.assertNotEqual(snp.FlankingSeq, NULL_VALUE)
-            self.assertNotEqual(snp.Validation, NULL_VALUE)
+            self.assertNotEqual(snp.flanking_seq, NULL_VALUE)
+            self.assertNotEqual(snp.validation, NULL_VALUE)
             i += 1
 
         self.assertEqual(i, limit)

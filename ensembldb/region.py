@@ -999,14 +999,14 @@ class Variation(_Region):
 
         self._attr_ensembl_table_map = dict(effect='variation_feature',
                                             symbol='variation_feature',
-                                            Validation='variation_feature',
-                                            MapWeight='variation_feature',
-                                            FlankingSeq='flanking_sequence',
-                                            PeptideAlleles='transcript_variation',
-                                            TranslationLocation='transcript_variation',
+                                            validation='variation_feature',
+                                            map_weight='variation_feature',
+                                            flanking_seq='flanking_sequence',
+                                            peptide_alleles='transcript_variation',
+                                            translation_location='transcript_variation',
                                             location='variation_feature',
-                                            AlleleFreqs='allele',
-                                            Ancestral='variation')
+                                            allele_freqs='allele',
+                                            ancestral='variation')
 
         assert data is not None, 'Variation record created in an unusual way'
         for name, value, func in \
@@ -1026,8 +1026,8 @@ class Variation(_Region):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        return "%s(symbol=%r; effect=%r; Alleles=%r)" % \
-               (my_type, self.symbol, self.effect, self.Alleles)
+        return "%s(symbol=%r; effect=%r; alleles=%r)" % \
+               (my_type, self.symbol, self.effect, self.alleles)
 
     def _get_variation_table_record(self):
         # this is actually the variation_feature table
@@ -1036,11 +1036,11 @@ class Variation(_Region):
             consequence_type += 's'  # change to plural column name
 
         attr_name_map = [('effect', consequence_type, _set_to_string),
-                         ('Alleles', 'allele_string', _quoted),
+                         ('alleles', 'allele_string', _quoted),
                          ('symbol', 'variation_name', _quoted),
-                         ('Validation', 'validation_status', _set_to_string),
-                         ('MapWeight', 'map_weight', int),
-                         ('Somatic', 'somatic', bool)]
+                         ('validation', 'validation_status', _set_to_string),
+                         ('map_weight', 'map_weight', int),
+                         ('somatic', 'somatic', bool)]
         self._populate_cache_from_record(attr_name_map, 'variation_feature')
         # TODO handle obtaining the variation_feature if we were created in
         # any way other than through the symbol or effect
@@ -1058,7 +1058,7 @@ class Variation(_Region):
                            var_table.c.variation_id == variation_id)
         record = asserted_one(query.execute())
         self._table_rows['variation'] = record
-        attr_name_map = [('Ancestral', 'ancestral_allele', str_or_none)]
+        attr_name_map = [('ancestral', 'ancestral_allele', str_or_none)]
         self._populate_cache_from_record(attr_name_map, 'variation')
 
     def _get_seq_region_record(self, seq_region_id):
@@ -1076,7 +1076,7 @@ class Variation(_Region):
         aligned_ref = self._table_rows[
             'variation_feature']['alignment_quality'] == 1
         if not aligned_ref:
-            self._cached['FlankingSeq'] = self.NULL_VALUE
+            self._cached['flanking_seq'] = self.NULL_VALUE
             return
 
         seqs = dict(up=self.NULL_VALUE, down=self.NULL_VALUE)
@@ -1089,7 +1089,7 @@ class Variation(_Region):
             seq = flanking.seq
             seqs[name] = seq
 
-        self._cached[('FlankingSeq')] = (seqs['up'][-300:], seqs['down'][:300])
+        self._cached[('flanking_seq')] = (seqs['up'][-300:], seqs['down'][:300])
 
     def _get_flanking_seq_data_lt_70(self):
         # maps to flanking_sequence through variation_feature_id
@@ -1119,13 +1119,13 @@ class Variation(_Region):
                 seq = flanking.seq
             seqs[name] = seq
 
-        self._cached[('FlankingSeq')] = (seqs['up'][-300:], seqs['down'][:300])
+        self._cached[('flanking_seq')] = (seqs['up'][-300:], seqs['down'][:300])
 
     def _get_flanking_seq(self):
-        return self._get_cached_value('FlankingSeq',
+        return self._get_cached_value('flanking_seq',
                                       self._get_flanking_seq_data)
 
-    FlankingSeq = property(_get_flanking_seq)
+    flanking_seq = property(_get_flanking_seq)
 
     def _get_effect(self):
         return self._get_cached_value('effect',
@@ -1134,21 +1134,21 @@ class Variation(_Region):
     effect = property(_get_effect)
 
     def _get_somatic(self):
-        return self._get_cached_value('Somatic',
+        return self._get_cached_value('somatic',
                                       self._get_variation_table_record)
 
-    Somatic = property(_get_somatic)
+    somatic = property(_get_somatic)
 
     def _get_alleles(self):
-        return self._get_cached_value('Alleles',
+        return self._get_cached_value('alleles',
                                       self._get_variation_table_record)
 
-    Alleles = property(_get_alleles)
+    alleles = property(_get_alleles)
 
     def _get_ancestral(self):
-        return self._get_cached_value('Ancestral', self._get_ancestral_data)
+        return self._get_cached_value('ancestral', self._get_ancestral_data)
 
-    Ancestral = property(_get_ancestral)
+    ancestral = property(_get_ancestral)
 
     def _get_allele_table_record(self):
         variation_id = self._table_rows['variation_feature']['variation_id']
@@ -1158,7 +1158,7 @@ class Variation(_Region):
         records = [r for r in query.execute()]
 
         if len(records) == 0:
-            self._cached[('AlleleFreqs')] = self.NULL_VALUE
+            self._cached[('allele_freqs')] = self.NULL_VALUE
             return
 
         # property change from >= 65, allele ids need to be looked up in
@@ -1187,17 +1187,17 @@ class Variation(_Region):
             data.append((allele, rec['frequency'], rec[sample_id]))
 
         if not data:
-            self._cached[('AlleleFreqs')] = self.NULL_VALUE
+            self._cached[('allele_freqs')] = self.NULL_VALUE
             return
 
         table = Table(header=['allele', 'freq', sample_id], rows=data)
-        self._cached[('AlleleFreqs')] = table.sorted([sample_id, 'allele'])
+        self._cached[('allele_freqs')] = table.sorted([sample_id, 'allele'])
 
     def _get_allele_freqs(self):
-        return self._get_cached_value('AlleleFreqs',
+        return self._get_cached_value('allele_freqs',
                                       self._get_allele_table_record)
 
-    AlleleFreqs = property(_get_allele_freqs)
+    allele_freqs = property(_get_allele_freqs)
 
     def _get_symbol(self):
         return self._get_cached_value('symbol',
@@ -1206,16 +1206,16 @@ class Variation(_Region):
     symbol = property(_get_symbol)
 
     def _get_validation(self):
-        return self._get_cached_value('Validation',
+        return self._get_cached_value('validation',
                                       self._get_variation_table_record)
 
-    Validation = property(_get_validation)
+    validation = property(_get_validation)
 
     def _get_map_weight(self):
-        return self._get_cached_value('MapWeight',
+        return self._get_cached_value('map_weight',
                                       self._get_variation_table_record)
 
-    MapWeight = property(_get_map_weight)
+    map_weight = property(_get_map_weight)
 
     def _get_transcript_record(self):
         if 'variation_feature' not in self._table_rows:
@@ -1230,11 +1230,11 @@ class Variation(_Region):
         # TODO swap what we use for nysn by Ensembl version, thanks Ensembl!
         nsyn = set(('coding_sequence_variant', 'missense_variant'))
         if not effects & nsyn:
-            self._cached['PeptideAlleles'] = self.NULL_VALUE
-            self._cached['TranslationLocation'] = self.NULL_VALUE
+            self._cached['peptide_alleles'] = self.NULL_VALUE
+            self._cached['translation_location'] = self.NULL_VALUE
             return
 
-        table_name = self._attr_ensembl_table_map['PeptideAlleles']
+        table_name = self._attr_ensembl_table_map['peptide_alleles']
         loc = lambda x: int(x) - 1
 
         # column name changed between releases, so we check to see which
@@ -1251,8 +1251,8 @@ class Variation(_Region):
             consequence_type = 'consequence_type'
 
         attr_column_map = [
-            ('PeptideAlleles', pep_allele_string, _quoted),
-            ('TranslationLocation', 'translation_start', loc)]
+            ('peptide_alleles', pep_allele_string, _quoted),
+            ('translation_location', 'translation_start', loc)]
 
         if table_name in self._table_rows:
             self._populate_cache_from_record(attr_column_map, table_name)
@@ -1279,8 +1279,8 @@ class Variation(_Region):
             translation_location += [record['translation_start']]
 
         if not pep_alleles:
-            self._cached['PeptideAlleles'] = self.NULL_VALUE
-            self._cached['TranslationLocation'] = self.NULL_VALUE
+            self._cached['peptide_alleles'] = self.NULL_VALUE
+            self._cached['translation_location'] = self.NULL_VALUE
             return
 
         # we only want unique allele strings
@@ -1298,25 +1298,25 @@ class Variation(_Region):
         self._populate_cache_from_record(attr_column_map, table_name)
 
     def _get_peptide_variation(self):
-        return self._get_cached_value('PeptideAlleles',
+        return self._get_cached_value('peptide_alleles',
                                       self._get_transcript_record)
 
-    PeptideAlleles = property(_get_peptide_variation)
+    peptide_alleles = property(_get_peptide_variation)
 
     def _get_translation_location(self):
-        return self._get_cached_value('TranslationLocation',
+        return self._get_cached_value('translation_location',
                                       self._get_transcript_record)
 
-    TranslationLocation = property(_get_translation_location)
+    translation_location = property(_get_translation_location)
 
     def _split_alleles(self):
-        return self.Alleles.split('/')
+        return self.alleles.split('/')
 
     def _get_number_alleles(self):
         result = self._split_alleles()
         return len(result)
 
-    NumAlleles = property(_get_number_alleles)
+    num_alleles = property(_get_number_alleles)
 
 
 class CpGisland(GenericRegion):
