@@ -155,15 +155,15 @@ class Genome(object):
 
         return self._gen_release
 
-    def _get_biotype_description_condition(self, gene_table, Description=None, BioType=None, like=True):
-        assert Description or BioType, "no valid argument provided"
+    def _get_biotype_description_condition(self, gene_table, Description=None, biotype=None, like=True):
+        assert Description or biotype, "no valid argument provided"
         btype, descr = None, None
 
-        if BioType:
+        if biotype:
             if like:
-                btype = gene_table.c.biotype.like('%' + BioType + '%')
+                btype = gene_table.c.biotype.like('%' + biotype + '%')
             else:
-                btype = gene_table.c.biotype == BioType
+                btype = gene_table.c.biotype == biotype
         if Description:
             if like:
                 descr = gene_table.c.description.like('%' + Description + '%')
@@ -217,7 +217,7 @@ class Genome(object):
         return symbol
 
     def _get_gene_query(self, db, symbol=None, Description=None, StableId=None,
-                        BioType=None, synonym=None, like=True):
+                        biotype=None, synonym=None, like=True):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
 
@@ -229,7 +229,7 @@ class Genome(object):
         else:
             gene_id_table = db.get_table('gene_stable_id')
 
-        assert symbol or Description or StableId or BioType, "no valid argument provided"
+        assert symbol or Description or StableId or biotype, "no valid argument provided"
         if symbol:
             condition = xref_table.c.display_label == symbol
         elif StableId and release_ge_65:
@@ -238,7 +238,7 @@ class Genome(object):
             condition = gene_id_table.c.stable_id == StableId
         else:
             condition = self._get_biotype_description_condition(
-                gene_table, Description, BioType, like)
+                gene_table, Description, biotype, like)
 
         query = self._build_gene_query(
             db, condition, gene_table, gene_id_table, xref_table)
@@ -262,11 +262,11 @@ class Genome(object):
         return gene
 
     def get_genes_matching(self, symbol=None, Description=None, StableId=None,
-                         BioType=None, like=True):
+                         biotype=None, like=True):
         """symbol: HGC gene symbol, case doesn't matter
         description: a functional description
         StableId: the ensebl identifier
-        BioType: the biological encoding type"""
+        biotype: the biological encoding type"""
         # TODO additional arguments to satisfy: external_ref, go_terms
         if symbol is not None:
             symbol = symbol.lower()
@@ -283,7 +283,7 @@ class Genome(object):
         # TODO catch conditions where user passes in both a symbol and a
         # biotype
         args = dict(symbol=symbol, Description=Description,
-                    StableId=StableId, BioType=BioType, like=like)
+                    StableId=StableId, biotype=biotype, like=like)
         query = self._get_gene_query(self.CoreDb, **args)
         records = query.execute()
         if records.rowcount == 0 and symbol is not None:
@@ -312,7 +312,7 @@ class Genome(object):
         return transcript
 
     def _get_transcript_query(self, db, symbol=None, Description=None, StableId=None,
-                              BioType=None, synonym=None, like=True):
+                              biotype=None, synonym=None, like=True):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         transcript_table = db.get_table('transcript')
 
@@ -324,7 +324,7 @@ class Genome(object):
         else:
             transcript_id_table = db.get_table('transcript_stable_id')
 
-        assert symbol or Description or StableId or BioType, "no valid argument provided"
+        assert symbol or Description or StableId or biotype, "no valid argument provided"
         if symbol:
             condition = xref_table.c.display_label == symbol
         elif StableId and release_ge_65:
@@ -333,7 +333,7 @@ class Genome(object):
             condition = transcript_id_table.c.stable_id == StableId
         else:
             condition = self._get_biotype_description_condition(
-                transcript_table, Description, BioType, like)
+                transcript_table, Description, biotype, like)
 
         query = self._build_transcript_query(
             db, condition, transcript_table, transcript_id_table, xref_table)

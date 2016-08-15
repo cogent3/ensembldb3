@@ -287,7 +287,7 @@ class Gene(_StableRegion):
         self._attr_ensembl_table_map = dict(StableId=['gene_stable_id',
                                                       'gene'][genome.general_release >= 65],
                                             symbol='xref',
-                                            Description='gene', BioType='gene', location='gene',
+                                            Description='gene', biotype='gene', location='gene',
                                             CanonicalTranscript='gene',
                                             Transcripts='transcript',
                                             Exons='transcript')
@@ -301,7 +301,7 @@ class Gene(_StableRegion):
 
         for name, func in \
             [('StableId', self._get_gene_stable_id_record),
-             ('BioType', self._get_gene_record),
+             ('biotype', self._get_gene_record),
              ('Description', self._get_gene_record),
              ('symbol', self._get_xref_record),
              ('location', self._get_gene_record)]:
@@ -329,7 +329,7 @@ class Gene(_StableRegion):
 
     def _get_gene_record(self):
         """adds the gene data to self._table_rows"""
-        attr_column_map = [('BioType', 'biotype', _quoted),
+        attr_column_map = [('biotype', 'biotype', _quoted),
                            ('Status', 'status', _quoted),
                            ('Description', 'description', _limit_words)]
         # we set all the attributes that derive from this
@@ -349,9 +349,9 @@ class Gene(_StableRegion):
         return
 
     def _get_biotype(self):
-        return self._get_cached_value('BioType', self._get_gene_record)
+        return self._get_cached_value('biotype', self._get_gene_record)
 
-    BioType = property(_get_biotype)
+    biotype = property(_get_biotype)
 
     def _get_symbol(self):
         if 'xref' in self._table_rows:
@@ -435,13 +435,13 @@ class Gene(_StableRegion):
         if self.Transcripts is self.NULL_VALUE:
             return None
         l = [ts.get_cds_length() for ts in self.Transcripts
-             if ts.BioType == self.BioType]
+             if ts.biotype == self.biotype]
         return l
 
     def get_longest_cds_transcript(self):
         """returns the Transcript with the longest Cds and the same biotype"""
         result = sorted([(ts.get_cds_length(), ts) for ts in self.Transcripts
-                         if ts.BioType == self.BioType])
+                         if ts.biotype == self.biotype])
 
         if result:  # last result is longest
             result = result[-1][1]
@@ -470,11 +470,11 @@ class Transcript(_StableRegion):
         self._set_transcript_record()
 
     def _set_transcript_record(self):
-        attr_column_map = [('BioType', 'biotype', _quoted),
+        attr_column_map = [('biotype', 'biotype', _quoted),
                            ('Status', 'status', _quoted)]
         self._populate_cache_from_record(attr_column_map, 'transcript')
         self._am_prot_coding = self._cached[
-            'BioType'].lower() == 'protein_coding'
+            'biotype'].lower() == 'protein_coding'
 
     def _get_status(self):
         return self._cached['Status']
@@ -482,9 +482,9 @@ class Transcript(_StableRegion):
     Status = property(_get_status)
 
     def _get_biotype(self):
-        return self._cached['BioType']
+        return self._cached['biotype']
 
-    BioType = property(_get_biotype)
+    biotype = property(_get_biotype)
 
     def _get_gene(self):
         gene_id = self.gene_id

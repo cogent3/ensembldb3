@@ -129,7 +129,7 @@ Because there can be multiple hits from a ``get_genes_matching`` query, and beca
     >>> print brca2.Description
     breast cancer 2...
     >>> print brca2
-    Gene(species='Homo sapiens'; BioType='protein_coding'; Description='breast...
+    Gene(species='Homo sapiens'; biotype='protein_coding'; Description='breast...
 
 This code serves to illustrate a few things. First, the sorts of properties that exist on the object. These can be directly accessed as illustrated above. Secondly, that the argument names to ``get_genes_matching`` match the properties.
 
@@ -146,11 +146,11 @@ Gene's also have a location. The length of a gene is the difference between its 
     
 Each location is directly tied to the parent genome and the coordinate above also shows the coordinates' *type* (chromosome in this case), name (13), start, end and strand. The start and end positions are python indices and will differ from the Ensembl indices in that start will be the Ensembl index - 1. This is because python counts from 0, not 1. In querying for regions using a specific set of coordinates, it is possible to put in the Ensembl coordinates (demonstrated below).
 
-``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``CanonicalTranscript`` and ``Transcripts``. ``CanonicalTranscript`` is the characteristic transcript for a gene, as defined by Ensembl. ``Transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``Exons``, ``Introns``, a ``Cds`` and, if the ``BioType`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
+``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``CanonicalTranscript`` and ``Transcripts``. ``CanonicalTranscript`` is the characteristic transcript for a gene, as defined by Ensembl. ``Transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``Exons``, ``Introns``, a ``Cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
 
 .. doctest::
 
-    >>> print brca2.BioType
+    >>> print brca2.biotype
     protein_coding
     >>> print brca2.Seq
     GGGCTTGTGGCGC...
@@ -211,14 +211,14 @@ There are obviously different types of genes, and the ``Genome`` object provides
 
 .. doctest::
 
-    >>> print human.get_distinct('BioType')
+    >>> print human.get_distinct('biotype')
     [u'unitary_pseudogene', u'rRNA', u'lincRNA'...
 
 The genome can be queried for any of these types, for instance we'll query for ``rRNA``. We'll get the first few records and then exit.
 
 .. doctest::
 
-    >>> rRNA_genes = human.get_genes_matching(BioType='rRNA')
+    >>> rRNA_genes = human.get_genes_matching(biotype='rRNA')
     >>> count = 0
     >>> for gene in rRNA_genes:
     ...     print gene
@@ -226,9 +226,9 @@ The genome can be queried for any of these types, for instance we'll query for `
     ...     if count == 1:
     ...         break
     ...
-    Gene(species='Homo sapiens'; BioType='rRNA'; Description='RNA, 5S...
+    Gene(species='Homo sapiens'; biotype='rRNA'; Description='RNA, 5S...
 
-This has the effect of returning any gene whose ``BioType`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``Transcripts`` will have ``ProteinSeq==None`` and ``TranslatedExons==None``, but it will have ``Exons`` and a ``Cds``.
+This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``Transcripts`` will have ``ProteinSeq==None`` and ``TranslatedExons==None``, but it will have ``Exons`` and a ``Cds``.
 
 .. doctest::
 
@@ -247,7 +247,7 @@ Ensembl's ``otherfeatures`` database mirrors the structure of the ``core`` datab
     >>> ests = human.get_features(feature_types='est', region=brca2)
     >>> for est in ests:
     ...     print est
-    Est(species='Homo sapiens'; BioType='protein_coding'; Description='None';...
+    Est(species='Homo sapiens'; biotype='protein_coding'; Description='None';...
 
 Getting Variation
 ^^^^^^^^^^^^^^^^^
@@ -375,7 +375,7 @@ The ``Compara`` object loads the corresponding ``Genome``'s and attaches them to
 
     >>> brca2 = compara.Human.get_gene_by_stableid(StableId='ENSG00000139618')
     >>> print brca2
-    Gene(species='Homo sapiens'; BioType='protein_coding'; Description='breast...
+    Gene(species='Homo sapiens'; biotype='protein_coding'; Description='breast...
 
 We can now use this result to search compara for related genes. We note here that like ``Genome``, ``Compara`` has the ``get_distinct`` method to assist in identifying appropriate search criteria. What are the distinct types of gene relationships recorded in Ensembl, for instance?
 
@@ -394,7 +394,7 @@ So we use the ``brca2`` instance above and search for orthologs among the human,
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(species='Rattus norvegicus'; BioType='protein_coding'; Description='breast cancer ...
+      Gene(species='Rattus norvegicus'; biotype='protein_coding'; Description='breast cancer ...
 
 I could also have done that query using a ``StableId``, which I now do using the Ensembl mouse identifier for *Brca2*.
 
@@ -405,14 +405,14 @@ I could also have done that query using a ``StableId``, which I now do using the
     >>> print orthologs
     RelatedGenes:
      Relationships=ortholog_one2one
-      Gene(species='Rattus norvegicus'; BioType='protein_coding'; Description='breast cancer...
+      Gene(species='Rattus norvegicus'; biotype='protein_coding'; Description='breast cancer...
 
 The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``Members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
 
 .. doctest::
 
     >>> print orthologs.Members
-    (Gene(species='Rattus norvegicus'; BioType='protein_coding'; Descr...
+    (Gene(species='Rattus norvegicus'; biotype='protein_coding'; Descr...
     >>> print orthologs.get_seqLengths()
     [40748, 84793, 47117]
 
@@ -440,7 +440,7 @@ We can also search for other relationship types, which we do here for a histone.
     >>> print paralogs
     RelatedGenes:
      Relationships=within_species_paralog
-      Gene(species='Homo sapiens'; BioType='protein_coding'; Description='H2A...
+      Gene(species='Homo sapiens'; biotype='protein_coding'; Description='H2A...
 
 Getting Comparative Alignments
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -503,7 +503,7 @@ Printing the ``method_species_links`` table provides all the necessary informati
     ...                             StableId='ENSOGAG00000003166')
     ...
     >>> print gene
-    Gene(species='Otolemur garnettii'; BioType='protein_coding'...
+    Gene(species='Otolemur garnettii'; biotype='protein_coding'...
     >>> syntenic = compara_pair.get_syntenic_regions(region=gene,
     ...          align_method='LASTZ_NET', align_clade='H.sap-O.gar')
     ...
