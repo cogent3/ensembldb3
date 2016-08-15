@@ -160,7 +160,7 @@ Get the CDS for a transcript
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> transcript = brca2.canonical_transcript
-    >>> cds = transcript.Cds
+    >>> cds = transcript.cds
     >>> print type(cds)
     <class 'cogent.core.sequence.DnaSequence'>
     >>> print cds
@@ -457,7 +457,7 @@ We sample all one-to-one orthologs for a group of species, generating a FASTA fo
     ...     for m in orthologs.members:
     ...         try: # if sequence can't be translated, we ignore it
     ...             # get the CDS without the ending stop
-    ...             seq = m.canonical_transcript.Cds.trim_stop_codon()
+    ...             seq = m.canonical_transcript.cds.trim_stop_codon()
     ...             # make the sequence name
     ...             seq.name = '%s:%s:%s' % \
     ...         (latin_to_common[m.genome.species], m.stableid, m.location)

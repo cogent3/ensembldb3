@@ -133,7 +133,7 @@ class TestGenome(GenomeTestBase):
     def test_diff_strand_contig_chrom(self):
         """get correct sequence when contig and chromosome strands differ"""
         gene = self.gorilla.get_gene_by_stableid('ENSGGOG00000001953')
-        cds = gene.canonical_transcript.Cds
+        cds = gene.canonical_transcript.cds
         self.assertEqual(str(cds), 'ATGGCCCAGGATCTCAGCGAGAAGGACCTGTTGAAGATG'
                          'GAGGTGGAGCAGCTGAAGAAAGAAGTGAAAAACACAAGAATTCCGATTTCCAAAGCGGGAAAGGAAAT'
                          'CAAAGAGTACGTGGAGGCCCAAGCAGGAAACGATCCTTTTCTCAAAGGCATCCCTGAGGACAAGAATC'
@@ -164,7 +164,7 @@ class TestGene(GenomeTestBase):
         # note length can change between genome builds
         self.assertGreaterThan(len(brca2), 83700)
         transcript = brca2.get_member('ENST00000544455')
-        self.assertEqual(transcript.get_cds_length(), len(transcript.Cds))
+        self.assertEqual(transcript.get_cds_length(), len(transcript.cds))
 
     def test_get_genes_by_stable_id(self):
         """if get gene by stable_id, attributes should be correctly
@@ -175,7 +175,7 @@ class TestGene(GenomeTestBase):
         """transcript should return correct exons for brca2"""
         transcript = self.brca2.get_member('ENST00000380152')
         self.assertEqual(len(transcript.translated_exons), 26)
-        self.assertEqual(len(transcript.Cds), 3419 * 3)
+        self.assertEqual(len(transcript.cds), 3419 * 3)
         self.assertEqual(len(transcript.ProteinSeq), 3418)
 
     def test_translated_exons(self):
@@ -200,10 +200,10 @@ class TestGene(GenomeTestBase):
         # the following works because we enforce the length being divisble by 3
         # in producing ProteinSeq
         prot_seq = transcript.ProteinSeq
-        # BUT if you work off the Cds you will need to slice the CDS to be
+        # BUT if you work off the cds you will need to slice the CDS to be
         # divisible by 3 to get the same protein sequence
         l = transcript.get_cds_length()
-        trunc_cds = transcript.Cds[: l - (l % 3)]
+        trunc_cds = transcript.cds[: l - (l % 3)]
         prot_seq = trunc_cds.get_translation()
         self.assertEqual(str(prot_seq),
                          'MPSSPLRVAVVCSSNQNRSMEAHNILSKRGFSVRSFGTGTHVKLPGPAPDKPNVYDFKTT'
@@ -223,7 +223,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(str(seq), 'HMLSKVGMWDFDIFLFDRLTN')
 
     def test_cds_from_outofphase(self):
-        """return a translatable Cds sequence from out-of-phase start"""
+        """return a translatable cds sequence from out-of-phase start"""
         # canonical transcript phase end_phase
         # ENSG00000111729 ENST00000229332 -1 -1
         # ENSG00000177151 ENST00000317450 0 -1
@@ -241,7 +241,7 @@ class TestGene(GenomeTestBase):
         stable_id = 'ENSG00000012048'
         gene = self.human.get_gene_by_stableid(stableid=stable_id)
         self.assertTrue(len(gene.transcripts) > 1)
-        # .. and correctly construct the Cds and location
+        # .. and correctly construct the cds and location
         for transcript in gene.transcripts:
             self.assertTrue(transcript.get_cds_length() > 0)
             self.assertEqual(transcript.location.coord_name, '17')
@@ -253,7 +253,7 @@ class TestGene(GenomeTestBase):
                                           ('ENSG00000206629', 164)]:
             gene = self.human.get_gene_by_stableid(stableid=stable_id)
             ts = gene.get_longest_cds_transcript()
-            self.assertEqual(len(ts.Cds), max_cds_length)
+            self.assertEqual(len(ts.cds), max_cds_length)
             self.assertEqual(ts.get_cds_length(), max(gene.get_cds_lengths()))
 
     def test_get_longest_cds_transcript1(self):
@@ -264,7 +264,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(ts.get_cds_length(), max(gene.get_cds_lengths()))
 
     def test_rna_transcript_cds(self):
-        """should return a Cds for an RNA gene too"""
+        """should return a cds for an RNA gene too"""
         rna_gene = self.human.get_gene_by_stableid(stableid='ENSG00000210049')
         self.assertTrue(rna_gene.transcripts[0].get_cds_length() > 0)
 
@@ -354,11 +354,11 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.canonical_transcript.stableid,
                          transcript.stableid)
         self.assertEqual(
-            brca2.canonical_transcript.get_cds_length(), len(transcript.Cds))
-        self.assertEqual(str(brca2.canonical_transcript.Cds),
-                         str(transcript.Cds))
-        self.assertEqual(str(brca2.canonical_transcript.Cds),
-                         str(transcript.Cds))
+            brca2.canonical_transcript.get_cds_length(), len(transcript.cds))
+        self.assertEqual(str(brca2.canonical_transcript.cds),
+                         str(transcript.cds))
+        self.assertEqual(str(brca2.canonical_transcript.cds),
+                         str(transcript.cds))
         self.assertEqual(str(brca2.canonical_transcript.seq),
                          str(transcript.seq))
         self.assertEqual(brca2.stableid, gene.stableid)
@@ -653,7 +653,7 @@ class TestFeatures(GenomeTestBase):
         minus_seq = minus.get_annotated_seq(feature_types='gene')
         # the seqs should be the rc of each other
         self.assertEqual(str(plus_seq), str(minus_seq.rc()))
-        # the Cds, however, from the annotated sequences should be identical
+        # the cds, however, from the annotated sequences should be identical
         plus_cds = plus_seq.get_annotations_matching('CDS')[0]
         minus_cds = minus_seq.get_annotations_matching('CDS')[0]
         self.assertEqual(str(plus_cds.get_slice()), str(minus_cds.get_slice()))

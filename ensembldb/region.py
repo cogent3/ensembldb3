@@ -430,7 +430,7 @@ class Gene(_StableRegion):
         return features
 
     def get_cds_lengths(self):
-        """returns the Cds lengths from transcripts with the same biotype.
+        """returns the cds lengths from transcripts with the same biotype.
         returns None if no transcripts."""
         if self.transcripts is self.NULL_VALUE:
             return None
@@ -439,7 +439,7 @@ class Gene(_StableRegion):
         return l
 
     def get_longest_cds_transcript(self):
-        """returns the Transcript with the longest Cds and the same biotype"""
+        """returns the Transcript with the longest cds and the same biotype"""
         result = sorted([(ts.get_cds_length(), ts) for ts in self.transcripts
                          if ts.biotype == self.biotype])
 
@@ -708,7 +708,7 @@ class Transcript(_StableRegion):
 
     def _make_cds_seq(self):
         if self.exons is self.NULL_VALUE:
-            self._cached['Cds'] = self.NULL_VALUE
+            self._cached['cds'] = self.NULL_VALUE
             return
 
         exons = [self.exons, self.translated_exons][self._am_prot_coding]
@@ -730,29 +730,29 @@ class Transcript(_StableRegion):
                 'N' * exons[-1].phase_end, name=full_seq.name)
             full_seq += fill
 
-        self._cached['Cds'] = full_seq
+        self._cached['cds'] = full_seq
 
     def _get_cds(self):
-        return self._get_cached_value('Cds', self._make_cds_seq)
+        return self._get_cached_value('cds', self._make_cds_seq)
 
-    Cds = property(_get_cds)
+    cds = property(_get_cds)
 
     def get_cds_length(self):
-        """returns the length of the Cds. If this property is not available,
+        """returns the length of the cds. If this property is not available,
         returns None."""
-        if self.Cds is self.NULL_VALUE:
+        if self.cds is self.NULL_VALUE:
             return None
         exons = [self.exons, self.translated_exons][self._am_prot_coding]
         return sum(map(len, exons))
 
     def _make_protein_seq(self):
-        if not self._am_prot_coding or self.Cds is self.NULL_VALUE:
+        if not self._am_prot_coding or self.cds is self.NULL_VALUE:
             self._cached['ProteinSeq'] = self.NULL_VALUE
             return
 
         DEBUG = False
         # enforce multiple of 3
-        cds = self.Cds
+        cds = self.cds
         length = len(cds)
         cds = cds[: length - (length % 3)]
         try:

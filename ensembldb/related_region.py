@@ -81,7 +81,7 @@ class RelatedGenes(_RelatedRegions):
         return self.__str__()
 
     def get_max_cds_lengths(self):
-        """returns the vector of maximum Cds lengths from member transcripts"""
+        """returns the vector of maximum cds lengths from member transcripts"""
         return [max(member.get_cds_lengths()) for member in self.members]
 
 

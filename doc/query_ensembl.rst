@@ -146,7 +146,7 @@ Gene's also have a location. The length of a gene is the difference between its 
     
 Each location is directly tied to the parent genome and the coordinate above also shows the coordinates' *type* (chromosome in this case), name (13), start, end and strand. The start and end positions are python indices and will differ from the Ensembl indices in that start will be the Ensembl index - 1. This is because python counts from 0, not 1. In querying for regions using a specific set of coordinates, it is possible to put in the Ensembl coordinates (demonstrated below).
 
-``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``canonical_transcript`` and ``transcripts``. ``canonical_transcript`` is the characteristic transcript for a gene, as defined by Ensembl. ``transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``exons``, ``introns``, a ``Cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
+``Gene`` has several useful properties, including the ability to directly get their own DNA sequence and their ``canonical_transcript`` and ``transcripts``. ``canonical_transcript`` is the characteristic transcript for a gene, as defined by Ensembl. ``transcripts`` is a ``tuple`` attribute containing individual region instances of type ``Transcript``. A ``Transcript`` has ``exons``, ``introns``, a ``cds`` and, if the ``biotype`` is protein coding, a protein sequence. In the following we grab the cannonical transcript from ``brca2``
 
 .. doctest::
 
@@ -154,7 +154,7 @@ Each location is directly tied to the parent genome and the coordinate above als
     protein_coding
     >>> print brca2.seq
     GGGCTTGTGGCGC...
-    >>> print brca2.canonical_transcript.Cds
+    >>> print brca2.canonical_transcript.cds
     ATGCCTATTGGATC...
     >>> print brca2.canonical_transcript.ProteinSeq
     MPIGSKERPTF...
@@ -170,10 +170,10 @@ It is also possible to iterate over a transcript's exons, over their translated 
     >>> for exon in transcript.translated_exons:
     ...     print exon, exon.location
     Exon(stableid=ENSE00001484009, rank=2) Homo sapiens:chromosome:13:...
-    >>> print transcript.Cds
+    >>> print transcript.cds
     ATGCCTATTGGATCCAAA...
 
-The ``Cds`` sequence includes the stop-codon, if present. The reason for this is there are many annotated transcripts in the Ensembl database the length of whose transcribed exons are not divisible by 3. Hence we leave it to the user to decide how to deal with that, but mention here that determining the number of complete codons is trivial and you can slice the ``Cds`` so that it's length is divisible by 3.
+The ``cds`` sequence includes the stop-codon, if present. The reason for this is there are many annotated transcripts in the Ensembl database the length of whose transcribed exons are not divisible by 3. Hence we leave it to the user to decide how to deal with that, but mention here that determining the number of complete codons is trivial and you can slice the ``cds`` so that it's length is divisible by 3.
 
 The ``exons`` and ``translated_exons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``seq`` attribute). Similar descriptions apply to the ``introns`` property and ``Intron`` class. We show just for the canonical transcript.
 
@@ -186,14 +186,14 @@ The ``exons`` and ``translated_exons`` properties are tuples that are evaluated 
     Intron(TranscriptId=ENST00000380152, rank=3)...
 
 
-The ``Gene`` region also has convenience methods for examining properties of it's transcripts, in presenting the ``Cds`` lengths and getting the ``Transcript`` encoding the longest ``Cds``.
+The ``Gene`` region also has convenience methods for examining properties of it's transcripts, in presenting the ``cds`` lengths and getting the ``transcript`` encoding the longest ``cds``.
 
 .. doctest::
 
     >>> print brca2.get_cds_lengths()
     [10257, 10257]
     >>> longest = brca2.get_longest_cds_transcript()
-    >>> print longest.Cds
+    >>> print longest.cds
     ATGCCTATTGGATCCAAA...
 
 All Regions have a ``get_features`` method which differs from that on genome only in that the genomic coordinates are automatically entered for you. Regions also have the ability to return their sequence as an annotated ``cogent`` sequence. The method on ``Gene`` simply queries the parent genome using the gene's own location as the coordinate for the currently supported region types. We will query ``brca2`` asking for gene features, the end-result will be a ``cogent`` sequence that can be used to obtain the CDS, for instance, using the standard ``cogent`` annotation capabilities.
@@ -228,14 +228,14 @@ The genome can be queried for any of these types, for instance we'll query for `
     ...
     Gene(species='Homo sapiens'; biotype='rRNA'; description='RNA, 5S...
 
-This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``transcripts`` will have ``ProteinSeq==None`` and ``translated_exons==None``, but it will have ``exons`` and a ``Cds``.
+This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``transcripts`` will have ``ProteinSeq==None`` and ``translated_exons==None``, but it will have ``exons`` and a ``cds``.
 
 .. doctest::
 
     >>> transcript = gene.transcripts[0]
     >>> assert transcript.ProteinSeq == None
     >>> assert transcript.translated_exons == None
-    >>> assert transcript.Cds != None
+    >>> assert transcript.cds != None
 
 Getting ESTs
 ^^^^^^^^^^^^
@@ -407,7 +407,7 @@ I could also have done that query using a ``stableid``, which I now do using the
      relationships=ortholog_one2one
       Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer...
 
-The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
+The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
 
 .. doctest::
 
@@ -416,7 +416,7 @@ The ``RelatedGenes`` object has a number of properties allowing you to get acces
     >>> print orthologs.get_seqLengths()
     [40748, 84793, 47117]
 
-In addition there's a ``get_max_cds_lengths`` method for returning the lengths of the longest ``Cds`` from each member.
+In addition there's a ``get_max_cds_lengths`` method for returning the lengths of the longest ``cds`` from each member.
 
 .. doctest::
 
