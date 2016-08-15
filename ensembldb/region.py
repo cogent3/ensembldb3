@@ -495,7 +495,7 @@ class Transcript(_StableRegion):
         gene = self.genome.get_gene_by_stableid(record[0])
         return gene
 
-    Gene = property(_get_gene)
+    gene = property(_get_gene)
 
     def _get_transcript_stable_id_record(self):
         table_name = self._attr_ensembl_table_map['stableid']

@@ -349,7 +349,7 @@ class TestGene(GenomeTestBase):
         stable_id = 'ENST00000380152'
         transcript = self.human.get_transcript_by_stableid(stableid=stable_id)
         self.assertEqual(transcript.stableid, stable_id)
-        gene = transcript.Gene
+        gene = transcript.gene
         brca2 = self.human.get_gene_by_stableid(stableid='ENSG00000139618')
         self.assertEqual(brca2.canonical_transcript.stableid,
                          transcript.stableid)
@@ -369,7 +369,7 @@ class TestGene(GenomeTestBase):
         brca2 = self.human.get_gene_by_stableid(stableid='ENSG00000139618')
         transcript = self.human.get_transcript_by_stableid(
             stableid='ENST00000380152')
-        self.assertEqual(transcript.Gene.symbol, brca2.symbol)
+        self.assertEqual(transcript.gene.symbol, brca2.symbol)
 
     def test_intron_number(self):
         """number of introns should be correct"""
