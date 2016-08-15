@@ -156,7 +156,7 @@ Each location is directly tied to the parent genome and the coordinate above als
     GGGCTTGTGGCGC...
     >>> print brca2.canonical_transcript.cds
     ATGCCTATTGGATC...
-    >>> print brca2.canonical_transcript.ProteinSeq
+    >>> print brca2.canonical_transcript.protein_seq
     MPIGSKERPTF...
 
 It is also possible to iterate over a transcript's exons, over their translated exons, or to obtain their coding DNA sequence. We grab the second transcript for this.
@@ -228,12 +228,12 @@ The genome can be queried for any of these types, for instance we'll query for `
     ...
     Gene(species='Homo sapiens'; biotype='rRNA'; description='RNA, 5S...
 
-This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``transcripts`` will have ``ProteinSeq==None`` and ``translated_exons==None``, but it will have ``exons`` and a ``cds``.
+This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``transcripts`` will have ``protein_seq==None`` and ``translated_exons==None``, but it will have ``exons`` and a ``cds``.
 
 .. doctest::
 
     >>> transcript = gene.transcripts[0]
-    >>> assert transcript.ProteinSeq == None
+    >>> assert transcript.protein_seq == None
     >>> assert transcript.translated_exons == None
     >>> assert transcript.cds != None
 

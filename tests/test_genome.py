@@ -176,18 +176,18 @@ class TestGene(GenomeTestBase):
         transcript = self.brca2.get_member('ENST00000380152')
         self.assertEqual(len(transcript.translated_exons), 26)
         self.assertEqual(len(transcript.cds), 3419 * 3)
-        self.assertEqual(len(transcript.ProteinSeq), 3418)
+        self.assertEqual(len(transcript.protein_seq), 3418)
 
     def test_translated_exons(self):
         """should correctly translate a gene with 2 exons but 1st exon
         transcribed"""
         gene = self.mouse.get_gene_by_stableid(stableid='ENSMUSG00000036136')
         transcript = gene.get_member('ENSMUST00000041133')
-        self.assertTrue(len(transcript.ProteinSeq) > 0)
+        self.assertTrue(len(transcript.protein_seq) > 0)
         # now one on the - strand
         gene = self.mouse.get_gene_by_stableid(stableid='ENSMUSG00000045912')
         transcript = gene.transcripts[0]
-        self.assertTrue(len(transcript.ProteinSeq) > 0)
+        self.assertTrue(len(transcript.protein_seq) > 0)
 
     def test_failed_ensembl_annotation(self):
         """we demonstrate a failed annotation by ensembl"""
@@ -198,8 +198,8 @@ class TestGene(GenomeTestBase):
         gene = self.macaq.get_gene_by_stableid(stableid='ENSMMUG00000001551')
         transcript = gene.get_member('ENSMMUT00000002194')
         # the following works because we enforce the length being divisble by 3
-        # in producing ProteinSeq
-        prot_seq = transcript.ProteinSeq
+        # in producing protein_seq
+        prot_seq = transcript.protein_seq
         # BUT if you work off the cds you will need to slice the CDS to be
         # divisible by 3 to get the same protein sequence
         l = transcript.get_cds_length()
@@ -234,7 +234,7 @@ class TestGene(GenomeTestBase):
         for index, stable_id in enumerate(canon_ids):
             gene = self.human.get_gene_by_stableid(stableid=stable_id)
             transcript = gene.canonical_transcript
-            prot_seq = transcript.ProteinSeq
+            prot_seq = transcript.protein_seq
 
     def test_gene_transcripts(self):
         """should return multiple transcripts"""

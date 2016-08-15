@@ -747,7 +747,7 @@ class Transcript(_StableRegion):
 
     def _make_protein_seq(self):
         if not self._am_prot_coding or self.cds is self.NULL_VALUE:
-            self._cached['ProteinSeq'] = self.NULL_VALUE
+            self._cached['protein_seq'] = self.NULL_VALUE
             return
 
         DEBUG = False
@@ -768,12 +768,12 @@ class Transcript(_StableRegion):
                 sys.stderr.write('\n'.join(map(str, out)) + '\n')
             raise
 
-        self._cached['ProteinSeq'] = cds.get_translation()
+        self._cached['protein_seq'] = cds.get_translation()
 
     def _get_protein_seq(self):
-        return self._get_cached_value('ProteinSeq', self._make_protein_seq)
+        return self._get_cached_value('protein_seq', self._make_protein_seq)
 
-    ProteinSeq = property(_get_protein_seq)
+    protein_seq = property(_get_protein_seq)
 
     def _get_exon_feature_data(self, parent_map):
         """returns the exon feature data"""
