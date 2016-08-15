@@ -35,7 +35,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0040286")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
-        self.assertEqual("ortholog_one2one", Orthologs.Relationships[0])
+        self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
 
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""

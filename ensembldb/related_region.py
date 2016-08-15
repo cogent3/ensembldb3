@@ -63,17 +63,17 @@ class _RelatedRegions(LazyRecord):
 class RelatedGenes(_RelatedRegions):
     type = 'related_genes'
 
-    def __init__(self, compara, members, Relationships):
+    def __init__(self, compara, members, relationships):
         super(RelatedGenes, self).__init__()
         self.compara = compara
         self.members = tuple(members)
-        self.Relationships = Relationships
+        self.relationships = relationships
 
     def __str__(self):
         my_type = self.__class__.__name__
 
         display = ['%s:' % my_type,
-                   ' Relationships=%s' % self.Relationships]
+                   ' relationships=%s' % self.relationships]
         display += ['  %s' % m for m in self.members]
         return '\n'.join(display)
 

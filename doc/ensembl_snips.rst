@@ -411,7 +411,7 @@ We get the one-to-one orthologs for *BRCA2*.
     ...                  Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
-     Relationships=ortholog_one2one
+     relationships=ortholog_one2one
       Gene(species='Macaca mulatta'; biotype='protein_coding'; description=...
 
 We iterate over the related members.
@@ -479,6 +479,6 @@ Get within species paralogs
     ...             Relationship='within_species_paralog')
     >>> print paralogs
     RelatedGenes:
-     Relationships=within_species_paralog
+     relationships=within_species_paralog
       Gene(species='Homo sapiens'; biotype='protein_coding'; description='H2A histone...
 

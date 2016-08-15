@@ -393,7 +393,7 @@ So we use the ``brca2`` instance above and search for orthologs among the human,
     ...                 Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
-     Relationships=ortholog_one2one
+     relationships=ortholog_one2one
       Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer ...
 
 I could also have done that query using a ``stableid``, which I now do using the Ensembl mouse identifier for *Brca2*.
@@ -404,7 +404,7 @@ I could also have done that query using a ``stableid``, which I now do using the
     ...                 Relationship='ortholog_one2one')
     >>> print orthologs
     RelatedGenes:
-     Relationships=ortholog_one2one
+     relationships=ortholog_one2one
       Gene(species='Rattus norvegicus'; biotype='protein_coding'; description='breast cancer...
 
 The ``RelatedGenes`` object has a number of properties allowing you to get access to data. A ``members`` attribute holds each of the ``Gene`` instances displayed above. The length of this attribute tells you how many hits there were, while each member has all of the capabilities described for ``Gene`` above, eg. a ``Cds`` property. There is also a ``get_seqLengths`` method which returns the vector of sequence lengths for the members. This method returns just the lengths of the individual genes.
@@ -439,7 +439,7 @@ We can also search for other relationship types, which we do here for a histone.
     ...             Relationship='within_species_paralog')
     >>> print paralogs
     RelatedGenes:
-     Relationships=within_species_paralog
+     relationships=within_species_paralog
       Gene(species='Homo sapiens'; biotype='protein_coding'; description='H2A...
 
 Getting Comparative Alignments

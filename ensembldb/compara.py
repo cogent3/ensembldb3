@@ -276,7 +276,7 @@ class Compara(object):
 
         if not data:
             return None
-        return RelatedGenes(self, data, Relationships=relationships)
+        return RelatedGenes(self, data, relationships=relationships)
 
     def _get_dnafrag_id_for_coord(self, coord):
         """returns the dnafrag_id for the coordnate"""

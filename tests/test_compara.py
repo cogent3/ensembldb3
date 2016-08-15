@@ -54,7 +54,7 @@ class TestCompara(ComparaTestBase):
         brca2 = self.comp.Mouse.get_gene_by_stableid("ENSMUSG00000041147")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               Relationship="ortholog_one2one")
-        self.assertEqual("ortholog_one2one", Orthologs.Relationships[0])
+        self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
 
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""
