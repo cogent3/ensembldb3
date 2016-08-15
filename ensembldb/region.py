@@ -685,26 +685,26 @@ class Transcript(_StableRegion):
 
     def _make_utr_seq(self):
         if self.untranslated_exons_5 is None and self.untranslated_exons_3 is None:
-            self._cached["Utr5"] = self.NULL_VALUE
-            self._cached["Utr3"] = self.NULL_VALUE
+            self._cached["utr5"] = self.NULL_VALUE
+            self._cached["utr3"] = self.NULL_VALUE
             return
         Utr5_seq, Utr3_seq = DNA.make_seq(""), DNA.make_seq("")
         for exon in self.untranslated_exons_5:
             Utr5_seq += exon.seq
         for exon in self.untranslated_exons_3:
             Utr3_seq += exon.seq
-        self._cached["Utr5"] = Utr5_seq
-        self._cached["Utr3"] = Utr3_seq
+        self._cached["utr5"] = Utr5_seq
+        self._cached["utr3"] = Utr3_seq
 
     def _get_utr5_seq(self):
-        return self._get_cached_value("Utr5", self._make_utr_seq)
+        return self._get_cached_value("utr5", self._make_utr_seq)
 
-    Utr5 = property(_get_utr5_seq)
+    utr5 = property(_get_utr5_seq)
 
     def _get_utr3_seq(self):
-        return self._get_cached_value("Utr3", self._make_utr_seq)
+        return self._get_cached_value("utr3", self._make_utr_seq)
 
-    Utr3 = property(_get_utr3_seq)
+    utr3 = property(_get_utr3_seq)
 
     def _make_cds_seq(self):
         if self.exons is self.NULL_VALUE:
