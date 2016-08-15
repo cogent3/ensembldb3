@@ -166,10 +166,10 @@ It is also possible to iterate over a transcript's exons, over their translated 
     >>> transcript = brca2.Transcripts[0]
     >>> for exon in transcript.Exons:
     ...     print exon, exon.location
-    Exon(stableid=ENSE00001184784, Rank=1) Homo sapiens:chromosome:13:...
+    Exon(stableid=ENSE00001184784, rank=1) Homo sapiens:chromosome:13:...
     >>> for exon in transcript.TranslatedExons:
     ...     print exon, exon.location
-    Exon(stableid=ENSE00001484009, Rank=2) Homo sapiens:chromosome:13:...
+    Exon(stableid=ENSE00001484009, rank=2) Homo sapiens:chromosome:13:...
     >>> print transcript.Cds
     ATGCCTATTGGATCCAAA...
 
@@ -181,9 +181,9 @@ The ``Exons`` and ``TranslatedExons`` properties are tuples that are evaluated o
 
     >>> for intron in brca2.CanonicalTranscript.Introns:
     ...     print intron
-    Intron(TranscriptId=ENST00000380152, Rank=1)
-    Intron(TranscriptId=ENST00000380152, Rank=2)
-    Intron(TranscriptId=ENST00000380152, Rank=3)...
+    Intron(TranscriptId=ENST00000380152, rank=1)
+    Intron(TranscriptId=ENST00000380152, rank=2)
+    Intron(TranscriptId=ENST00000380152, rank=3)...
 
 
 The ``Gene`` region also has convenience methods for examining properties of it's transcripts, in presenting the ``Cds`` lengths and getting the ``Transcript`` encoding the longest ``Cds``.

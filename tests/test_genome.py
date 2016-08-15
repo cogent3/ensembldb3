@@ -415,7 +415,7 @@ class TestGene(GenomeTestBase):
                 exp_seq3 = exp_introns[idx]
                 self.assertEqual(loc.strand, strand)
                 # test the order using rank
-                self.assertEqual(intron.Rank, exp_rank)
+                self.assertEqual(intron.rank, exp_rank)
                 # test position
                 self.assertEqual(start, exp_start)
                 self.assertEqual(end, exp_end)

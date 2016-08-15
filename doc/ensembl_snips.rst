@@ -190,7 +190,7 @@ We show just for the canonical transcript.
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> print brca2.CanonicalTranscript.Exons[0]
-    Exon(stableid=ENSE00001184784, Rank=1)
+    Exon(stableid=ENSE00001184784, rank=1)
 
 Get the introns for a transcript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,9 +204,9 @@ We show just for the canonical transcript.
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> for intron in brca2.CanonicalTranscript.Introns:
     ...     print intron
-    Intron(TranscriptId=ENST00000380152, Rank=1)
-    Intron(TranscriptId=ENST00000380152, Rank=2)
-    Intron(TranscriptId=ENST00000380152, Rank=3)...
+    Intron(TranscriptId=ENST00000380152, rank=1)
+    Intron(TranscriptId=ENST00000380152, rank=2)
+    Intron(TranscriptId=ENST00000380152, rank=3)...
 
 
 Inspect the genomic coordinate for a feature

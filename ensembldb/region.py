@@ -620,7 +620,7 @@ class Transcript(_StableRegion):
             sys.stderr.write('\n'.join(map(str, out)) + '\n')
 
         new_start_exon = Exon(self.genome, self.db, start_exon.exon_id,
-                              start_exon.Rank, location=coord)
+                              start_exon.rank, location=coord)
         translated_exons = (new_start_exon,) +\
             self.Exons[start_index + 1:end_index]
         if start_index != end_index:
@@ -629,7 +629,7 @@ class Transcript(_StableRegion):
             shift_end = [seq_end - len(end_exon), 0][flip_coords]
             coord = end_exon.location.resized(shift_start, shift_end)
             new_end_exon = Exon(self.genome, self.db, end_exon.exon_id,
-                                end_exon.Rank, location=coord)
+                                end_exon.rank, location=coord)
             translated_exons += (new_end_exon,)
         self._cached['TranslatedExons'] = translated_exons
 
@@ -650,7 +650,7 @@ class Transcript(_StableRegion):
         start_exon, end_exon = translated_exons[0], translated_exons[-1]
         flip_coords = start_exon.location.strand == -1
 
-        for exon in exons[0:start_exon.Rank]:   # get 5'UTR
+        for exon in exons[0:start_exon.rank]:   # get 5'UTR
             coord = exon.location.copy()
             if exon.stableid == start_exon.stableid:
                 coord.start = [coord.start,
@@ -658,15 +658,15 @@ class Transcript(_StableRegion):
                 coord.end = [start_exon.location.start, coord.end][flip_coords]
             if len(coord) != 0:
                 untranslated_5exons.append(Exon(self.genome, self.db,
-                                                exon.exon_id, exon.Rank, location=coord))
-        for exon in exons[end_exon.Rank - 1: num_exons]:  # get 3'UTR
+                                                exon.exon_id, exon.rank, location=coord))
+        for exon in exons[end_exon.rank - 1: num_exons]:  # get 3'UTR
             coord = exon.location.copy()
             if exon.stableid == end_exon.stableid:
                 coord.start = [end_exon.location.end, coord.start][flip_coords]
                 coord.end = [coord.end, end_exon.location.start][flip_coords]
             if len(coord) != 0:
                 untranslated_3exons.append(Exon(self.genome, self.db,
-                                                exon.exon_id, exon.Rank, location=coord))
+                                                exon.exon_id, exon.rank, location=coord))
 
         self._cached["UntranslatedExons5"] = tuple(untranslated_5exons)
         self._cached["UntranslatedExons3"] = tuple(untranslated_3exons)
@@ -762,7 +762,7 @@ class Transcript(_StableRegion):
                 raise
             out = ['\n****\nFAILED=%s' % self.stableid]
             for exon in self.TranslatedExons:
-                out += ['TranslatedExon[rank=%d]\n' % exon.Rank, exon,
+                out += ['TranslatedExon[rank=%d]\n' % exon.rank, exon,
                         exon.location,
                         '%s ... %s' % (exon.Seq[:20], exon.Seq[-20:])]
                 sys.stderr.write('\n'.join(map(str, out)) + '\n')
@@ -857,7 +857,7 @@ class Transcript(_StableRegion):
 class Exon(_StableRegion):
     type = 'exon'
 
-    def __init__(self, genome, db, exon_id, Rank, location=None):
+    def __init__(self, genome, db, exon_id, rank, location=None):
         """created by a Gene"""
         _StableRegion.__init__(self, genome, db, location=location)
 
@@ -866,23 +866,23 @@ class Exon(_StableRegion):
                                             location='exon')
 
         self.exon_id = exon_id
-        self.Rank = Rank
+        self.rank = rank
 
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return '%s(stableid=%s, Rank=%s)' % (my_type, self.stableid, self.Rank)
+        return '%s(stableid=%s, rank=%s)' % (my_type, self.stableid, self.rank)
 
     def __lt__(self, other):
-        return self.Rank < other.Rank
+        return self.rank < other.rank
 
     def __eq__(self, other):
-        return self.Rank == other.Rank
+        return self.rank == other.rank
 
     def __ne__(self, other):
-        return self.Rank != other.Rank
+        return self.rank != other.rank
 
     def _get_exon_stable_id_record(self):
         if self.genome.general_release >= 65:
@@ -907,7 +907,7 @@ class Exon(_StableRegion):
         self._table_rows['exon'] = record
 
     def _make_symbol(self):
-        self._cached['symbol'] = '%s-%s' % (self.stableid, self.Rank)
+        self._cached['symbol'] = '%s-%s' % (self.stableid, self.rank)
 
     def _get_symbol(self):
         return self._get_cached_value('symbol', self._make_symbol)
@@ -940,18 +940,18 @@ class Intron(GenericRegion):
     def __init__(self, genome, db, rank, transcript_stable_id, location=None):
         GenericRegion.__init__(self, genome, db, location=location)
         self.TranscriptStableId = transcript_stable_id
-        self.Rank = rank
+        self.rank = rank
 
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return '%s(TranscriptId=%s, Rank=%s)' % (my_type,
-                                                 self.TranscriptStableId, self.Rank)
+        return '%s(TranscriptId=%s, rank=%s)' % (my_type,
+                                                 self.TranscriptStableId, self.rank)
 
     def _make_symbol(self):
-        self._cached['symbol'] = '%s-%s' % (self.TranscriptStableId, self.Rank)
+        self._cached['symbol'] = '%s-%s' % (self.TranscriptStableId, self.rank)
 
     def _get_symbol(self):
         return self._get_cached_value('symbol', self._make_symbol)
