@@ -1345,9 +1345,9 @@ class Repeat(GenericRegion):
     def __init__(self, genome, db, location, Score, data):
         super(Repeat, self).__init__(genome=genome, db=db, location=location)
         self._attr_ensembl_table_map = dict(symbol='repeat_consensus',
-                                            RepeatType='repeat_consensus',
-                                            RepeatClass='repeat_consensus',
-                                            Consensus='repeat_consensus')
+                                            repeat_type='repeat_consensus',
+                                            repeat_class='repeat_consensus',
+                                            consensus='repeat_consensus')
 
         self.Score = Score
         # assume always created from repeat_feature table
@@ -1373,9 +1373,9 @@ class Repeat(GenericRegion):
         self._table_rows['repeat_consensus'] = record
         limit_length = lambda x: DisplayString(x, repr_length=10)
         attr_column_map = [('symbol', 'repeat_name', _quoted),
-                           ('RepeatClass', 'repeat_class', _quoted),
-                           ('RepeatType', 'repeat_type', _quoted),
-                           ('Consensus', 'repeat_consensus', limit_length)]
+                           ('repeat_class', 'repeat_class', _quoted),
+                           ('repeat_type', 'repeat_type', _quoted),
+                           ('consensus', 'repeat_consensus', limit_length)]
         self._populate_cache_from_record(attr_column_map, 'repeat_consensus')
 
     def _get_symbol(self):
@@ -1385,19 +1385,19 @@ class Repeat(GenericRegion):
     symbol = property(_get_symbol)
 
     def _get_repeat_class(self):
-        return self._get_cached_value('RepeatClass',
+        return self._get_cached_value('repeat_class',
                                       self._get_repeat_consensus_record)
 
-    RepeatClass = property(_get_repeat_class)
+    repeat_class = property(_get_repeat_class)
 
     def _get_repeat_type(self):
-        return self._get_cached_value('RepeatType',
+        return self._get_cached_value('repeat_type',
                                       self._get_repeat_consensus_record)
 
-    RepeatType = property(_get_repeat_type)
+    repeat_type = property(_get_repeat_type)
 
     def _get_consensus(self):
-        return self._get_cached_value('Consensus',
+        return self._get_cached_value('consensus',
                                       self._get_repeat_consensus_record)
 
-    Consensus = property(_get_consensus)
+    consensus = property(_get_consensus)

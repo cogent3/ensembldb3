@@ -235,7 +235,7 @@ We query the genome for repeats within a specific coordinate range on chromosome
     >>> human = Genome('human', release=76, account=account)
     >>> repeats = human.get_features(coord_name='13', start=32305473, end=32315473, feature_types='repeat')
     >>> for repeat in repeats:
-    ...     print repeat.RepeatClass
+    ...     print repeat.repeat_class
     ...     print repeat
     ...     break
     SINE/Alu
