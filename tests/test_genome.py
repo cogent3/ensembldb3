@@ -174,7 +174,7 @@ class TestGene(GenomeTestBase):
     def test_get_exons(self):
         """transcript should return correct exons for brca2"""
         transcript = self.brca2.get_member('ENST00000380152')
-        self.assertEqual(len(transcript.TranslatedExons), 26)
+        self.assertEqual(len(transcript.translated_exons), 26)
         self.assertEqual(len(transcript.Cds), 3419 * 3)
         self.assertEqual(len(transcript.ProteinSeq), 3418)
 
@@ -304,12 +304,12 @@ class TestGene(GenomeTestBase):
         # just returns the first
         exon_id = 'ENSE00001484009'
         exon = transcript.get_member(exon_id)
-        trans_exon = transcript.get_member(exon_id, 'TranslatedExons')
+        trans_exon = transcript.get_member(exon_id, 'translated_exons')
         self.assertEqual(exon.stableid, exon_id)
         self.assertEqual(trans_exon.stableid, exon_id)
         # we check we got Exon in the first call and TranslatedExon in the
         # second using the fact that the exons entry is longer than the
-        # TranslatedExons one
+        # translated_exons one
         self.assertGreaterThan(len(exon), len(trans_exon))
 
     def test_get_by_biotype(self):

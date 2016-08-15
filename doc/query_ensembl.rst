@@ -167,7 +167,7 @@ It is also possible to iterate over a transcript's exons, over their translated 
     >>> for exon in transcript.exons:
     ...     print exon, exon.location
     Exon(stableid=ENSE00001184784, rank=1) Homo sapiens:chromosome:13:...
-    >>> for exon in transcript.TranslatedExons:
+    >>> for exon in transcript.translated_exons:
     ...     print exon, exon.location
     Exon(stableid=ENSE00001484009, rank=2) Homo sapiens:chromosome:13:...
     >>> print transcript.Cds
@@ -175,7 +175,7 @@ It is also possible to iterate over a transcript's exons, over their translated 
 
 The ``Cds`` sequence includes the stop-codon, if present. The reason for this is there are many annotated transcripts in the Ensembl database the length of whose transcribed exons are not divisible by 3. Hence we leave it to the user to decide how to deal with that, but mention here that determining the number of complete codons is trivial and you can slice the ``Cds`` so that it's length is divisible by 3.
 
-The ``exons`` and ``TranslatedExons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``seq`` attribute). Similar descriptions apply to the ``introns`` property and ``Intron`` class. We show just for the canonical transcript.
+The ``exons`` and ``translated_exons`` properties are tuples that are evaluated on demand and can be sliced. Each ``Exon/TranslatedExon`` is itself a region, with all of the properties of generic regions (like having a ``seq`` attribute). Similar descriptions apply to the ``introns`` property and ``Intron`` class. We show just for the canonical transcript.
 
 .. doctest::
 
@@ -228,13 +228,13 @@ The genome can be queried for any of these types, for instance we'll query for `
     ...
     Gene(species='Homo sapiens'; biotype='rRNA'; description='RNA, 5S...
 
-This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``transcripts`` will have ``ProteinSeq==None`` and ``TranslatedExons==None``, but it will have ``exons`` and a ``Cds``.
+This has the effect of returning any gene whose ``biotype`` includes the phrase ``rRNA``. If a gene is not a protein coding gene, as in the current case, then it's ``transcripts`` will have ``ProteinSeq==None`` and ``translated_exons==None``, but it will have ``exons`` and a ``Cds``.
 
 .. doctest::
 
     >>> transcript = gene.transcripts[0]
     >>> assert transcript.ProteinSeq == None
-    >>> assert transcript.TranslatedExons == None
+    >>> assert transcript.translated_exons == None
     >>> assert transcript.Cds != None
 
 Getting ESTs

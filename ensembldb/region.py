@@ -258,7 +258,7 @@ class _StableRegion(GenericRegion):
 
         Arguments:
             - member_types: the property to be searched, depends on self.type.
-              transcripts for genes, exons/TranslatedExons for transcripts."""
+              transcripts for genes, exons/translated_exons for transcripts."""
 
         member_types = member_types or self._member_types
         if type(member_types) == str:
@@ -451,7 +451,7 @@ class Gene(_StableRegion):
 
 class Transcript(_StableRegion):
     type = 'transcript'
-    _member_types = ['exons', 'TranslatedExons']
+    _member_types = ['exons', 'translated_exons']
 
     def __init__(self, genome, db, transcript_id, data, location=None):
         """created by Gene"""
@@ -461,7 +461,7 @@ class Transcript(_StableRegion):
                                                       'transcript'][genome.general_release >= 65],
                                             location='transcript',
                                             status='transcript',
-                                            TranslatedExons='translation')
+                                            translated_exons='translation')
 
         self._am_prot_coding = None
         self.transcript_id = transcript_id
@@ -570,7 +570,7 @@ class Transcript(_StableRegion):
         try:
             record = asserted_one(query.execute())
         except NoItemError:
-            self._set_null_values(['TranslatedExons'], 'translation')
+            self._set_null_values(['translated_exons'], 'translation')
             return
 
         self._table_rows['translation'] = record
@@ -631,20 +631,20 @@ class Transcript(_StableRegion):
             new_end_exon = Exon(self.genome, self.db, end_exon.exon_id,
                                 end_exon.rank, location=coord)
             translated_exons += (new_end_exon,)
-        self._cached['TranslatedExons'] = translated_exons
+        self._cached['translated_exons'] = translated_exons
 
     def _get_translated_exons(self):
-        return self._get_cached_value('TranslatedExons', self._get_transcript)
+        return self._get_cached_value('translated_exons', self._get_transcript)
 
-    TranslatedExons = property(_get_translated_exons)
+    translated_exons = property(_get_translated_exons)
 
     def _calculate_Utr_exons(self):
         # TODO clean up this code
         exons = self.exons
-        translated_exons = self.TranslatedExons
+        translated_exons = self.translated_exons
         num_exons = len(self.exons)
         if not translated_exons:
-            self._set_null_values(["UntranslatedExons5", "UntranslatedExons3"])
+            self._set_null_values(["untranslated_exons_5", "untranslated_exons_3"])
             return
         untranslated_5exons, untranslated_3exons = [], []
         start_exon, end_exon = translated_exons[0], translated_exons[-1]
@@ -668,30 +668,30 @@ class Transcript(_StableRegion):
                 untranslated_3exons.append(Exon(self.genome, self.db,
                                                 exon.exon_id, exon.rank, location=coord))
 
-        self._cached["UntranslatedExons5"] = tuple(untranslated_5exons)
-        self._cached["UntranslatedExons3"] = tuple(untranslated_3exons)
+        self._cached["untranslated_exons_5"] = tuple(untranslated_5exons)
+        self._cached["untranslated_exons_3"] = tuple(untranslated_3exons)
 
     def _get_5prime_untranslated_exons(self):
-        return self._get_cached_value("UntranslatedExons5",
+        return self._get_cached_value("untranslated_exons_5",
                                       self._calculate_Utr_exons)
 
-    UntranslatedExons5 = property(_get_5prime_untranslated_exons)
+    untranslated_exons_5 = property(_get_5prime_untranslated_exons)
 
     def _get_3prime_untranslated_exons(self):
-        return self._get_cached_value("UntranslatedExons3",
+        return self._get_cached_value("untranslated_exons_3",
                                       self._calculate_Utr_exons)
 
-    UntranslatedExons3 = property(_get_3prime_untranslated_exons)
+    untranslated_exons_3 = property(_get_3prime_untranslated_exons)
 
     def _make_utr_seq(self):
-        if self.UntranslatedExons5 is None and self.UntranslatedExons3 is None:
+        if self.untranslated_exons_5 is None and self.untranslated_exons_3 is None:
             self._cached["Utr5"] = self.NULL_VALUE
             self._cached["Utr3"] = self.NULL_VALUE
             return
         Utr5_seq, Utr3_seq = DNA.make_seq(""), DNA.make_seq("")
-        for exon in self.UntranslatedExons5:
+        for exon in self.untranslated_exons_5:
             Utr5_seq += exon.seq
-        for exon in self.UntranslatedExons3:
+        for exon in self.untranslated_exons_3:
             Utr3_seq += exon.seq
         self._cached["Utr5"] = Utr5_seq
         self._cached["Utr3"] = Utr3_seq
@@ -711,7 +711,7 @@ class Transcript(_StableRegion):
             self._cached['Cds'] = self.NULL_VALUE
             return
 
-        exons = [self.exons, self.TranslatedExons][self._am_prot_coding]
+        exons = [self.exons, self.translated_exons][self._am_prot_coding]
         full_seq = None
         for exon in exons:
             if full_seq is None:
@@ -742,7 +742,7 @@ class Transcript(_StableRegion):
         returns None."""
         if self.Cds is self.NULL_VALUE:
             return None
-        exons = [self.exons, self.TranslatedExons][self._am_prot_coding]
+        exons = [self.exons, self.translated_exons][self._am_prot_coding]
         return sum(map(len, exons))
 
     def _make_protein_seq(self):
@@ -761,7 +761,7 @@ class Transcript(_StableRegion):
             if not DEBUG:
                 raise
             out = ['\n****\nFAILED=%s' % self.stableid]
-            for exon in self.TranslatedExons:
+            for exon in self.translated_exons:
                 out += ['TranslatedExon[rank=%d]\n' % exon.rank, exon,
                         exon.location,
                         '%s ... %s' % (exon.seq[:20], exon.seq[-20:])]
@@ -802,10 +802,10 @@ class Transcript(_StableRegion):
     def _get_translated_exon_feature_data(self, parent_map):
         """returns featureD data for translated exons"""
         features = []
-        if self.TranslatedExons is self.NULL_VALUE:
+        if self.translated_exons is self.NULL_VALUE:
             return features
         cds_spans = []
-        for exon in self.TranslatedExons:
+        for exon in self.translated_exons:
             feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
@@ -821,12 +821,12 @@ class Transcript(_StableRegion):
         # TODO: Simplify this part
         features = []
         utr5_spans, utr3_spans = [], []
-        for exon in self.UntranslatedExons5:
+        for exon in self.untranslated_exons_5:
             feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
             utr5_spans.extend(feature_data[-1].spans)
-        for exon in self.UntranslatedExons3:
+        for exon in self.untranslated_exons_3:
             feature_data = exon.feature_data(parent_map)
             if feature_data is None:
                 continue
@@ -849,7 +849,7 @@ class Transcript(_StableRegion):
         features = self._get_exon_feature_data(parent_map)
         features += self._get_intron_feature_data(parent_map)
         features += self._get_translated_exon_feature_data(parent_map)
-        if self.TranslatedExons:
+        if self.translated_exons:
             features += self._get_Utr_feature_data(parent_map)
         return features
 
