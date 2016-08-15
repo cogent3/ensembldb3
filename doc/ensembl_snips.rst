@@ -365,7 +365,7 @@ alignment method in the vertebrates clade:
     >>> aligned_pairs = [r for r in regions]
     >>> alignment = aligned_pairs[0]                                                            
     >>> aligned_regions = [m for m in alignment.members
-    ...                    if m.Region is not None]
+    ...                    if m.region is not None]
     >>> source_region, target_region = aligned_regions
     >>> print source_region.location.coord_name, source_region.location.start, source_region.location.end
     X 155754928 155755079

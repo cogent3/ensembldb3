@@ -501,7 +501,7 @@ class Genome(object):
     def get_features(self, region=None, feature_types=None, where_feature=None,
                     coord_name=None, start=None, end=None, strand=None,
                     ensembl_coord=False):
-        """returns Region instances for the specified location"""
+        """returns region instances for the specified location"""
         if isinstance(feature_types, str):
             feature_types = [feature_types]
         feature_types = [ft.lower() for ft in feature_types]

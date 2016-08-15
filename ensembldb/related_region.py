@@ -108,25 +108,25 @@ class SyntenicRegion(LazyRecord):
                 region = location
             else:
                 region = genome.get_region(region=location)
-            self._cached['Region'] = region
+            self._cached['region'] = region
 
         for identifier, value in list(dict(identifiers_values).items()):
             self._cached[identifier] = value
 
     def __len__(self):
-        return len(self._get_cached_value('Region', self._make_map_func))
+        return len(self._get_cached_value('region', self._make_map_func))
 
     def _get_location(self):
-        region = self._get_cached_value('Region', self._make_map_func)
+        region = self._get_cached_value('region', self._make_map_func)
         return region.location
 
     location = property(_get_location)
 
     def _get_region(self):
-        region = self._get_cached_value('Region', self._make_map_func)
+        region = self._get_cached_value('region', self._make_map_func)
         return region
 
-    Region = property(_get_region)
+    region = property(_get_region)
 
     def _get_cigar_record(self):
         genomic_align_table = \
@@ -173,7 +173,7 @@ class SyntenicRegion(LazyRecord):
         region_loc = ref_location.copy()
         region_loc.strand = block_loc.strand
         region = self.genome.get_region(region=region_loc)
-        self._cached['Region'] = region
+        self._cached['region'] = region
 
     def _make_map_from_ref(self):
         # this is the 'other' species
@@ -209,12 +209,12 @@ class SyntenicRegion(LazyRecord):
             region = self.genome.get_region(region=loc)
         except IndexError:  # TODO ask Hua where these index errors occur
             region = None
-        self._cached['Region'] = region
+        self._cached['region'] = region
 
     def _make_aligned(self, feature_types=None, where_feature=None):
         if self.aln_loc is None or self.aln_map is None:  # is this required?
             self._make_map_func()
-        region = self._cached['Region']
+        region = self._cached['region']
         if region is None:
             self._cached['AlignedSeq'] = None
             return
@@ -236,7 +236,7 @@ class SyntenicRegion(LazyRecord):
 
     def get_annotated_aligned(self, feature_types, where_feature=None):
         """returns aligned seq annotated for the specified feature types"""
-        region = self._get_cached_value('Region', self._make_map_func)
+        region = self._get_cached_value('region', self._make_map_func)
         if region is None:
             return None
         self._make_aligned(feature_types=feature_types,
@@ -273,7 +273,7 @@ class SyntenicRegions(_RelatedRegions):
 
         display = ['%s:' % my_type]
         display += ['  %r' % m.location for m in self.members
-                    if m.Region is not None]
+                    if m.region is not None]
         return '\n'.join(display)
 
     def __repr__(self):
@@ -293,7 +293,7 @@ class SyntenicRegions(_RelatedRegions):
         if self._do_rc is not None:
             return self._do_rc
         self._populate_ref()
-        inferred = self.ref_member._cached['Region'].location.strand
+        inferred = self.ref_member._cached['region'].location.strand
         self._do_rc = self.ref_location.strand != inferred
         return self._do_rc
 
