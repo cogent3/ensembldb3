@@ -304,12 +304,12 @@ We allow the query to be an inexact match by setting ``like=True``. Again we'll 
     GCTGAGAAAAT...
     >>> assert str(nsyn_variant.seq) in nsyn_variant.Alleles, str(nsyn_variant.seq)
 
-As a standard feature, ``Variation`` within a specific interval can also be obtained. Using the ``brca2`` gene region instance created above, we can find all the genetic variants using the ``Variants`` property of genome regions. We use this example to also demonstrate the ``PeptideAlleles`` and ``TranslationLocation`` attributes. ``PeptideAlleles`` is the amino-acid variation resulting from the nucleotide variation while ``TranslationLocation`` is the position in the translated peptide of the variant. If a variant does not affect protein coding sequence (either it's not exonic or it's a synonymous variant) then these properties have the value ``None``.
+As a standard feature, ``Variation`` within a specific interval can also be obtained. Using the ``brca2`` gene region instance created above, we can find all the genetic variants using the ``variants`` property of genome regions. We use this example to also demonstrate the ``PeptideAlleles`` and ``TranslationLocation`` attributes. ``PeptideAlleles`` is the amino-acid variation resulting from the nucleotide variation while ``TranslationLocation`` is the position in the translated peptide of the variant. If a variant does not affect protein coding sequence (either it's not exonic or it's a synonymous variant) then these properties have the value ``None``.
 We illustrate their use.
 
 .. doctest::
 
-    >>> for variant in brca2.Variants:
+    >>> for variant in brca2.variants:
     ...     if variant.PeptideAlleles is None:
     ...         continue
     ...     print variant.PeptideAlleles, variant.TranslationLocation
@@ -317,7 +317,7 @@ We illustrate their use.
 
 .. note:: These are Python coordinates, add 1 to get the Ensembl value.
 
-We can also use a slightly more involved query to find all variants within the gene of a specific type. (Of course, you could also simply iterate over the ``Variants`` attribute to grab these out too.)
+We can also use a slightly more involved query to find all variants within the gene of a specific type. (Of course, you could also simply iterate over the ``variants`` attribute to grab these out too.)
 
 .. doctest::
 

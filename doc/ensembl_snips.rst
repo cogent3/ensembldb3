@@ -272,9 +272,9 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> transcript = brca2.CanonicalTranscript
-    >>> print transcript.Variants
+    >>> print transcript.variants
     (<cogent.db.ensembl.region.Variation object at ...
-    >>> for variant in transcript.Variants:
+    >>> for variant in transcript.variants:
     ...     print variant
     ...     break
     Variation(symbol='rs370721506'; effect=['non_coding_exon_variant', 'nc_transcript_variant', '5_prime...

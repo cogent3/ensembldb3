@@ -118,14 +118,14 @@ class _Region(LazyRecord):
 
     def _get_variants(self):
         """constructs the variants attribute"""
-        if 'Variants' not in self._cached:
+        if 'variants' not in self._cached:
             variants = self.genome.get_features(
                 feature_types='variation', region=self)
-            self._cached['Variants'] = tuple(variants)
+            self._cached['variants'] = tuple(variants)
 
-        return self._cached['Variants']
+        return self._cached['variants']
 
-    Variants = property(_get_variants)
+    variants = property(_get_variants)
 
     def feature_data(self, parent_map):
         symbol = self.symbol or getattr(self, 'stableid', '')

@@ -325,7 +325,7 @@ class TestGene(GenomeTestBase):
 
     def test_variant(self):
         """variant attribute correctly constructed"""
-        self.assertTrue(len(self.brca2.Variants) > 880)
+        self.assertTrue(len(self.brca2.variants) > 880)
 
     def test_get_gene_by_stable_id(self):
         """should correctly handle getting gene by stable_id"""
