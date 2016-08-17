@@ -12,7 +12,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 23
+release = 32
 account = HostAccount('mysql-eg-publicsql.ebi.ac.uk',
                       'anonymous', '', port=4157)
 
@@ -32,7 +32,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
     def test_get_related_genes(self):
         """should correctly return the related gene regions from each genome"""
         # using sc35, a splicing factor
-        sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0040286")
+        sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0265298")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
         self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
@@ -48,7 +48,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
 
     def test_get_collection(self):
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid(
-            stableid="FBgn0040286")
+            stableid="FBgn0265298")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               Relationship="ortholog_one2one")
         collection = Orthologs.get_seq_collection()
@@ -59,15 +59,10 @@ class MZ_Genome(TestCase):
 
     def test_get_general_release(self):
         """should correctly infer the general release"""
-        rel_lt_65 = Genome('D.melanogaster', release=22, account=account)
-        self.assertEqual(rel_lt_65.general_release, 75)
-        self.assertEqual(rel_lt_65.CoreDb.db_name,
-                         'drosophila_melanogaster_core_22_75_546')
-
-        rel_gt_65 = Genome('D.melanogaster', release=23, account=account)
-        self.assertEqual(rel_gt_65.general_release, 76)
-        self.assertEqual(rel_gt_65.CoreDb.db_name,
-                         'drosophila_melanogaster_core_23_76_546')
+        rel_gt_65 = Genome('D.melanogaster', release=32, account=account)
+        self.assertEqual(rel_gt_65.general_release, 85)
+        self.assertEqual(rel_gt_65.CoreDb.db_name.name,
+                         'drosophila_melanogaster_core_32_85_6')
 
 
 if __name__ == "__main__":
