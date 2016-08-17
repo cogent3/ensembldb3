@@ -1,3 +1,4 @@
+from collections import defaultdict
 import sqlalchemy as sql
 
 from cogent3.util import table as cogent_table
@@ -113,3 +114,19 @@ class Database(object):
             rows.append(['%s.%s' % (self.db_name, name), count])
 
         return cogent_table.Table(header=['name', 'count'], rows=rows)
+
+# used to store commonly looked up attribs
+# there are restrictions imposed at present but a
+# key structure
+class _CachedDbAttribs(defaultdict):
+    """used to store common lookups"""
+    def __init__(self):
+        super(_CachedDbAttribs, self).__init__(lambda: None)
+    
+    def add_to_cache(self, db, key, val):
+        """just ensure we have 2 element keys"""
+        self[(db, key)] = val
+    
+
+cached_attribs = _CachedDbAttribs()
+

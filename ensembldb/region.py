@@ -11,6 +11,7 @@ from .util import LazyRecord, asserted_one, DisplayString, \
 from .assembly import Coordinate, CoordSystem, \
     location_query, assembly_exception_coordinate
 from .sequence import get_sequence
+from .database import cached_attribs
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2007-2012, The Cogent Project"
@@ -985,6 +986,8 @@ class Variation(_Region):
         self.transcript_variation_table = get_table('transcript_variation')
         self.allele_table = get_table('allele')
         self.variation_table = get_table('variation')
+        self.attr_table = get_table("attrib")
+        self.attrib_type_tab = get_table("attrib_type")
         try:
             self.allele_code_table = get_table('allele_code')
         except sql.exceptions.ProgrammingError:
@@ -1038,9 +1041,15 @@ class Variation(_Region):
         attr_name_map = [('effect', consequence_type, _set_to_string),
                          ('alleles', 'allele_string', _quoted),
                          ('symbol', 'variation_name', _quoted),
-                         ('validation', 'validation_status', _set_to_string),
                          ('map_weight', 'map_weight', int),
                          ('somatic', 'somatic', bool)]
+        
+        if self.genome.general_release < 83:
+            attr_name_map.append(
+                         ('validation', 'validation_status', _set_to_string))
+        else:
+            attr_name_map.append(('validation', 'evidence_attribs', lambda x: x))            
+        
         self._populate_cache_from_record(attr_name_map, 'variation_feature')
         # TODO handle obtaining the variation_feature if we were created in
         # any way other than through the symbol or effect
@@ -1205,11 +1214,29 @@ class Variation(_Region):
 
     symbol = property(_get_symbol)
 
-    def _get_validation(self):
-        return self._get_cached_value('validation',
-                                      self._get_variation_table_record)
-
-    validation = property(_get_validation)
+    @property
+    def validation(self):
+        result = self._get_cached_value('validation',
+                                        self._get_variation_table_record)        
+        if self.genome.general_release < 83:
+            # we need to access cached descriptions
+            return result
+        
+        mapping = cached_attribs[(self.genome, "validation")]
+        if mapping is None:
+            attr = self.attr_table
+            attr_ty = self.attrib_type_tab
+            query = sql.select([attr.c.attrib_id, attr.c.value],
+                               sql.and_(attr.c.attrib_type_id==attr_ty.c.attrib_type_id,
+                                        attr_ty.c.name == 'Variant evidence status'))
+            mapping = dict((str(i), v) for i,v in query.execute().fetchall())
+            cached_attribs.add_to_cache(self.genome, "validation", mapping)
+        
+        out = [mapping[k] for k in sorted(result)]
+        result = set(out)
+        
+        return result
+            
 
     def _get_map_weight(self):
         return self._get_cached_value('map_weight',
@@ -1275,14 +1302,19 @@ class Variation(_Region):
         for record in records:
             if not record[consequence_type] & self_effect:
                 continue
-            pep_alleles += [record[pep_allele_string]]
+            
+            allele = record[pep_allele_string]
+            if not allele:
+                continue
+            
+            pep_alleles += [allele]
             translation_location += [record['translation_start']]
 
         if not pep_alleles:
             self._cached['peptide_alleles'] = self.NULL_VALUE
             self._cached['translation_location'] = self.NULL_VALUE
             return
-
+        
         # we only want unique allele strings
         allele_location = dict(list(zip(pep_alleles, translation_location)))
         pep_alleles = list(set(pep_alleles))

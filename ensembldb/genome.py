@@ -115,6 +115,9 @@ class Genome(object):
     def __ne__(self, other):
         return self.CoreDb != other.CoreDb
 
+    def __hash__(self):
+        return hash((self.species, self.release, self._account))
+
     def _connect_db(self, db_type):
         connection = dict(account=self._account, release=self.release,
                           species=self.species, pool_recycle=self._pool_recycle)
@@ -558,7 +561,7 @@ class Genome(object):
               provided
             - symbol: the external or ensembl identifier - returns the exact
               match
-            - validated: variant has validation_status != None
+            - validated: variant has validation != None
             - somatic: exclude somatic mutations
             - flanks_match_ref: flanking sequence matches the reference
             - limit: only return this number of hits"""
@@ -582,6 +585,10 @@ class Genome(object):
             query = var_feature_table.c.variation_name == symbol
 
         if validated:
+            validated_col = "evidence_attribs"
+            if self.general_release < 83:
+                validated_col = "validation_status"
+            
             # in release 65, the default validated status is now ''
             # why?? thanks Ensembl!
             null = None
@@ -589,7 +596,7 @@ class Genome(object):
                 null = ''
 
             query = sql.and_(
-                query, var_feature_table.c.validation_status != null)
+                query, var_feature_table.columns[validated_col] != null)
 
         if not somatic:
             query = sql.and_(query, var_feature_table.c.somatic != 1)

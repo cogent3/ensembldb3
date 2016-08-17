@@ -18,7 +18,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 81
+release = 85
 
 NULL_VALUE = None
 
@@ -157,7 +157,7 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.symbol.lower(), 'brca2')
         self.assertEqual(brca2.stableid, 'ENSG00000139618')
         self.assertEqual(brca2.biotype.lower(), 'protein_coding')
-        self.assertContains(brca2.description.lower(), 'breast cancer')
+        self.assertContains(brca2.description.lower(), 'dna repair associated')
         self.assertEqual(brca2.status, 'KNOWN')
         self.assertEqual(brca2.canonical_transcript.stableid,
                          'ENST00000380152')
@@ -294,7 +294,7 @@ class TestGene(GenomeTestBase):
     def test_get_by_description(self):
         """if get by description, all attributes should be correctly
         constructed"""
-        description = 'breast cancer 2'
+        description = 'brca2'
         results = list(self.human.get_genes_matching(description=description))
         self._eval_brca2(results[0])
 
