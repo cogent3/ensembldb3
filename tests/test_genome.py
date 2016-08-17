@@ -441,11 +441,11 @@ class TestGene(GenomeTestBase):
 class TestVariation(GenomeTestBase):
     snp_names = ['rs34213141', 'rs12791610',
         'rs10792769', 'rs11545807', 'rs11270496']
-    snp_nt_alleles = ['G/A', 'C/T', 'A/G', 'C/A', 'CAGCTCCAGCTC/-']
+    snp_nt_alleles = ['G/A/C', 'C/T', 'A/G', 'C/A', 'CAGCTCCAGCTC/-']
     snp_aa_alleles = ['G/R', 'P/L', 'Y/C', 'V/F', 'GAGAV/V']
-    snp_effects = [['intron_variant', 'missense_variant'],
-                   ['intron_variant', 'missense_variant'],
-                   ['intron_variant', 'missense_variant'],
+    snp_effects = [['missense_variant'],
+                   ['missense_variant'],
+                   ['missense_variant'],
                    ['upstream_gene_variant', 'missense_variant',
                     'regulatory_region_variant'],
                    ['non_synonymous_codon']]
@@ -460,17 +460,33 @@ class TestVariation(GenomeTestBase):
          'CTGCTGCAAGCCCGTGTGCTGCTGTGTTCCAGCCTGTTCCTGCTCTAGCTGTGGCAAGCGGGGCTGTGGCTCCTGTGGGGGCTCCAAGGGAGGCTGTGGTTCTTGTGGCTGCTCCCAGTGCAGTTGCTGCAAGCCCTGCTGTTGCTCTTCAGGCTGTGGGTCATCCTGCTGCCAGTGCAGCTGCTGCAAGCCCTACTGCTCCCAGTGCAGCTGCTGTAAGCCCTGTTGCTCCTCCTCGGGTCGTGGGTCATCCTGCTGCCAATCCAGCTGCTGCAAGCCCTGCTGCTCATCCTCAGGCTG'),
         ('GCTGAAGAAACCATTTCAAACAGGATTGGAATAGGGAAACCCGGCACTCAGCTCGGCGCAAGCCGGCGGTGCCTTCAGACTAGAGAGCCTCTCCTCCGGTGCGCTGCAAGTAGGGCCTCGGCTCGAGGTCAACATTCTAGTTGTCCAGCGCTCCCTCTCCGGCACCTCGGTGAGGCTAGTTGACCCGACAGGCGCGGATCATGAGCAGCTGCAGGAGAATGAAGAGCGGGGACGTAATGAGGCCGAACCAGAGCTCCCGAGTCTGCTCCGCCAGCTTCTGGCACAACAGCATCTCGAAGA',
          'GAACTTGAGACTCAGGACCGTAAGTACCCAGAAAAGGCGGAGCACCGCCAGCCGCTTCTCTCCATCCTGGAAGAGGCGCACGGACACGATGGTGGTGAAGTAGGTGCTGAGCCCGTCAGCGGCGAAGAAAGGCACGAACACGTTCCACCAGGAGAGGCCCGGGACCAGGCCATCCACACGCAGTGCCAGCAGCACAGAGAACACCAACAGGGCCAGCAGGTGCACGAAGATCTCGAAGGTGGCGAAGCCTAGCCACTGCACCAGCTCCCGGAGCGAGAAGAGCATCGCGCCCGTTGAGCG')]
-    ancestral = [None, None, None, 'C', None]
+    ancestral = ['G', 'C', 'G', 'C', None]
 
+    cached_snps = {}
+    
+    def _get_snp(self, name, **kwargs):
+        """cache standard SNPs"""
+        if name in self.cached_snps:
+            return self.cached_snps[name]
+        snp = list(self.human.get_variation(symbol=name, flanks_match_ref=False,
+                                            **kwargs))[0]
+        self.cached_snps[name] = snp
+        return snp
+    
     def test_get_variation_by_symbol(self):
         """should return correct snp when query genome by symbol"""
         # supplement this test with some synonymous snp's, where they have no
         # peptide alleles
         for i in range(4):
-            snp = list(self.human.get_variation(symbol=self.snp_names[i]))[0]
+            snp = self._get_snp(self.snp_names[i])
             self.assertEqual(snp.ancestral, self.ancestral[i])
             self.assertEqual(snp.symbol, self.snp_names[i])
-            self.assertEqual(set(snp.effect), set(self.snp_effects[i]))
+            if isinstance(snp.effect, str):
+                effect = set([snp.effect])
+            else:
+                effect = set(snp.effect)
+            
+            self.assertEqual(effect, set(self.snp_effects[i]))
             self.assertEqual(snp.alleles, self.snp_nt_alleles[i])
             self.assertEqual(snp.map_weight, self.map_weights[i])
 
@@ -478,20 +494,19 @@ class TestVariation(GenomeTestBase):
         """somatic attribute of variants should be correct"""
         symbols_somatic = [('COSM256414', True), ('rs80359189', False)]
         for symbol, expect in symbols_somatic:
-            snp = list(self.human.get_variation(symbol=symbol, somatic=True,
-                                               flanks_match_ref=False))[0]
+            snp = self._get_snp(symbol, somatic=True)
             self.assertEqual(snp.somatic, expect)
 
     def test_num_alleles(self):
         """should correctly infer the number of alleles"""
         for i in range(4):
-            snp = list(self.human.get_variation(symbol=self.snp_names[i]))[0]
+            snp = self._get_snp(self.snp_names[i])
             self.assertEqual(len(snp), self.snp_nt_len[i])
 
     def test_get_peptide_alleles(self):
         """should correctly infer the peptide alleles"""
         for i in range(4):
-            snp = list(self.human.get_variation(symbol=self.snp_names[i]))[0]
+            snp = self._get_snp(self.snp_names[i])
             if 'missense_variant' not in snp.effect:
                 continue
 
@@ -499,13 +514,13 @@ class TestVariation(GenomeTestBase):
 
     def test_no_pep_alleles(self):
         """handle case where coding_sequence_variant has no peptide alleles"""
-        snp = list(self.human.get_variation(symbol='CM033341'))[0]
+        snp = self._get_snp('CM033341')
         self.assertTrue(snp.peptide_alleles is None)
 
     def test_get_peptide_location(self):
         """should return correct location for aa variants"""
         index = self.snp_names.index('rs11545807')
-        snp = list(self.human.get_variation(symbol=self.snp_names[index]))[0]
+        snp = self._get_snp('rs11545807')
         self.assertEqual(snp.translation_location, 95)
 
     def test_validation_status(self):
@@ -515,12 +530,15 @@ class TestVariation(GenomeTestBase):
                 x = [x]
             return set(x)
 
-        data = (('rs34213141', set(['freq']), func),
-                ('rs12791610', set(['cluster', 'freq']), func),
-                ('rs10792769', set(['cluster', 'freq', '1000Genome',
-                                    'hapmap', 'doublehit']), func))
+        data = (('rs34213141', set(['ESP', '1000Genomes', 'Frequency', 'ExAC']),
+                 func),
+                ('rs12791610', set(['ESP', '1000Genomes', 'Frequency', 'ExAC']),
+                 func),
+                ('rs10792769', set(['ESP', '1000Genomes', 'Frequency', 'HapMap',
+                                    'ExAC']),
+                 func))
         for name, status, conv in data:
-            snp = list(self.human.get_variation(symbol=name))[0]
+            snp = self._get_snp(name)
             got = conv(snp.validation)
             self.assertTrue(status & got)
 
@@ -528,25 +546,24 @@ class TestVariation(GenomeTestBase):
         """should correctly get the flanking sequence if matches reference genome"""
 
         for i in range(4):  # only have flanking sequence for 3
-            snp = list(self.human.get_variation(symbol=self.snp_names[i],
-                                               flanks_match_ref=False))[0]
+            snp = self._get_snp(self.snp_names[i])
             self.assertEqual(snp.flanking_seq, self.snp_flanks[i])
 
     def test_variation_seq(self):
         """should return the sequence for a Variation snp if asked"""
-        snp = list(self.human.get_variation(symbol=self.snp_names[0]))[0]
+        snp = self._get_snp(self.snp_names[0])
         self.assertContains(snp.alleles, str(snp.seq))
 
     def test_get_validation_condition(self):
         """simple test of SNP validation status"""
-        snp_status = [('rs94', False), ('rs90', True)]
+        snp_status = [('rs90', True)]
         for symbol, status in snp_status:
-            snp = list(self.human.get_variation(symbol=symbol, validated=True))
+            snp = self._get_snp(symbol)
             self.assertEqual(snp != [], status)
 
     def test_allele_freqs(self):
         """exercising getting AlleleFreq data"""
-        snp = list(self.human.get_variation(symbol='rs34213141'))[0]
+        snp = self._get_snp('rs34213141')
         expect = set([('A', '0.0303'), ('G', '0.9697')])
         allele_freqs = snp.allele_freqs
         allele_freqs = set((a, '%.4f' % f)
@@ -561,7 +578,7 @@ class TestVariation(GenomeTestBase):
     def test_complex_query(self):
         """only return non-somatic SNPs that are validated and match reference"""
         i = 0
-        limit = 10
+        limit = 4
         for snp in self.human.get_variation(effect='missense_variant', like=False,
                                            validated=True, somatic=False,
                                            flanks_match_ref=True, limit=limit):
@@ -572,7 +589,6 @@ class TestVariation(GenomeTestBase):
             i += 1
 
         self.assertEqual(i, limit)
-
 
 class TestFeatures(GenomeTestBase):
 
