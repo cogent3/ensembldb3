@@ -42,13 +42,25 @@ class _Region(LazyRecord):
         return len(self.location)
 
     def __lt__(self, other):
-        return self.location < other.location
+        try:
+            return self.location < other.location
+        except AttributeError:
+            raise TypeError("cannot compare %s to %s" % (self.__class__,
+                                                         other.__class__))
 
     def __eq__(self, other):
-        return self.location == other.location
+        try:
+            val = self.location == other.location
+        except AttributeError:
+            val = False
+        return val
 
     def __ne__(self, other):
-        return self.location != other.location
+        try:
+            val = self.location != other.location
+        except AttributeError:
+            val = True
+        return val
 
     def _make_location(self):
         row = self._table_rows[self._attr_ensembl_table_map['location']]
