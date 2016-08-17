@@ -1,7 +1,7 @@
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.host import HostAccount, get_ensembl_account
-from ensembldb.compara import Compara, Genome
+from ensembldb3.host import HostAccount, get_ensembl_account
+from ensembldb3.compara import Compara, Genome
 
 __author__ = "Jason Merkin"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

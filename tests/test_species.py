@@ -1,6 +1,6 @@
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.species import Species
+from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

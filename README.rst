@@ -1,6 +1,6 @@
-#########
-ensembldb
-#########
+##########
+ensembldb3
+##########
 
 This library provides capabilities for ensembl MySQL databases. The library began it's existence as ``cogent.db.ensembl`` in 2009. With the port of PyCogent to Python 3 it was decided to split it out into it's own project, making it more visible to users and simplifying the PyCogent3 dependencies.
 
@@ -15,7 +15,7 @@ Because PyCogent3 requires numpy be installed prior to installation, the followi
 ::
 
     $ pip install numpy
-    $ pip install hg+ssh://hg@bitbucket.org/pycogent3/ensembldb
+    $ pip install hg+ssh://hg@bitbucket.org/pycogent3/ensembldb3
 
 *****
 Usage

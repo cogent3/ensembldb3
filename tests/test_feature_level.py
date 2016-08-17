@@ -3,10 +3,10 @@ import os
 from cogent3 import DNA
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.host import HostAccount, get_ensembl_account
-from ensembldb.genome import Genome
-from ensembldb.assembly import CoordSystem, Coordinate, get_coord_conversion
-from ensembldb.feature_level import FeatureCoordLevels
+from ensembldb3.host import HostAccount, get_ensembl_account
+from ensembldb3.genome import Genome
+from ensembldb3.assembly import CoordSystem, Coordinate, get_coord_conversion
+from ensembldb3.feature_level import FeatureCoordLevels
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

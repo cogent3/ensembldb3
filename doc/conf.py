@@ -178,7 +178,7 @@ htmlhelp_basename = 'EnsemblDbDoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ensembldb.tex', u'PyCogent Documentation',
+  ('index', 'ensembldb3.tex', u'PyCogent Documentation',
    u'EnsemblDb Team', 'manual'),
 ]
 

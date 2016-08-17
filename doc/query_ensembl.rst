@@ -28,7 +28,7 @@ So the first step is to specify what host and account are to be used. On my lab'
     
     >>> import os
     >>> release = 76
-    >>> from ensembldb import HostAccount
+    >>> from ensembldb3 import HostAccount
     >>> if 'ENSEMBL_ACCOUNT' in os.environ:
     ...     host, username, password = os.environ['ENSEMBL_ACCOUNT'].split()
     ...     account = HostAccount(host, username, password)
@@ -42,7 +42,7 @@ Another key element, of course, is the species available. Included as part of ``
 
 .. doctest::
 
-    >>> from ensembldb import Species
+    >>> from ensembldb3 import Species
     >>> print Species
     ================================================================================
            Common Name                   Species Name              Ensembl Db Prefix
@@ -82,7 +82,7 @@ As implied above, Ensembl databases are versioned, hence you must explicitly sta
 
 .. doctest::
 
-    >>> from ensembldb import HostAccount, Genome
+    >>> from ensembldb3 import HostAccount, Genome
     >>> human = Genome(species='human', release=release, account=account)
     >>> print human
     Genome(species='Homo sapiens'; release='76')
@@ -363,7 +363,7 @@ The Ensembl compara database is represented by ``cogent.db.ensembl.compara.Compa
 
 .. doctest::
 
-    >>> from ensembldb import Compara
+    >>> from ensembldb3 import Compara
     >>> compara = Compara(['human', 'mouse', 'rat'], account=account,
     ...                  release=release)
     >>> print compara

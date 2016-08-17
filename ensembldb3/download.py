@@ -11,8 +11,8 @@ import click
 os.environ['DONT_USE_MPI'] = "1"
 from cogent3.util import parallel
 
-from ensembldb.species import Species
-from ensembldb.name import EnsemblDbName
+from ensembldb3.species import Species
+from ensembldb3.name import EnsemblDbName
 from .util import exec_command, abspath, makedirs, ENSEMBLDBRC
 
 __author__ = "Gavin Huttley"

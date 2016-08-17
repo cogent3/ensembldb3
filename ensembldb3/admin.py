@@ -344,7 +344,7 @@ def exportrc(outpath):
     """exports the rc directory to the nominated path
     
     setting an environment variable ENSEMBLDBRC with this path
-    will force it's contents to override the default ensembldb settings"""
+    will force it's contents to override the default ensembldb3 settings"""
     shutil.copytree(ENSEMBLDBRC, outpath)
     click.echo("Contents written to %s" % outpath)
     

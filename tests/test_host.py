@@ -2,10 +2,10 @@ import os
 
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.name import EnsemblDbName
-from ensembldb.host import get_db_name, get_latest_release,\
+from ensembldb3.name import EnsemblDbName
+from ensembldb3.host import get_db_name, get_latest_release,\
     DbConnection, HostAccount, get_ensembl_account
-from ensembldb.species import Species
+from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

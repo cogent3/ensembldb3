@@ -3,11 +3,11 @@ import os
 from cogent3 import DNA
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.host import HostAccount, get_ensembl_account
-from ensembldb.util import convert_strand
-from ensembldb.genome import Genome
-from ensembldb.sequence import _assemble_seq
-from ensembldb.util import asserted_one
+from ensembldb3.host import HostAccount, get_ensembl_account
+from ensembldb3.util import convert_strand
+from ensembldb3.genome import Genome
+from ensembldb3.sequence import _assemble_seq
+from ensembldb3.util import asserted_one
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

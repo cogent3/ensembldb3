@@ -9,7 +9,7 @@ Connecting
 
 .. doctest::
 
-    >>> from ensembldb import HostAccount
+    >>> from ensembldb3 import HostAccount
     >>> account = HostAccount('fastcomputer.topuni.edu', 'username',
     ...                       'somepass')
 
@@ -17,7 +17,7 @@ To specify a specific port to connect to MySQL on:
 
 .. doctest::
 
-    >>> from ensembldb import HostAccount
+    >>> from ensembldb3 import HostAccount
     >>> account = HostAccount('anensembl.server.edu', 'someuser',
     ...                       'somepass', port=3306)
 
@@ -37,7 +37,7 @@ To see what existing species are available
 
 .. doctest::
 
-    >>> from ensembldb import Species
+    >>> from ensembldb3 import Species
     >>> print Species
     ================================================================================
            Common Name                   Species Name              Ensembl Db Prefix
@@ -89,7 +89,7 @@ We query for the *BRCA2* gene for humans.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> print human
     Genome(species='Homo sapiens'; release='76')
@@ -107,7 +107,7 @@ We use the stable ID for *BRCA2*.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> gene = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> print gene
@@ -120,7 +120,7 @@ We look for breast cancer related genes that are estrogen induced.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> genes = human.get_genes_matching(description='breast cancer anti-estrogen')
     >>> for gene in genes:
@@ -144,7 +144,7 @@ We get the canonical transcripts for *BRCA2*.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> transcript = brca2.canonical_transcript
@@ -156,7 +156,7 @@ Get the CDS for a transcript
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> transcript = brca2.canonical_transcript
@@ -171,7 +171,7 @@ Look at all transcripts for a gene
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> for transcript in brca2.transcripts:
@@ -186,7 +186,7 @@ We show just for the canonical transcript.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> print brca2.canonical_transcript.exons[0]
@@ -199,7 +199,7 @@ We show just for the canonical transcript.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> for intron in brca2.canonical_transcript.introns:
@@ -214,7 +214,7 @@ Inspect the genomic coordinate for a feature
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> print brca2.location.coord_name
@@ -231,7 +231,7 @@ We query the genome for repeats within a specific coordinate range on chromosome
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> repeats = human.get_features(coord_name='13', start=32305473, end=32315473, feature_types='repeat')
     >>> for repeat in repeats:
@@ -248,7 +248,7 @@ We query the genome for CpG islands within a specific coordinate range on chromo
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> islands = human.get_features(coord_name='11', start=2129111, end=2149604, feature_types='cpg')
     >>> for island in islands:
@@ -268,7 +268,7 @@ We find the genetic variants for the canonical transcript of *BRCA2*.
 
 .. doctest::
 
-    >>> from ensembldb import Genome
+    >>> from ensembldb3 import Genome
     >>> human = Genome('human', release=76, account=account)
     >>> brca2 = human.get_gene_by_stableid(stableid='ENSG00000139618')
     >>> transcript = brca2.canonical_transcript
@@ -305,7 +305,7 @@ We create a ``Compara`` instance for human, chimpanzee and macaque.
 
 .. doctest::
 
-    >>> from ensembldb import Compara
+    >>> from ensembldb3 import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> print compara.method_species_links
@@ -326,7 +326,7 @@ We first get the syntenic region corresponding to human gene *BRCA2*.
 
 .. doctest::
 
-    >>> from ensembldb import Compara
+    >>> from ensembldb3 import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> human_brca2 = compara.Human.get_gene_by_stableid(stableid='ENSG00000139618')
@@ -391,7 +391,7 @@ What gene relationships are available
 
 .. doctest::
 
-    >>> from ensembldb import Compara
+    >>> from ensembldb3 import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> print compara.get_distinct('relationship')
@@ -404,7 +404,7 @@ We get the one-to-one orthologs for *BRCA2*.
 
 .. doctest::
 
-    >>> from ensembldb import Compara
+    >>> from ensembldb3 import Compara
     >>> compara = Compara(['human', 'chimp', 'macaque'], release=76,
     ...                  account=account)
     >>> orthologs = compara.get_related_genes(stableid='ENSG00000139618',

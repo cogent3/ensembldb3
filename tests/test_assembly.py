@@ -2,10 +2,10 @@ import os
 
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.host import HostAccount, get_ensembl_account
-from ensembldb.assembly import Coordinate, CoordSystem, \
+from ensembldb3.host import HostAccount, get_ensembl_account
+from ensembldb3.assembly import Coordinate, CoordSystem, \
     get_coord_conversion
-from ensembldb.genome import Genome
+from ensembldb3.genome import Genome
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

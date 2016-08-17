@@ -2,8 +2,8 @@ import os
 
 from cogent3.util.unit_test import TestCase, main
 
-from ensembldb.host import HostAccount, get_ensembl_account
-from ensembldb.database import Database
+from ensembldb3.host import HostAccount, get_ensembl_account
+from ensembldb3.database import Database
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

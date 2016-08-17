@@ -21,13 +21,13 @@ if sys.version_info < (3,5):
 short_description = "Ensembl DB"
 
 # This ends up displayed by the installer
-long_description = """ensembldb
+long_description = """ensembldb3
 A toolkit for querying the Ensembl MySQL databases.
 Version %s.
 """ % __version__
 
 setup(
-    name="ensembldb",
+    name="ensembldb3",
     version=__version__,
     url="http://github.com/pycogent/pycogent",
     author="Gavin Huttley, Hua Ying",
@@ -45,7 +45,7 @@ setup(
             "Topic :: Software Development :: Libraries :: Python Modules",
             "Operating System :: OS Independent",
             ],
-    packages=['ensembldb'],
+    packages=['ensembldb3'],
     dependency_links=['ssh://hg@bitbucket.org/pycogent3/pycogent3'],
     install_requires=[
               'numpy',
@@ -54,7 +54,7 @@ setup(
               'PyMySQL',
               'sqlalchemy'],
     entry_points={
-        'console_scripts': ['ensembl_admin=ensembldb.admin:main',
+        'console_scripts': ['ensembl_admin=ensembldb3.admin:main',
                             ],
     }
 )
