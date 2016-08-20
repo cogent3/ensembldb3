@@ -53,7 +53,7 @@ class TestCompara(ComparaTestBase):
         """should correctly return the related gene regions from each genome"""
         brca2 = self.comp.Mouse.get_gene_by_stableid("ENSMUSG00000041147")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
-                                              Relationship="ortholog_one2one")
+                                              relationship="ortholog_one2one")
         self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
 
     def test_get_related_genes2(self):
@@ -61,13 +61,13 @@ class TestCompara(ComparaTestBase):
         clec2d = self.comp.Mouse.get_gene_by_stableid(
             stableid='ENSMUSG00000030157')
         orthologs = self.comp.get_related_genes(gene_region=clec2d,
-                                              Relationship='ortholog_one2many')
+                                              relationship='ortholog_one2many')
         self.assertTrue(len(orthologs.members) < 4)
 
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
-                                              Relationship="ortholog_one2one")
+                                              relationship="ortholog_one2one")
         collection = Orthologs.get_seq_collection()
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
@@ -121,7 +121,7 @@ class TestCompara(ComparaTestBase):
                       'Mus musculus', 'Rattus norvegicus'])
         brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
         Orthologs = self.comp.get_related_genes(gene_region=brca1,
-                                              Relationship="ortholog_one2one")
+                                              relationship="ortholog_one2one")
         self.assertEqual(Orthologs.get_species_set(), expect)
 
     def test_pool_connection(self):

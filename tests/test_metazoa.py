@@ -34,7 +34,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         # using sc35, a splicing factor
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0265298")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
-                                              Relationship="ortholog_one2one")
+                                              relationship="ortholog_one2one")
         self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
 
     def test_get_related_genes2(self):
@@ -43,14 +43,14 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         brca2 = self.comp.Dmelanogaster.get_gene_by_stableid(
             stableid='FBgn0050169')
         orthologs = self.comp.get_related_genes(gene_region=brca2,
-                                              Relationship='ortholog_one2one')
+                                              relationship='ortholog_one2one')
         self.assertEqual(len(orthologs.members), 2)
 
     def test_get_collection(self):
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid(
             stableid="FBgn0265298")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
-                                              Relationship="ortholog_one2one")
+                                              relationship="ortholog_one2one")
         collection = Orthologs.get_seq_collection()
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
