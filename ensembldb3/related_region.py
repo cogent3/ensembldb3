@@ -57,7 +57,8 @@ class _RelatedRegions(LazyRecord):
 
     def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.location.species for m in self.members])
+        return set([m.location.species for m in self.members
+                    if m.location is not None])
 
 
 class RelatedGenes(_RelatedRegions):
@@ -66,7 +67,7 @@ class RelatedGenes(_RelatedRegions):
     def __init__(self, compara, members, relationships):
         super(RelatedGenes, self).__init__()
         self.compara = compara
-        self.members = tuple(members)
+        self.members = tuple(m for m in members if m.location is not None)
         self.relationships = relationships
 
     def __str__(self):
@@ -118,7 +119,8 @@ class SyntenicRegion(LazyRecord):
 
     def _get_location(self):
         region = self._get_cached_value('region', self._make_map_func)
-        return region.location
+        location = None if region is None else region.location
+        return location
 
     location = property(_get_location)
 
@@ -179,36 +181,38 @@ class SyntenicRegion(LazyRecord):
         # this is the 'other' species
         if self.aln_loc and self.aln_map is not None:
             return
+        
         record = self._cached
-        try:
-            aln_map, aln_loc = cigar.slice_cigar(self.cigar_line,
-                                                 self.parent.cigar_start,
-                                                 self.parent.cigar_end,
-                                                 by_align=True)
-            self.aln_map = aln_map
-            self.aln_loc = aln_loc  # probably unnecesary to store??
+        aln_map, aln_loc = cigar.slice_cigar(self.cigar_line,
+                                             self.parent.cigar_start,
+                                             self.parent.cigar_end,
+                                             by_align=True)
+        if not aln_loc:
+            self._cached['region'] = self.NULL_VALUE
+            return
+        
+        self.aln_map = aln_map
+        self.aln_loc = aln_loc  # probably unnecesary to store??
 
-            # we make a loc for the aligned region
-            block_loc = self.genome.make_location(coord_name=record['name'],
-                                                 start=record['dnafrag_start'],
-                                                 end=record['dnafrag_end'],
-                                                 strand=record[
-                                                     'dnafrag_strand'],
-                                                 ensembl_coord=True)
-            relative_start = aln_loc[0]
-            relative_end = aln_loc[1]
-            # new location with correct length ensembl_start
-            loc = block_loc.copy()
-            loc.end = loc.start + (relative_end - relative_start)
+        # we make a loc for the aligned region
+        block_loc = self.genome.make_location(coord_name=record['name'],
+                                             start=record['dnafrag_start'],
+                                             end=record['dnafrag_end'],
+                                             strand=record[
+                                                 'dnafrag_strand'],
+                                             ensembl_coord=True)
+        relative_start = aln_loc[0]
+        relative_end = aln_loc[1]
+        # new location with correct length ensembl_start
+        loc = block_loc.copy()
+        loc.end = loc.start + (relative_end - relative_start)
 
-            if block_loc.strand != 1:
-                shift = len(block_loc) - relative_end
-            else:
-                shift = relative_start
-            loc = loc.shifted(shift)
-            region = self.genome.get_region(region=loc)
-        except IndexError:  # TODO ask Hua where these index errors occur
-            region = None
+        if block_loc.strand != 1:
+            shift = len(block_loc) - relative_end
+        else:
+            shift = relative_start
+        loc = loc.shifted(shift)
+        region = self.genome.get_region(region=loc)
         self._cached['region'] = region
 
     def _make_aligned(self, feature_types=None, where_feature=None):
@@ -258,11 +262,14 @@ class SyntenicRegions(_RelatedRegions):
                 ref_member = SyntenicRegion(self, genome, dict(data),
                                             am_ref_member=True, location=ref_location)
             else:
-                mems += [SyntenicRegion(self, genome, dict(data),
-                                           am_ref_member=False)]
+                mem = SyntenicRegion(self, genome, dict(data),
+                                           am_ref_member=False)
+                mems.append(mem)
+                
 
         assert ref_member is not None, "Can't match a member to ref_location"
         self.ref_member = ref_member
+        
         self.members = tuple([ref_member] + mems)
         self.num_members = len(self.members)
         self.aln_loc = None

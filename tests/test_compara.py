@@ -213,6 +213,16 @@ class TestSyntenicRegions(TestCase):
         syntenic_regions = list(self.comp.get_syntenic_regions(region=gene,
                                                              align_method='PECAN',
                                                              align_clade='vertebrates'))
+    
+    def test_syntenic_species_missing(self):
+        """should not fail when a compara species has no syntenic region"""
+        gene = self.comp.Human.get_gene_by_stableid(stableid='ENSG00000104827')
+        syntenic = list(
+            self.comp.get_syntenic_regions(region=gene.canonical_transcript,
+                                         method_clade_id=756))[0]
+        species = syntenic.get_species_set()
+        self.assertEqual(species, set(["Homo sapiens", "Pan troglodytes"]))
+
 
 
 if __name__ == "__main__":
