@@ -405,7 +405,7 @@ class Genome(object):
                                ensembl_coord=True)
             if query_coord.coord_name != target_coord.coord_name:
                 coord = asserted_one(get_coord_conversion(
-                    coord, target_coord.CoordType, self.CoreDb))[1]
+                    coord, target_coord.coord_type, self.CoreDb))[1]
 
             # coord = coord.make_relative_to(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
             # coord = coord.make_relative_to(target_coord, False)
@@ -431,7 +431,7 @@ class Genome(object):
                                ensembl_coord=True)
             if query_coord.coord_name != target_coord.coord_name:
                 coord = asserted_one(get_coord_conversion(
-                    coord, target_coord.CoordType, self.CoreDb))[1]
+                    coord, target_coord.coord_type, self.CoreDb))[1]
             # coord = coord.make_relative_to(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
             # coord = coord.make_relative_to(target_coord, False)
             yield klass(self, db, location=coord, Score=record['score'],

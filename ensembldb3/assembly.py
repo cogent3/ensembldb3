@@ -71,16 +71,16 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
 class Coordinate(object):
 
     def __init__(self, genome, coord_name, start, end, strand=1,
-                 CoordType=None, seq_region_id=None, ensembl_coord=False):
-        if not CoordType or not (seq_region_id or start or end):
-            seq_region_data, CoordType = \
+                 coord_type=None, seq_region_id=None, ensembl_coord=False):
+        if not coord_type or not (seq_region_id or start or end):
+            seq_region_data, coord_type = \
                 _get_coord_type_and_seq_region_id(coord_name, genome.CoreDb)
             seq_region_id = seq_region_data['seq_region_id']
             start = start or 0
             end = end or seq_region_data['length']
         # TODO allow creation with just seq_region_id
         self.species = genome.species
-        self.CoordType = DisplayString(CoordType, repr_length=4,
+        self.coord_type = DisplayString(coord_type, repr_length=4,
                                        with_quotes=False)
         self.coord_name = DisplayString(coord_name, repr_length=4,
                                        with_quotes=False)
@@ -122,19 +122,19 @@ class Coordinate(object):
     ensembl_end = property(_get_ensembl_end)
 
     def __str__(self):
-        return '%s:%s:%s:%d-%d:%d' % (self.species, self.CoordType,
+        return '%s:%s:%s:%d-%d:%d' % (self.species, self.coord_type,
                                       self.coord_name, self.start, self.end, self.strand)
 
     def __repr__(self):
         my_type = self.__class__.__name__
         name = _Species.get_common_name(self.species)
-        coord_type = self.CoordType
+        coord_type = self.coord_type
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
                                        self.coord_name, self.start, self.end, self.strand)
         return c.replace("'", "")
 
     def adopted(self, other, shift=False):
-        """adopts the seq_region_id (including coord_name and CoordType) of
+        """adopts the seq_region_id (including coord_name and coord_type) of
         another coordinate.
 
         Arguments:
@@ -159,7 +159,7 @@ class Coordinate(object):
         """returns a copy"""
         return self.__class__(genome=self.genome, coord_name=self.coord_name,
                               start=self.start, end=self.end, strand=self.strand,
-                              CoordType=self.CoordType, seq_region_id=self.seq_region_id)
+                              coord_type=self.coord_type, seq_region_id=self.seq_region_id)
 
     def resized(self, from_start, from_end):
         """returns a new resized Coordinate with the
@@ -343,11 +343,11 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
 
     q_location = Coordinate(coord_name=query_coord.coord_name, start=q_start,
                             end=q_end, strand=q_strand,
-                            CoordType=query_coord.CoordType,
+                            coord_type=query_coord.coord_type,
                             seq_region_id=q_seq_region_id,
                             genome=query_coord.genome, ensembl_coord=True)
     t_location = Coordinate(coord_name=assembly_row['name'], start=t_start,
-                            end=t_end, strand=t_strand, CoordType=target_coord_type,
+                            end=t_end, strand=t_strand, coord_type=target_coord_type,
                             seq_region_id=t_seq_region_id,
                             genome=query_coord.genome,
                             ensembl_coord=True)
@@ -370,7 +370,7 @@ def assembly_exception_coordinate(loc):
                            loc.start, loc.end, query=query)
     record = asserted_one(query.execute().fetchall())
     s, conv_loc = _get_equivalent_coords(loc, record, "seq_region",
-                                         "exc_seq_region", loc.CoordType)
+                                         "exc_seq_region", loc.coord_type)
     return conv_loc
 
 
@@ -385,7 +385,7 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
     target_coord_system_id = CoordSystem(target_coord_type, core_db=core_db,
                                          species=species).coord_system_id
 
-    query_prefix, target_prefix = _rank_checking(query_location.CoordType,
+    query_prefix, target_prefix = _rank_checking(query_location.coord_type,
                                                  target_coord_type, core_db, species)
     if query_prefix == target_prefix:
         return [[query_location, query_location]]

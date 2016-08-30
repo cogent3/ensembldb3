@@ -38,7 +38,7 @@ class TestLocation(TestCase):
         human_loc = Coordinate(coord_name='x', start=1000, end=10000, strand=-1,
                                genome=human)
         # TODO: complete test for platpus
-        self.assertEqual(human_loc.CoordType, 'chromosome')
+        self.assertEqual(human_loc.coord_type, 'chromosome')
         self.assertEqual(human_loc.coord_name, 'x')
         self.assertEqual(human_loc.start, 1000)
         self.assertEqual(human_loc.end, 10000)
@@ -95,7 +95,7 @@ class TestLocation(TestCase):
                         strand=strand, genome=human)
         c3 = c1.adopted(c2)
         self.assertEqual(c3.coord_name, c2.coord_name)
-        self.assertEqual(c3.CoordType, c2.CoordType)
+        self.assertEqual(c3.coord_type, c2.coord_type)
         self.assertEqual(c3.seq_region_id, c2.seq_region_id)
         self.assertEqual(c3.start, c1.start)
         self.assertEqual(c3.end, c1.end)

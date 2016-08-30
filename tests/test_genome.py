@@ -76,7 +76,7 @@ class TestGenome(GenomeTestBase):
         self.assertEqual(region.location.start, start - 1)
         self.assertEqual(region.location.end, end)
         self.assertEqual(region.location.coord_name, str(chrom))
-        self.assertEqual(region.location.CoordType, 'chromosome')
+        self.assertEqual(region.location.coord_type, 'chromosome')
         self.assertEqual(region.seq, 'ACCTCAGTAATCCGAAAAGCC')
 
     def test_get_assembly_exception_region(self):

@@ -47,7 +47,7 @@ def get_lower_coord_conversion(coord, species, core_db):
     coord_system = CoordSystem(species=species, core_db=core_db)
     seq_level_coord_type = CoordSystem(species=species, core_db=core_db,
                                        seq_level=True)
-    query_rank = coord_system[coord.CoordType].rank
+    query_rank = coord_system[coord.coord_type].rank
     seq_level_rank = coord_system[seq_level_coord_type].rank
     assemblies = None
     for rank in range(query_rank + 1, seq_level_rank):
@@ -80,7 +80,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
     if DEBUG:
         print('Created Coordinate:', coord,
               coord.ensembl_start, coord.ensembl_end)
-        print(coord.CoordType, coord_type)
+        print(coord.coord_type, coord_type)
 
     assemblies = get_coord_conversion(coord, coord_type, genome.CoreDb)
 
