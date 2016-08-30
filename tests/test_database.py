@@ -74,22 +74,13 @@ class TestDatabase(TestCase):
 
     def test_table_has_column(self):
         """return correct values for whether a Table has a column"""
-        account = get_ensembl_account(release=release)
-        var61 = Database(account=account, release=61, species='human',
+        vardb = Database(account=account, release=85, species='human',
                          db_type='variation')
 
-        var62 = Database(account=account, release=62, species='human',
-                         db_type='variation')
-
-        self.assertTrue(var61.table_has_column('transcript_variation',
-                                             'peptide_allele_string'))
-        self.assertFalse(var61.table_has_column('transcript_variation',
-                                              'pep_allele_string'))
-
-        self.assertTrue(var62.table_has_column('transcript_variation',
-                                             'pep_allele_string'))
-        self.assertFalse(var62.table_has_column('transcript_variation',
-                                              'peptide_allele_string'))
+        self.assertTrue(vardb.table_has_column('variation',
+                                             'evidence_attribs'))
+        self.assertFalse(vardb.table_has_column('variation',
+                                              'validation_status'))
 
 if __name__ == "__main__":
     main()

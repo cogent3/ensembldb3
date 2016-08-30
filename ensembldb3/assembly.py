@@ -192,6 +192,22 @@ class Coordinate(object):
         return self.__class__(other.genome, coord_name=other.coord_name,
                               start=start, end=end, strand=other.strand,
                               seq_region_id=other.seq_region_id)
+    
+    def union(self, other):
+        """returns union of self and other coordinate
+        
+        None if other is different species, strand or coordinate name"""
+        if not all([other.strand == self.strand,
+                    other.genome.species == self.genome.species,
+                    other.coord_name == self.coord_name]):
+            return None
+        
+        start = min(self.start, other.start)
+        end = max(self.end, other.end)
+        
+        new = self.__class__(self.genome, coord_name=self.coord_name,
+                             start=start, end=end, strand=self.strand)
+        return new
 
 
 class _CoordRecord(object):

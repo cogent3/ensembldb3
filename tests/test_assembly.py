@@ -103,6 +103,37 @@ class TestLocation(TestCase):
         c3 = c1.adopted(c2, shift=100)
         self.assertEqual(c3.start, c1.start + 100)
         self.assertEqual(c3.end, c1.end + 100)
+    
+    def test_union(self):
+        """union of coordinates correct for +/- strands"""
+        c1 = Coordinate(coord_name='1', start=50, end=100,
+                        strand=1, genome=human)
+        # None returned when different coord_name
+        c2 = Coordinate(coord_name='2', start=2000, end=2000000,
+                        strand=1, genome=human)
+        self.assertEqual(c1.union(c2), None)
+        # None returned when different strand
+        c2 = Coordinate(coord_name='1', start=50, end=300,
+                        strand=-1, genome=human)
+        self.assertEqual(c1.union(c2), None)
+        # None returned when different species
+        c2 = Coordinate(coord_name='1', start=50, end=300,
+                        strand=1, genome=platypus)
+        self.assertEqual(c1.union(c2), None)
+        
+        # correct span when '+' strand
+        c2 = Coordinate(coord_name='1', start=120, end=200,
+                        strand=1, genome=human)
+        c3 = c1.union(c2)
+        self.assertEqual((c3.start, c3.end, c3.strand), (50, 200, 1))
+        
+        # correct span when '-' strand
+        c1 = Coordinate(coord_name='1', start=500, end=100,
+                        strand=-1, genome=human)
+        c2 = Coordinate(coord_name='1', start=600, end=500,
+                        strand=-1, genome=human)
+        c3 = c1.union(c2)
+        self.assertEqual((c3.start, c3.end, c3.strand), (100, 600, -1))
 
 
 class TestCoordSystem(TestCase):
