@@ -286,6 +286,9 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
         cursor = server.cursor()
         if force_overwrite or not is_installed(local_path, dbname.name):
             _drop_db(cursor, dbname.name)
+            if is_installed(local_path, dbname.name):
+                chk = get_installed_checkpoint_path(local_path, dbname.name)
+                shutil.rmtree(chk)
         
         if verbose:
             click.echo("Creating database %s" % dbname.name)
