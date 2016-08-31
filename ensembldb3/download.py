@@ -27,6 +27,16 @@ __status__ = "alpha"
 
 _remote_pub = "rsync://ftp.ensembl.org/ensembl/pub/"
 
+def get_download_checkpoint_path(local_path, dbname):
+    """returns path to db checkpoint file"""
+    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DONWLOADED")
+    return checkpoint_file
+
+def is_downloaded(local_path, dbname):
+    """returns True if checkpoint file exists for dbname"""
+    chk = get_download_checkpoint_path(local_path, dbname)
+    return os.path.exists(chk)
+
 def rsync_listdir(dirname="", debug=True):
     if dirname:
         cmnd = "%s%s" % (_remote_pub, dirname)
@@ -138,12 +148,24 @@ _cfg = os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg')
 def WrapDownload(remote_template, local_base, release, verbose, debug):
     """returns a callback function, that takes the database name and rsync downloads"""
     def rsync_call_wrapper(dbname):
+        if is_downloaded(local_base, dbname):
+            if verbose or debug:
+                click.secho(
+                    "Already downloaded: %s, skipping" % dbname,
+                    fg="green")
+            return
+        
         props = {'dbname': dbname, 'release': release}
         remote_db_path = remote_template % props
         local_db_path = os.path.join(local_base, dbname)
         run_args = dict(remote_path=remote_db_path, local_path=local_db_path,
                         verbose=verbose, debug=debug)
         download_db(**run_args)
+        checkpoint_file = get_download_checkpoint_path(local_base, dbname)    
+        with open(checkpoint_file, "w") as checked:
+            pass
+        
+        click.secho("Completed download: %s" % dbname, fg="green")
     
     return rsync_call_wrapper
 
