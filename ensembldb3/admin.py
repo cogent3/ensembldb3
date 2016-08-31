@@ -86,14 +86,14 @@ def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport", verbose=F
     
     return install_table
 
-def get_db_checkpoint_path(local_path, dbname):
+def get_installed_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
-    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DONE")
+    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_INSTALLED")
     return checkpoint_file
 
 def is_installed(local_path, dbname):
     """returns True if checkpoint file exists for dbname"""
-    chk = get_db_checkpoint_path(local_path, dbname)
+    chk = get_installed_checkpoint_path(local_path, dbname)
     return os.path.exists(chk)
 
 def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, force_overwrite=False, verbose=False, debug=False):
@@ -171,7 +171,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
         pass
     
     # existence of this file signals completion of the install without failure
-    checkpoint_file = get_db_checkpoint_path(local_path, dbname)    
+    checkpoint_file = get_installed_checkpoint_path(local_path, dbname)    
     with open(checkpoint_file, "w") as checked:
         pass
     
