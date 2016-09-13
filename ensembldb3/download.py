@@ -25,8 +25,6 @@ __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
 
-_remote_pub = "rsync://ftp.ensembl.org/ensembl/pub/"
-
 def get_download_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
     checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DONWLOADED")
@@ -37,13 +35,13 @@ def is_downloaded(local_path, dbname):
     chk = get_download_checkpoint_path(local_path, dbname)
     return os.path.exists(chk)
 
-def rsync_listdir(dirname="", debug=True):
+def rsync_listdir(remote_path, dirname="", debug=True):
     if dirname:
-        cmnd = "%s%s" % (_remote_pub, dirname)
+        cmnd = "%s%s" % (remote_path, dirname)
     else:
-        cmnd = _remote_pub
+        cmnd = remote_path
     
-    cmnd = r"rsync --list-only %s" % cmnd
+    cmnd = r"rsync --list-only rsync://%s" % cmnd
     if debug:
         print(cmnd)
     result = exec_command(cmnd)
@@ -107,7 +105,7 @@ def download_db(remote_path, local_path, verbose=False, debug=False):
     local_path : str
        local path to write to the data to
     """
-    cmnd = "rsync --progress -av %s%s %s" % (_remote_pub, remote_path, local_path)
+    cmnd = "rsync --progress -av rsync://%s %s" % (remote_path, local_path)
     if debug or verbose:
         print(cmnd)
         kwargs = dict(stderr=None, stdout=None)
@@ -123,11 +121,12 @@ def read_config(config_path, verbose=False):
     parser = configparser.ConfigParser()
     parser.read_file(config_path)
     release = parser.get('release', 'release')
+    remote_path = parser.get('remote path', 'path')
     local_path = parser.get('local path', 'path')
     local_path = abspath(local_path)
     species_dbs = {}
     for section in parser.sections():
-        if section in ('release', 'local path'):
+        if section in ('release', 'remote path', 'local path'):
             continue
         
         if section != 'compara':
@@ -138,10 +137,10 @@ def read_config(config_path, verbose=False):
         species_dbs[species] = dbs
     
     if verbose:
-        click.echo("DOWNLOADING\n  ensembl release=%s" % release)
-        click.echo("\n".join(["  %s" % d for d in species_dbs]))
-        click.echo("\nWRITING to output path=%s\n" % local_path)
-    return release, local_path, species_dbs
+        click.secho("DOWNLOADING\n  ensembl release=%s" % release, fg="green")
+        click.secho("\n".join(["  %s" % d for d in species_dbs]), fg="green")
+        click.secho("\nWRITING to output path=%s\n" % local_path, fg="green")
+    return release, remote_path, local_path, species_dbs
 
 _cfg = os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg')
 
@@ -173,11 +172,13 @@ def download_dbs(configpath, numprocs, verbose, debug):
     if configpath.name == _cfg:
         warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
     
-    release, local_path, sp_db = read_config(configpath, verbose=verbose)
+    release, remote_path, local_path, sp_db = read_config(configpath,
+                                                          verbose=verbose)
     makedirs(local_path)
     
     props = dict(release=release)
-    contents = rsync_listdir('release-%(release)s/mysql/' % props, debug=debug)
+    contents = rsync_listdir(remote_path,
+                             'release-%(release)s/mysql/' % props, debug=debug)
     db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
     if verbose or debug:
         pprint(db_names)
@@ -188,9 +189,12 @@ def download_dbs(configpath, numprocs, verbose, debug):
         parallel.use_multiprocessing(numprocs)
     
     remote_template = 'release-%(release)s/mysql/%(dbname)s/'
+    remote_template = os.path.join(remote_path, remote_template)
     rsync = WrapDownload(remote_template, local_path, release, verbose=verbose,
                          debug=debug)
     dbnames = [n.name for n in db_names]
     for r in parallel.imap(rsync, dbnames):
         pass
 
+    click.secho("\nWROTE to output path=%s\n" % local_path, fg="green")
+    
