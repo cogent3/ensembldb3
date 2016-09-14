@@ -120,14 +120,15 @@ class _Region(LazyRecord):
 
     symbol = property(_get_symbol)
 
-    def get_features(self, feature_types, where_feature=None):
+    def get_features(self, feature_types, where_feature=None, limit=None):
         """queries the parent genome for feature types corresponding to this
         region
         where_feature: the returned region can either lie 'within' this region,
         'overlap' this region, or 'span' this region"""
         return self.genome.get_features(self.location,
                                        feature_types=feature_types,
-                                       where_feature=where_feature)
+                                       where_feature=where_feature,
+                                       limit=limit)
 
     def _get_variants(self):
         """constructs the variants attribute"""

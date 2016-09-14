@@ -388,7 +388,7 @@ class Genome(object):
         return record['seq_region_id']
 
     def _get_simple_features(self, db, klass, target_coord, query_coord,
-                             where_feature):
+                             where_feature, limit=None):
         """returns feature_type records for the query_coord from the
         simple_feature table. The returned coord is referenced to
         target_coord. At present, only CpG islands being queried."""
@@ -403,6 +403,9 @@ class Genome(object):
         query = location_query(simple_feature_table, query_coord.ensembl_start,
                                query_coord.ensembl_end, query=query,
                                where=where_feature)
+        if limit is not None:
+            query = query.limit(limit)
+        
         records = query.execute()
         for record in records:
             coord = Coordinate(self, coord_name=query_coord.coord_name,
@@ -420,7 +423,7 @@ class Genome(object):
             yield klass(self, db, location=coord, Score=record['score'])
 
     def _get_repeat_features(self, db, klass, target_coord, query_coord,
-                             where_feature):
+                             where_feature, limit=None):
         """returns Repeat region instances"""
         # we build repeats using coordinates from repeat_feature table
         # the repeat_consensus_id is required to get the repeat name, class
@@ -430,6 +433,9 @@ class Genome(object):
                            repeat_feature_table.c.seq_region_id == query_coord.seq_region_id)
         query = location_query(repeat_feature_table, query_coord.ensembl_start,
                                query_coord.ensembl_end, query=query, where=where_feature)
+        if limit is not None:
+            query = query.limit(limit)
+        
         for record in query.execute():
             coord = Coordinate(self, coord_name=query_coord.coord_name,
                                start=record['seq_region_start'],
@@ -446,7 +452,7 @@ class Genome(object):
                         data=record)
 
     def _get_gene_features(self, db, klass, target_coord, query_coord,
-                           where_feature):
+                           where_feature, limit=None):
         """returns all genes"""
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
@@ -464,7 +470,9 @@ class Genome(object):
             db, condition, gene_table, gene_id_table, xref_table)
         query = location_query(gene_table, query_coord.ensembl_start,
                                query_coord.ensembl_end, query=query, where=where_feature)
-
+        if limit is not None:
+            query = query.limit(limit)
+        
         for record in query.execute():
             new = Coordinate(self, coord_name=query_coord.coord_name,
                              start=record['seq_region_start'],
@@ -477,7 +485,7 @@ class Genome(object):
             yield gene
 
     def _get_variation_features(self, db, klass, target_coord, query_coord,
-                                where_feature):
+                                where_feature, limit=None):
         """returns variation instances within the specified region"""
         # variation features at supercontig level
         var_feature_table = self.VarDb.get_table('variation_feature')
@@ -486,6 +494,9 @@ class Genome(object):
                            var_feature_table.c.seq_region_id == query_coord.seq_region_id)
         query = location_query(var_feature_table, query_coord.ensembl_start,
                                query_coord.ensembl_end, query=query, where=where_feature)
+        if limit is not None:
+            query = query.limit(limit)
+        
         for record in query.execute():
             yield klass(self, self.CoreDb, symbol=record['variation_name'],
                         data=record)
@@ -511,7 +522,7 @@ class Genome(object):
 
     def get_features(self, region=None, feature_types=None, where_feature=None,
                     coord_name=None, start=None, end=None, strand=None,
-                    ensembl_coord=False):
+                    ensembl_coord=False, limit=None):
         """returns region instances for the specified location"""
         if isinstance(feature_types, str):
             feature_types = [feature_types]
@@ -555,7 +566,8 @@ class Genome(object):
                                                           db, where=where_feature)
                 for chrom_coord, other_coord in chrom_other_coords:
                     for region in target_func(db, target_class, chrom_coord,
-                                              other_coord, where_feature):
+                                              other_coord, where_feature,
+                                              limit=limit):
                         yield region
 
     def get_variation(self, effect=None, symbol=None, like=True,

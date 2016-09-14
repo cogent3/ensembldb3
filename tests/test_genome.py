@@ -616,7 +616,8 @@ class TestFeatures(GenomeTestBase):
         """should not fail to get multiple feature types"""
         regions =\
             self.human.get_features(feature_types=['repeat', 'gene', 'cpg'],
-                                   coord_name=1, start=869936, end=901867)
+                                   coord_name=1, start=869936, end=901867,
+                                   limit=5)
         for region in regions:
             pass
 
