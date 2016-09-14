@@ -316,6 +316,13 @@ class TestGene(GenomeTestBase):
         results = list(self.human.get_genes_matching(
             biotype='Mt_tRNA', like=False))
         self.assertEqual(len(results), 22)
+    
+    def test_limit_genes_matching(self):
+        """limit argument should work for get_genes_matching"""
+        # use the limit argument
+        results = list(self.human.get_genes_matching(
+            biotype='protein_coding', limit=10))
+        self.assertEqual(len(results), 10)
 
     def test_get_by_decsr_biotype(self):
         """combining the description and biotype should return a result"""

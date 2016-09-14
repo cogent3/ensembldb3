@@ -265,11 +265,16 @@ class Genome(object):
         return gene
 
     def get_genes_matching(self, symbol=None, description=None, stableid=None,
-                         biotype=None, like=True):
-        """symbol: HGC gene symbol, case doesn't matter
-        description: a functional description
-        stableid: the ensebl identifier
-        biotype: the biological encoding type"""
+                         biotype=None, like=True, limit=None):
+        """returns a generator of Gene instances
+        
+        Arguments:
+            - symbol: HGC gene symbol, case doesn't matter
+            - description: a functional description
+            - stableid: the ensebl identifier
+            - biotype: the biological encoding type
+            - like: allow incomplete matches
+            - limit: only return this number of hits"""
         # TODO additional arguments to satisfy: external_ref, go_terms
         if symbol is not None:
             symbol = symbol.lower()
@@ -288,6 +293,9 @@ class Genome(object):
         args = dict(symbol=symbol, description=description,
                     stableid=stableid, biotype=biotype, like=like)
         query = self._get_gene_query(self.CoreDb, **args)
+        if limit is not None:
+            query = query.limit(limit)
+        
         records = query.execute()
         if records.rowcount == 0 and symbol is not None:
             # see if the symbol has a synonym
