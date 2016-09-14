@@ -140,7 +140,7 @@ class _Region(LazyRecord):
 
     variants = property(_get_variants)
 
-    def feature_data(self, parent_map):
+    def _feature_data(self, parent_map):
         symbol = self.symbol or getattr(self, 'stableid', '')
         assert not parent_map.reverse
         feat_map = parent_map[self.location.start:self.location.end]
@@ -162,7 +162,7 @@ class _Region(LazyRecord):
         seq_map = seq_map.inverse()
 
         for region in regions:
-            data = region.feature_data(seq_map)
+            data = region._feature_data(seq_map)
             if data is None:
                 continue
             # this will consider the strand information of actual sequence
@@ -171,7 +171,7 @@ class _Region(LazyRecord):
             self.seq.add_annotation(Feature, data[0], data[1], feature_map)
 
             if region.type == 'gene':  # TODO: SHOULD be much simplified
-                sub_data = region.sub_feature_data(seq_map)
+                sub_data = region._sub_feature_data(seq_map)
                 for feature_type, feature_name, feature_map in sub_data:
                     if self.location.strand == -1:
                         # again, change feature map to -1 strand sequence if
@@ -428,17 +428,17 @@ class Gene(_StableRegion):
 
     transcripts = property(_get_transcripts)
 
-    def sub_feature_data(self, parent_map):
+    def _sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. These can be
         automatically applied to the seq by the get_annotated_seq method.
         Returns None if self lies outside parent's span.
         """
         features = []
         for transcript in self.transcripts:
-            transcript_data = transcript.feature_data(parent_map)
+            transcript_data = transcript._feature_data(parent_map)
             if transcript_data:
                 features.append(transcript_data)
-                data = transcript.sub_feature_data(parent_map)
+                data = transcript._sub_feature_data(parent_map)
                 features.extend(data)
         return features
 
@@ -794,7 +794,7 @@ class Transcript(_StableRegion):
         if self.exons is self.NULL_VALUE:
             return features
         for exon in self.exons:
-            feature_data = exon.feature_data(parent_map)
+            feature_data = exon._feature_data(parent_map)
             if feature_data is None:
                 continue
             features.append(feature_data)
@@ -806,7 +806,7 @@ class Transcript(_StableRegion):
         if self.introns is self.NULL_VALUE:
             return features
         for intron in self.introns:
-            feature_data = intron.feature_data(parent_map)
+            feature_data = intron._feature_data(parent_map)
             if feature_data is None:
                 continue
             features.append(feature_data)
@@ -819,7 +819,7 @@ class Transcript(_StableRegion):
             return features
         cds_spans = []
         for exon in self.translated_exons:
-            feature_data = exon.feature_data(parent_map)
+            feature_data = exon._feature_data(parent_map)
             if feature_data is None:
                 continue
             cds_spans.extend(feature_data[-1].spans)
@@ -835,12 +835,12 @@ class Transcript(_StableRegion):
         features = []
         utr5_spans, utr3_spans = [], []
         for exon in self.untranslated_exons_5:
-            feature_data = exon.feature_data(parent_map)
+            feature_data = exon._feature_data(parent_map)
             if feature_data is None:
                 continue
             utr5_spans.extend(feature_data[-1].spans)
         for exon in self.untranslated_exons_3:
-            feature_data = exon.feature_data(parent_map)
+            feature_data = exon._feature_data(parent_map)
             if feature_data is None:
                 continue
             utr3_spans.extend(feature_data[-1].spans)
@@ -854,7 +854,7 @@ class Transcript(_StableRegion):
             features.append(("3'UTR", str(self.stableid), utr3_map))
         return features
 
-    def sub_feature_data(self, parent_map):
+    def _sub_feature_data(self, parent_map):
         """returns data for making a cogent Feature. This can be automatically
         applied to the seq by the get_annotated_seq method. Returns None if
         self lies outside parent's span.
