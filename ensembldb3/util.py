@@ -24,6 +24,7 @@ def get_resource_dir():
     else:
         path = resource_filename("ensembldb3", "data")
     
+    path = os.path.abspath(os.path.expanduser(path))
     if not os.path.exists(path):
         raise ValueError("ENSEMBLDBRC directory '%s' does not exist")
     
