@@ -276,6 +276,7 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(mysql_info["host"], mysql_info["user"],
                           mysql_info["passwd"])
+    
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     
     release, remote_path, local_path, species_dbs = read_config(configpath)
@@ -320,7 +321,7 @@ def drop(configpath, mysqlcfg, verbose, debug):
                           mysql_info["passwd"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     cursor = server.cursor()
-    release, local_path, species_dbs = read_config(configpath)
+    release, remote_path, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
     
