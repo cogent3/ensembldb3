@@ -1,4 +1,4 @@
-__all__ = ['test_assembly', 'test_compara', 'test_database',
+__all__ = ['test_ensembl_admin', 'test_assembly', 'test_compara', 'test_database',
            'test_feature_level', 'test_genome', 'test_host', 'test_species']
 
 __author__ = "Gavin Huttley, Hua Ying"
