@@ -278,7 +278,7 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
                           mysql_info["passwd"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     
-    release, local_path, species_dbs = read_config(configpath)
+    release, remote_path, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
     for dbname in dbnames:
