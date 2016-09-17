@@ -37,22 +37,41 @@ In my scripts I then create the ``HostAccount`` instance as
 Species
 =======
 
-The ``Species`` class is a top level import that is used to translate between latin names and Ensembl's database naming scheme. It also serves to allow the user to simply enter the common name for a species in order to reference it's genome databases. The queries are case-insensitive. 
+The ``Species`` class is a top level import that is used to translate between latin names and Ensembl's database naming scheme. It also serves to allow the user to use just a species common name to reference it's genome databases. The queries are case-insensitive.
 
 .. doctest::
 
     >>> from ensembldb3 import Species
     >>> print(Species)
-    ================================================================================
-           Common name                   Species name              Ensembl Db Prefix
-    --------------------------------------------------------------------------------
-             A.aegypti                  Aedes aegypti                  aedes_aegypti
-            A.clavatus           Aspergillus clavatus           aspergillus_clavatus...
-
+    =========================================================================================================
+                 Common name                Species name           Ensembl Db Prefix                Synonymns
+    ---------------------------------------------------------------------------------------------------------
+                      Alpaca               Vicugna pacos               vicugna_pacos                         
+                Amazon molly            Poecilia formosa            poecilia_formosa                         
+                Anole Lizard         Anolis carolinensis         anolis_carolinensis                         ...
+ 
 You can directly extend the list of species, or modify an existing entry, using ``Species.amend_species``. If you wish to edit the species list on a larger scale or just do it once so all your scripts can rely on that change, you can directly modify the reference species data used by ``ensembldb3``.
 
 #. See  :ref:`exportrc` to obtain the species data distributed with ``ensembldb3`` plus other configuration files and edit the ``species.tsv`` file
 #. Add an environment variable ``ENSEMBLDBRC`` to your ``.bashrc`` as follows::
     
     export ENSEMBLDBRC="~/path/to/ensembldbrc/"
+
+.. note::
+    The ``species.tsv`` file has at least 2, and up to 3, fields per line: species name, common name, species name synonymn.
+
+
+Look up a species common name
+-----------------------------
+
+This can be done using the species name. Note that some synonymns are supported.
+
+.. doctest::
+    
+    >>> Species.get_common_name("Felis catus")
+    'Cat'
+    >>> Species.get_common_name("Canis familiaris")
+    'Dog'
+    >>> Species.get_common_name("Canis lupus familiaris")
+    'Dog'
 

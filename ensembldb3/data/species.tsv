@@ -1,121 +1,70 @@
-Acyrthosiphon pisum	A.pisum
-Aedes aegypti	A.aegypti
-Anolis carolinensis	Anole lizard
-Anopheles gambiae	A.gambiae
-Apis mellifera	Honeybee
-Arabidopsis lyrata	A.lyrata
-Arabidopsis thaliana	A.thaliana
-Aspergillus clavatus	A.clavatus
-Aspergillus flavus	A.flavus
-Aspergillus fumigatus	A.fumigatus
-Aspergillus fumigatusa1163	A.fumigatusa1163
-Aspergillus nidulans	A.nidulans
-Aspergillus niger	A.niger
-Aspergillus oryzae	A.oryzae
-Aspergillus terreus	A.terreus
-Bacillus collection	Bacillus
-Borrelia collection	Borrelia
-Bos taurus	Cow
-Brachypodium distachyon	B.distachyon
-Buchnera collection	Buchnera
-Caenorhabditis brenneri	C.brenneri
-Caenorhabditis briggsae	C.briggsae
-Caenorhabditis elegans	C.elegans
-Caenorhabditis japonica	C.japonica
-Caenorhabditis remanei	C.remanei
-Callithrix jacchus	Marmoset
-Canis familiaris	Dog
-Cavia porcellus	Guinea Pig
-Choloepus hoffmanni	Sloth
-Ciona intestinalis	C.intestinalis
-Ciona savignyi	C.savignyi
-Culex quinquefasciatus	C.quinquefasciatus
-Danio rerio	Zebrafish
-Dasypus novemcinctus	Armadillo
-Dictyostelium discoideum	D.discoideum
-Dipodomys ordii	Kangaroo rat
-Drosophila ananassae	D.ananassae
-Drosophila erecta	D.erecta
-Drosophila grimshawi	D.grimshawi
-Drosophila melanogaster	D.melanogaster
-Drosophila mojavensis	D.mojavensis
-Drosophila persimilis	D.persimilis
-Drosophila pseudoobscura	D.pseudoobscura
-Drosophila sechellia	D.sechellia
-Drosophila simulans	D.simulans
-Drosophila virilis	D.virilis
-Drosophila willistoni	D.willistoni
-Drosophila yakuba	D.yakuba
-Echinops telfairi	Tenrec
-Equus caballus	Horse
-Erinaceus europaeus	Hedgehog
-Escherichia shigella	E.shigella
-Felis catus	Cat
-Gallus gallus	Chicken
-Gasterosteus aculeatus	Stickleback
-Gorilla gorilla	Gorilla
-Homo sapiens	Human
-Ictidomys tridecemlineatus	Squirrel
-Ixodes scapularis	I.scapularis
-Loxodonta africana	Elephant
-Macaca mulatta	Macaque
-Macropus eugenii	Wallaby
-Microcebus murinus	Mouse lemur
-Monodelphis domestica	Opossum
-Mus musculus	Mouse
-Mycobacterium collection	Mycobacterium
-Myotis lucifugus	Microbat
-Neisseria collection	Neisseria
-Nematostella vectensis	N.vectensis
-Neosartorya fischeri	N.fischeri
-Neurospora crassa	N.crassa
-Ochotona princeps	Pika
-Ornithorhynchus anatinus	Platypus
-Oryctolagus cuniculus	Rabbit
-Oryza indica	O.indica
-Oryza sativa	O.sativa
-Oryzias latipes	Medaka
-Otolemur garnettii	Bushbaby
-Pan troglodytes	Chimp
-Pediculus humanus	P.humanus
-Petromyzon marinus	Lamprey
-Phaeodactylum tricornutum	P.tricornutum
-Physcomitrella patens	P.patens
-Phytophthora infestans	P.infestans
-Phytophthora ramorum	P.ramorum
-Phytophthora sojae	P.sojae
-Plasmodium berghei	P.berghei
-Plasmodium chabaudi	P.chabaudi
-Plasmodium falciparum	P.falciparum
-Plasmodium knowlesi	P.knowlesi
-Plasmodium vivax	P.vivax
-Pongo abelii	Orangutan
-Populus trichocarpa	P.trichocarpa
-Pristionchus pacificus	P.pacificus
-Procavia capensis	Rock hyrax
-Pteropus vampyrus	Flying fox
-Puccinia graministritici	P.graministritici
-Pyrococcus collection	Pyrococcus
-Rattus norvegicus	Rat
-Saccharomyces cerevisiae	S.cerevisiae
-Schistosoma mansoni	S.mansoni
-Schizosaccharomyces pombe	S.pombe
-Sorex araneus	Shrew
-Sorghum bicolor	S.bicolor
-Staphylococcus collection	Staphylococcus
-Streptococcus collection	Streptococcus
-Strongylocentrotus purpuratus	S.purpuratus
-Sus scrofa	Pig
-Taeniopygia guttata	Zebra finch
-Takifugu rubripes	Fugu
-Tarsius syrichta	Tarsier
-Tetraodon nigroviridis	Tetraodon
-Thalassiosira pseudonana	T.pseudonana
-Trichoplax adhaerens	T.adhaerens
-Tupaia belangeri	Tree Shrew
-Tursiops truncatus	Bottlenose dolphin
-Vicugna pacos	Alpaca
-Vitis vinifera	V.vinifera
-Wolbachia collection	Wolbachia
-Xenopus tropicalis	Xenopus
-Zea mays	Z.mays
+Ailuropoda melanoleuca	Panda	
+Anas platyrhynchos	Duck	
+Anolis carolinensis	Anole Lizard	
+Astyanax mexicanus	Cave fish	
+Bos taurus	Cow	
+Caenorhabditis elegans	C.elegans	
+Callithrix jacchus	Marmoset	
+Canis familiaris	Dog	Canis lupus familiaris
+Cavia porcellus	Guinea Pig	
+Chlorocebus sabaeus	Vervet/AGM	
+Choloepus hoffmanni	Sloth	
+Ciona intestinalis	C.intestinalis	
+Ciona savignyi	C.savignyi	
+Danio rerio	Zebrafish	
+Dasypus novemcinctus	Armadillo	
+Dipodomys ordii	Kangaroo rat	
+Drosophila melanogaster	D.melanogaster	
+Drosophila grimshawi	D.grimshawi	
+Echinops telfairi	Tenrec	
+Equus caballus	Horse	
+Erinaceus europaeus	Hedgehog	
+Felis catus	Cat	
+Ficedula albicollis	Flycatcher	
+Gadus morhua	Cod	
+Gallus gallus	Chicken	
+Gasterosteus aculeatus	Stickleback	
+Gorilla gorilla	Gorilla	Gorilla gorilla gorilla
+Homo sapiens	Human	
+Ictidomys tridecemlineatus	Squirrel	
+Latimeria chalumnae	Coelacanth	
+Lepisosteus oculatus	Spotted gar	
+Loxodonta africana	Elephant	
+Macaca mulatta	Macaque	
+Macropus eugenii	Wallaby	
+Meleagris gallopavo	Turkey	
+Microcebus murinus	Mouse Lemur	
+Monodelphis domestica	Opossum	
+Mus musculus	Mouse	
+Mustela putorius furo	Ferret	
+Myotis lucifugus	Microbat	
+Nomascus leucogenys	Gibbon	
+Ochotona princeps	Pika	
+Oreochromis niloticus	Tilapia	
+Ornithorhynchus anatinus	Platypus	
+Oryctolagus cuniculus	Rabbit	
+Oryzias latipes	Medaka	
+Otolemur garnettii	Bushbaby	
+Ovis aries	Sheep	
+Pan troglodytes	Chimp	
+Papio anubis	Olive baboon	
+Pelodiscus sinensis	Chinese softshell turtle	
+Petromyzon marinus	Lamprey	
+Poecilia formosa	Amazon molly	
+Pongo abelii	Orangutan	
+Procavia capensis	Hyrax	
+Pteropus vampyrus	Megabat	
+Rattus norvegicus	Rat	
+Saccharomyces cerevisiae	S.cerevisiae	
+Sarcophilus harrisii	Tasmanian devil	
+Sorex araneus	Shrew	
+Sus scrofa	Pig	
+Taeniopygia guttata	Zebra Finch	
+Takifugu rubripes	Fugu	
+Tarsius syrichta	Tarsier	
+Tetraodon nigroviridis	Tetraodon	
+Tupaia belangeri	Tree Shrew	
+Tursiops truncatus	Dolphin	
+Vicugna pacos	Alpaca	
+Xenopus tropicalis	X.tropicalis	
+Xiphophorus maculatus	Platyfish	

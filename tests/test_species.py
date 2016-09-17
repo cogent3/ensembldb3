@@ -72,6 +72,29 @@ class TestSpeciesNamemaps(TestCase):
         self.assertEqual(Species.get_compara_name('C.elegans'), 'Celegans')
         self.assertEqual(Species.get_compara_name('Caenorhabditis elegans'),
                          'Celegans')
+    
+    def test_lookup_raises(self):
+        """setting level  to raise should create exceptions"""
+        self.assertRaises(ValueError,
+                          Species.get_species_name,
+                          "failme", level="raise")
+        self.assertRaises(ValueError,
+                          Species.get_common_name,
+                          "failme", level="raise")
+        self.assertRaises(ValueError,
+                          Species.get_ensembl_db_prefix,
+                          "failme")
+    
+    def test_synonymns_work(self):
+        """species with synonymns should allow correct lookups"""
+        self.assertEqual(Species.get_species_name("Canis lupus familiaris"),
+                         "Canis familiaris")
+        self.assertEqual(Species.get_common_name("Canis lupus familiaris"),
+                         "Dog")
+        self.assertEqual(Species.get_ensembl_db_prefix(
+            "Canis lupus familiaris"), "canis_familiaris")
+        self.assertEqual(Species.get_compara_name("Canis lupus familiaris"),
+                         "Dog")
 
 
 if __name__ == "__main__":

@@ -99,8 +99,8 @@ class CaseInsensitiveString(str):
     """A case insensitive string class. Comparisons are case insensitive."""
     def __new__(cls, arg, h=None):
         n = str.__new__(cls, str(arg))
-        n._hash = hash(''.join(list(n)).lower())
         n._lower = ''.join(list(n)).lower()
+        n._hash = hash(n._lower)
         return n
 
     def __eq__(self, other):
