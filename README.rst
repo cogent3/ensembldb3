@@ -2,15 +2,15 @@
 ensembldb3
 ##########
 
-This library provides capabilities for ensembl MySQL databases. The library began it's existence as part of PyCogent, specifically ``cogent.db.ensembl`` in 2009. With the port of PyCogent to Python 3 (resulting in `PyCogent3 <https://bitbucket.org/pycogent3/cogent3>`_), it was decided to split it out into it's own project, making it more visible to users and simplifying the PyCogent3 dependencies.
+This library provides capabilities for querying Ensembl MySQL databases and for "administering" them. ``ensembldb3`` is compatible with a range of Ensembl releases.
 
-We support API changes across multiple releases of Ensembl
+``ensembldb3`` began it's existence in 2009 as ``cogent.db.ensembl``, a part of PyCogent. With the port of PyCogent to Python 3 (resulting in `PyCogent3 <https://bitbucket.org/pycogent3/cogent3>`_), it was decided to split the Ensembl querying code out into it's own project. This allows increasing features and making it more visible to users.
 
 ************
 Installation
 ************
 
-Installation via pip into virtualenv's has been tested and is described below.
+Installation via pip into virtualenv's or conda environmenrs (via pip) has been tested and is described below.
 
 Because PyCogent3 requires numpy be installed prior to installation, the following steps are recommended.
 
@@ -33,6 +33,8 @@ Usage
 
 Install adds an experimental download script ``ensembl_admin`` which provides functions for downloading, installing and dropping databases. It uses rsync to download mysql dumps from the `ensembl ftp site <ftp://ftp.ensembl.org/pub/>`_. ``ensembl_download``  requires the user to specify a config file indicating the release, species and their databases to download. A sample config file is included for demonstration purposes. Here's an example ::
 
+    [remote path] # required
+    path=ftp.ensembl.org/ensembl/pub/
     [local path] # required
     path=/tmp/ensembldb_download
     [release] # required
@@ -46,10 +48,17 @@ Install adds an experimental download script ``ensembl_admin`` which provides fu
     [compara]
     db=compara
 
+:NOTE: The species common name is used in the ``[]`` and the db's to be downloaded are comma separated.
+
 You then download the corresponding databases as ::
 
     $ ensembl_admin -c /path/to/your.cfg -v
 
 The ``-v`` option means verbose. Use ``--help`` for more information.
 
-:NOTE: The species common name is used in the ``[]`` and the db's to be downloaded are comma separated.
+If you are running this on a server, then we suggest using ``nohup`` to execute the command such that it doesn't die if, for instance, you close the laptop you use to login to the server... Doh! Here's an example ::
+
+    $ nohup ensembl_admin install -c download.cfg -m mysql.cfg -v > install.out 2>&1 &
+    $ exit
+
+When you log back in, the download progress will be in ``install.out``.
