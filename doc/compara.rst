@@ -25,6 +25,21 @@ Instantiating ``Compara`` requires the ensembl release, the series of species of
 .. note::
     Use ``Species.get_compara_name(species_name)`` to see what the attribute name will be.
 
+Get the species tree
+====================
+
+This is accessed from the ``Compara`` instance.
+
+.. doctest::
+    
+    >>> tree = compara.get_species_tree(just_members=True)
+    >>> print(tree.ascii_art())
+                        /-Pan troglodytes
+              /Homininae
+    -root----|          \-Homo sapiens
+             |
+              \-Macaca mulatta
+
 What alignment types are available
 ==================================
 
@@ -79,6 +94,8 @@ You can specify an equivalent query using the corresponding ``method_link_specie
     >>> regions = compara.get_syntenic_regions(region=human_brca2, method_clade_id=756)
     >>> for region in regions:
     ...     print(region)
+    ...     # tree = region.get_species_tree()
+    ...     # print(tree.ascii_art())
     SyntenicRegions:
       Coordinate(Human,chro...,13,32315473-32400266,1)
       Coordinate(Chimp,chro...,13,31957346-32041418,-1)
@@ -119,7 +136,7 @@ We can identify which species are in the set (it may not always be the same as t
 
 .. doctest::
     
-    >>> orthologs.get_species_set()
+    >>> orthologs.get_species_set() # doctest: +SKIP
     {'Pan troglodytes', 'Macaca mulatta', 'Homo sapiens'}
 
 Within species paralogs
@@ -136,6 +153,27 @@ I'm using the haemoglobin B locus identifier ``ENSG00000244734``.
      relationships=within_species_paralog
       Gene(species='Homo sapiens'; biotype='protein_coding'; description='hemoglobin subunit beta...'; location=Coordinate(Human,chro...,11,5225463-5229395,-1); stableid='ENSG00000244734'; status='KNOWN'; symbol='HBB')
       Gene(species='Homo sapiens'; biotype='protein_coding'; description='hemoglobin subunit delta...'; location=Coordinate(Human,chro...,11,5232677-5235370,-1); stableid='ENSG00000223609'; status='KNOWN'; symbol='HBD')...
+    >>> tree = paras.get_tree()
+    >>> print(tree.ascii_art())
+                                  /-ENSG00000223609
+                        /edge.0--|
+                       |          \-ENSG00000244734
+              /edge.3--|
+             |         |                    /-ENSG00000196565
+             |         |          /edge.1--|
+             |          \edge.2--|          \-ENSG00000213934
+             |                   |
+             |                    \-ENSG00000213931
+    -root----|
+             |                                        /-ENSG00000188536
+             |                              /edge.4--|
+             |                    /edge.5--|          \-ENSG00000206172
+             |                   |         |
+             |          /edge.6--|          \-ENSG00000086506
+             |         |         |
+              \edge.7--|          \-ENSG00000206177
+                       |
+                        \-ENSG00000130656
 
 Getting the CDS from related genes
 ----------------------------------

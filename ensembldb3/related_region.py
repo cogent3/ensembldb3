@@ -1,7 +1,10 @@
 from pprint import pprint
+from collections import defaultdict
+import warnings
 
 import sqlalchemy as sql
-from cogent3 import DNA
+from cogent3 import DNA, LoadTree
+from cogent3.core.tree import PhyloNode
 from cogent3.core.alignment import SequenceCollection, Alignment, Aligned
 from cogent3.parse import cigar
 
@@ -64,11 +67,13 @@ class _RelatedRegions(LazyRecord):
 class RelatedGenes(_RelatedRegions):
     type = 'related_genes'
 
-    def __init__(self, compara, members, relationships):
+    def __init__(self, compara, members, relationships, gene_tree_root=None):
         super(RelatedGenes, self).__init__()
         self.compara = compara
         self.members = tuple(m for m in members if m.location is not None)
         self.relationships = relationships
+        # gene_tree_root is the id from homology
+        self._gene_tree_root = gene_tree_root
 
     def __str__(self):
         my_type = self.__class__.__name__
@@ -84,6 +89,63 @@ class RelatedGenes(_RelatedRegions):
     def get_max_cds_lengths(self):
         """returns the vector of maximum cds lengths from member transcripts"""
         return [max(member.get_cds_lengths()) for member in self.members]
+    
+    def get_tree(self, just_members=True):
+        """returns the gene tree with tip names as gene stableid's
+        
+        Arguments:
+        ----------
+          - just_members: limits tips to just members of self
+        """
+        gtrn = self.compara.ComparaDb.get_table("gene_tree_node")
+        condition = gtrn.c.root_id == list(self._gene_tree_root)[0]
+        query = sql.select([gtrn.c.node_id, gtrn.c.parent_id,
+                            gtrn.c.distance_to_parent, gtrn.c.seq_member_id],
+                           whereclause=condition)
+        records = query.execute().fetchall()
+        
+        # get the gene stable IDs, via join of seq_member with gene_member
+        # on seq_member_id
+        seqmem_ids = [r['seq_member_id'] for r in records]
+        seqmem = self.compara.ComparaDb.get_table("seq_member")
+        genmem = self.compara.ComparaDb.get_table("gene_member")
+        condition = genmem.c.gene_member_id == seqmem.c.gene_member_id
+        joined = seqmem.join(genmem,
+                             genmem.c.gene_member_id == seqmem.c.gene_member_id)
+        query = sql.select([joined.c.seq_member_seq_member_id,
+                            joined.c.gene_member_stable_id]).\
+            where(joined.c.seq_member_seq_member_id.in_(seqmem_ids)).select_from(joined)
+        
+        gene_ids = dict(query.execute().fetchall())
+        nodes = {}
+        parents = defaultdict(list)
+        for record in records:
+            parent_id = record['parent_id']
+            node_id = record['node_id']
+            length = record['distance_to_parent']
+            name = gene_ids.get(record['seq_member_id'], None)
+            node = PhyloNode(length=length, name=name)
+            nodes[node_id] = node
+            parents[parent_id].append(node)
+        
+        root = None
+        for parent in parents:
+            if parent not in nodes:
+                node = PhyloNode(name='root')
+                nodes[parent] = node
+            
+            node = nodes[parent]
+            for child in parents[parent]:
+                child.parent = node
+            if len(parents[parent]) == 1:
+                root = node
+        
+        if just_members:
+            stableids = [g.stableid for g in self.members]
+            root = root.get_sub_tree(stableids)
+        
+        return root
+        
 
 
 class SyntenicRegion(LazyRecord):
@@ -251,9 +313,10 @@ class SyntenicRegion(LazyRecord):
 class SyntenicRegions(_RelatedRegions):
     type = 'syntenic_regions'
 
-    def __init__(self, compara, members, ref_location):
+    def __init__(self, compara, members, ref_location, method_clade_id=None):
         super(SyntenicRegions, self).__init__()
         self.compara = compara
+        self._method_clade_id = method_clade_id
         mems = []
         ref_member = None
         self.ref_location = ref_location
@@ -358,3 +421,13 @@ class SyntenicRegions(_RelatedRegions):
             aln = aln.omit_gap_pos()
 
         return aln
+    
+    def get_species_tree(self):
+        """returns the species tree for the members
+        
+        Arguments:
+        ----------
+        - just_members: limits tips to species that are just members of self
+        """
+        tree = self.compara.get_species_tree()
+        return tree.get_sub_tree(self.get_species_set())

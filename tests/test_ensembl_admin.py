@@ -77,29 +77,31 @@ class TestAdminCli(TestCase):
         # check it's installed via checkpoint file
         self.assertTrue(os.path.exists(chkpt))
         
-        # then show
+        # and using show
         release = parser.get("release", "release")
         r = exec_show(test_mysql_cfg, release)
-        print(r.output)
+        self.assertTrue("saccharomyces" in r.output)
         
         # then drop, but don't execute
+        runner = CliRunner()
+        r = runner.invoke(drop, ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+                          catch_exceptions=False, input="n")
         
-        # then show
+        # then show still present
         r = exec_show(test_mysql_cfg, release)
-        print(r.output)
+        self.assertTrue("saccharomyces" in r.output)
         
         # then drop
         runner = CliRunner()
         r = runner.invoke(drop, ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
-                          catch_exceptions=False)
-        
-        # then show
+                          catch_exceptions=False, input="y")
+        # then show now gone
         r = exec_show(test_mysql_cfg, release)
-        print(r.output)
+        self.assertTrue("saccharomyces" not in r.output)
         
         shutil.rmtree(self.dirname)
 
-    def est_exportrc(self):
+    def test_exportrc(self):
         """exportrc works correctly"""
         runner = CliRunner()
         
@@ -113,7 +115,6 @@ class TestAdminCli(TestCase):
         self.assertEqual(len(fnames), 3)
         shutil.rmtree(self.dirname)
         
-
 
 if __name__ == "__main__":
     main()

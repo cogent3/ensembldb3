@@ -1,5 +1,6 @@
 import os
 
+from cogent3 import LoadTree
 from cogent3.util.unit_test import TestCase, main
 
 from ensembldb3.host import HostAccount, get_ensembl_account
@@ -123,7 +124,42 @@ class TestCompara(ComparaTestBase):
         Orthologs = self.comp.get_related_genes(gene_region=brca1,
                                               relationship="ortholog_one2one")
         self.assertEqual(Orthologs.get_species_set(), expect)
-
+    
+    def test_gene_tree(self):
+        """gene tree should match one downloaded from ensembl web"""
+        hbb = self.comp.Human.get_gene_by_stableid("ENSG00000244734")
+        paras = self.comp.get_related_genes(gene_region=hbb,
+                                        relationship="within_species_paralog")
+        t = paras.get_tree()
+        expect = LoadTree("data/HBB_gene_tree.nh")
+        expect = expect.get_sub_tree(t.get_tip_names())
+        self.assertTrue(expect.same_topology(t))
+    
+    def test_species_tree(self):
+        """should match the one used by ensembl"""
+        comp = Compara(["human", "mouse", "dog", "platypus"], release=release,
+                       account=account)
+        
+        # sub-tree should have correct species
+        sub_species = comp.get_species_tree(just_members=True)
+        self.assertEqual(set(sub_species.get_tip_names()),
+                         set(["Homo sapiens", "Mus musculus",
+                              "Canis familiaris", "Ornithorhynchus anatinus"]))
+        # topology should match current topology belief
+        expect = LoadTree(
+            treestring="(((Homo_sapiens,Mus_musculus),"\
+            "Canis_familiaris),Ornithorhynchus_anatinus)",
+            underscore_unmunge=True)
+        self.assertTrue(sub_species.same_topology(expect))
+        
+        # returned full tree should match download from ensembl
+        # but taxon names are customised in what they put up on
+        # the web-site, so need a better test.
+        sptree = comp.get_species_tree(just_members=False)
+        expect = LoadTree("data/ensembl_all_species.nh",
+                          underscore_unmunge=True)
+        self.assertTrue(len(sptree.get_tip_names()) == len(expect.get_tip_names()))
+    
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
         dog = Compara(['chimp', 'dog'], release=release, account=account,

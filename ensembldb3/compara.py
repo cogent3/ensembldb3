@@ -1,6 +1,9 @@
+from collections import defaultdict
 import sqlalchemy as sql
 from numpy import empty
 
+from cogent3 import LoadTree
+from cogent3.core.tree import PhyloNode
 from cogent3.util.table import Table
 
 from .species import Species as _Species
@@ -107,7 +110,71 @@ class Compara(object):
         return self._species_db_map
 
     genome_taxon = property(_get_genome_db_ids)
-
+    
+    def get_species_tree(self, just_members=True):
+        """returns the species tree
+        
+        Arguments:
+        ----------
+          - just_members: limits tips to just members of self
+        """
+        # grab the Ensembl species tree root ID
+        sptr = self.ComparaDb.get_table("species_tree_root")
+        condition = sptr.c.label == "Ensembl"
+        query = sql.select([sptr.c.root_id], whereclause=condition)
+        records = query.execute().fetchall()
+        assert len(records) == 1, records
+        root_id = records[0]["root_id"]
+        
+        # get the tree nodes
+        sptn = self.ComparaDb.get_table("species_tree_node")
+        condition = sql.and_(sptn.c.root_id==root_id)
+        query = sql.select([sptn], whereclause=condition)
+        records = query.execute().fetchall()
+        
+        # get the genome db -> name map
+        gen_db = self.ComparaDb.get_table('genome_db')
+        db_ids = [r["genome_db_id"] for r in records]
+        query = sql.select([gen_db.c.genome_db_id, gen_db.c.name],
+                           whereclause=gen_db.c.genome_db_id.in_(db_ids))
+        id_name = dict(query.execute().fetchall())
+        for id_, name in id_name.items():
+            name = _Species.get_species_name(name)
+            id_name[id_] = None if name == 'None' else name
+        
+        nodes = {}
+        parents = defaultdict(list)
+        for record in records:
+            parent_id = record['parent_id']
+            node_id = record['node_id']
+            length = record['distance_to_parent']
+            name = record['node_name']
+            gen_dbid = record['genome_db_id']
+            n = None if gen_dbid is None else id_name[gen_dbid]
+            name = name if n is None else n
+            node = PhyloNode(length=length, name=name)
+            nodes[node_id] = node
+            parents[parent_id].append(node)
+        
+        root = None
+        for parent in parents:
+            if parent not in nodes:
+                node = PhyloNode(name='root')
+                nodes[parent] = node
+            
+            node = nodes[parent]
+            for child in parents[parent]:
+                child.parent = node
+            
+            if len(parents[parent]) == 1:
+                root = node
+        
+        # convert tip-names to match genome db names
+        if just_members:
+            root = root.get_sub_tree(self.species)
+        
+        return root
+    
     def _get_species_set(self):
         if self._species_set is not None:
             return self._species_set
@@ -204,7 +271,8 @@ class Compara(object):
         member_table = self.ComparaDb.get_table(mem_name)
         homology_member_table = self.ComparaDb.get_table('homology_member')
         homology_table = self.ComparaDb.get_table('homology')
-
+        # homolog.c.gene_tree_root_id "The root_id of the gene tree from which 
+        # the homology is derived"
         member_ids = sql.select([member_table.c[mem_id]],
                                 member_table.c.stable_id == str(stableid))
 
@@ -228,16 +296,19 @@ class Compara(object):
         homology_records = \
             sql.select([homology_table.c.homology_id,
                         homology_table.c.description,
-                        homology_table.c.method_link_species_set_id],
+                        homology_table.c.method_link_species_set_id,
+                        homology_table.c.gene_tree_root_id],
                        sql.and_(homology_table.c.homology_id.in_(homology_ids),
                                 homology_table.c.description == relationship))
 
         homology_ids = []
+        gene_tree_roots = set()
         for r in homology_records.execute():
             homology_ids.append((r["homology_id"],
                                  (r["description"], r["method_link_species_set_id"])))
+            gene_tree_roots.update([r["gene_tree_root_id"]])
         homology_ids = dict(homology_ids)
-
+        
         if DEBUG:
             print("2 - homology_ids", homology_ids)
         if not homology_ids:
@@ -276,7 +347,8 @@ class Compara(object):
 
         if not data:
             return None
-        return RelatedGenes(self, data, relationships=relationships)
+        return RelatedGenes(self, data, relationships=relationships,
+                            gene_tree_root=gene_tree_roots)
 
     def _get_dnafrag_id_for_coord(self, coord):
         """returns the dnafrag_id for the coordnate"""
@@ -414,7 +486,8 @@ class Compara(object):
                 members += [(genome, record)]
             assert ref_location is not None, "Failed to make the reference"\
                 " location"
-            yield SyntenicRegions(self, members, ref_location=ref_location)
+            yield SyntenicRegions(self, members, ref_location=ref_location,
+                                  method_clade_id=method_clade_id)
 
     def get_distinct(self, property_type):
         """returns the Ensembl data-bases distinct values for the named
