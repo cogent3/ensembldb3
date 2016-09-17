@@ -89,7 +89,7 @@ class TestGenome(GenomeTestBase):
 
     def test_no_assembly(self):
         """return N's for coordinates with no assembly"""
-        krat = Genome('Kangaroo rat', release=58)
+        krat = Genome('Kangaroo rat', release=85)
         start = 24385
         end = start + 100
         region = krat.get_region(coord_name='scaffold_13754', start=start,
