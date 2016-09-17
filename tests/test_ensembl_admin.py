@@ -23,9 +23,9 @@ class TestAdminCli(TestCase):
             return r
         
         test_mysql_cfg = os.environ.get("ENSEMBLDB_TEST_CFG", None)
-        #if test_mysql_cfg is None:
-            #self.skipTest("ENSEMBLDB_TEST_CFG variable not defined, "
-                          #"skipping some cli tests")
+        if test_mysql_cfg is None:
+            self.skipTest("ENSEMBLDB_TEST_CFG variable not defined, "
+                          "skipping some cli tests")
         
         if os.path.exists(self.dirname):
             shutil.rmtree(self.dirname)
