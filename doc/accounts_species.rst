@@ -58,13 +58,13 @@ You can directly extend the list of species, or modify an existing entry, using 
     export ENSEMBLDBRC="~/path/to/ensembldbrc/"
 
 .. note::
-    The ``species.tsv`` file has at least 2, and up to 3, fields per line: species name, common name, species name synonymn.
+    The ``species.tsv`` file has at least 2, and up to 3, fields per line: species name, common name, species name synonym.
 
 
 Look up a species common name
 -----------------------------
 
-This can be done using the species name. Note that some synonymns are supported.
+This can be done using the species name. Note that some synonyms are supported.
 
 .. doctest::
     

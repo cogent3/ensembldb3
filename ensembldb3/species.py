@@ -32,7 +32,7 @@ def load_species(species_path):
                 print(num_fields, line)
                 raise ValueError(
                     "species file should be "
-                    "<latin name>\t<common name>\t<optional species synonymn>"
+                    "<latin name>\t<common name>\t<optional species synonym>"
                     " per line")                
         
     return data
@@ -76,7 +76,7 @@ class SpeciesNameMap(dict):
                                           "'; '".join(list(self._common_species.keys())) + "'")
     
     def add_synonym(self, species, synonym):
-        """add a synonymn for a species name
+        """add a synonym for a species name
         
         This provides an additional mapping to common names and ensembl
         db names"""

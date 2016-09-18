@@ -286,7 +286,7 @@ class TestGene(GenomeTestBase):
         self.assertTrue(found)
 
     def test_get_by_symbol_synonym(self):
-        """return correct gene if provide a synonymn, rather than symbol"""
+        """return correct gene if provide a synonym, rather than symbol"""
         synonym = 'FOXO1A'
         gene = list(self.human.get_genes_matching(symbol=synonym))[0]
         self.assertEqual(gene.symbol, 'FOXO1')

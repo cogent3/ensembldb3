@@ -85,8 +85,8 @@ class TestSpeciesNamemaps(TestCase):
                           Species.get_ensembl_db_prefix,
                           "failme")
     
-    def test_synonymns_work(self):
-        """species with synonymns should allow correct lookups"""
+    def test_synonyms_work(self):
+        """species with synonyms should allow correct lookups"""
         self.assertEqual(Species.get_species_name("Canis lupus familiaris"),
                          "Canis familiaris")
         self.assertEqual(Species.get_common_name("Canis lupus familiaris"),
