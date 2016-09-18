@@ -47,6 +47,8 @@ When posting a ticket, please provide a minimum working example to reproduce the
 Citation
 ********
 
+For now, please continue to cite  `Knight et al., 2007, Genome Biol, 8, R171 <http://genomebiology.com/2007/8/8/R171>`_.
+
 .. todo::
     
     on publication of the preprint
