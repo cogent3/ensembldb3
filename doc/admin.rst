@@ -126,4 +126,4 @@ will display all databases from release 85 on the mysql host in the server speci
 Trouble shooting
 ================
 
-Many of the administrative functions wrap shell commands. If you encounter any issues, use the verbose flag (``-v``) on a tool which will print the shell command to stdout. Then try the shell command directly to get all error messages.
+Many of the administrative functions wrap shell commands. If you encounter any issues, use the verbose flag (``-v``), causing shell commands to be printed to stdout. Then try the shell command directly to get all error messages.
