@@ -78,7 +78,7 @@ The command::
     
     $ ensembl_admin download -c /path/to/edited/ensembldb_download.cfg -n 3
 
-will download databases for the species specified in the  config file provided as the ``-c`` option. The specific databases for the Ensembl release, remote and local paths must all be defined in that file (see :ref:`exportrc`). The ``-n`` option indicates the number of parallel processors to use for the download (maximum allowed is 5).
+will download databases for the species specified in the ``ensembldb_download.cfg`` config. The specific databases for the Ensembl release, remote and local paths must all be defined in that file (see :ref:`exportrc`). The ``-n`` option indicates the number of parallel processors to use for the download (maximum allowed is 5).
 
 For the very large databases (e.g. compara or human variation) the download times can be very long. In which case we recommend, if running on a server, using the ``nohup`` command.
 
@@ -97,7 +97,7 @@ The command::
     
     $ ensembl_admin install -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg -n 3
     
-installs databases specified from the same config you used for downloading (``-c``),  into the specified mysql server with mysql account details in the config provided to (``-m``). In this instance, 3 processors are used for separate gnzipping and ``mysqlimport`` of tables in parallel.
+installs databases specified in the ``ensembldb_download.cfg`` config, into the mysql server specified by ``mysql.cfg``. In this instance, 3 processors are used for separate gzipping and ``mysqlimport`` of tables in parallel.
 
 For the very large databases (e.g. compara or human variation) the install times can be very long. In which case we recommend, if running on a server, using the ``nohup`` command.
 
@@ -112,7 +112,7 @@ The command::
 
     $ ensembl_admin drop -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg
 
-will drop the databases specified in the ``ensembldb_download.cfg`` from the mysql host provided to ``-m``. You are required to confirm dropping listed databases.
+will drop the databases specified in the ``ensembldb_download.cfg`` from the mysql server specified by ``mysql.cfg``. You are required to confirm dropping listed databases.
 
 ``ensembl_admin show``
 ======================
@@ -121,7 +121,7 @@ The command::
 
     $ ensembl_admin show --release 85 -m /path/to/mysql.cfg
 
-will display all databases from release 85 on the mysql host in the config provided to ``-m``.
+will display all databases from release 85 on the mysql host in the server specified by ``mysql.cfg``.
 
 Trouble shooting
 ================
