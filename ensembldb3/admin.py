@@ -193,11 +193,15 @@ def read_mysql_config(config_path, section, verbose=False):
     if not parser.has_section(section):
         return opts
     
-    for k in ["host", "user", "passwd", "command"]:
+    for k in ["host", "user", "passwd", "command", "port"]:
         if not parser.has_option(section, k):
             continue
         
-        opts[k] = parser.get(section, k) or opts[k]
+        val = parser.get(section, k) or opts[k]
+        if k == "port":
+            val = int(val)
+        
+        opts[k] = val
     
     return opts
 
@@ -275,7 +279,7 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     """install ensembl databases into a MySQL server"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(mysql_info["host"], mysql_info["user"],
-                          mysql_info["passwd"])
+                          mysql_info["passwd"], port=mysql_info["port"])
     
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     
@@ -318,7 +322,7 @@ def drop(configpath, mysqlcfg, verbose, debug):
     """drop databases from a MySQL server"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(mysql_info["host"], mysql_info["user"],
-                          mysql_info["passwd"])
+                          mysql_info["passwd"], port=mysql_info["port"])
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     cursor = server.cursor()
     release, remote_path, local_path, species_dbs = read_config(configpath)
@@ -360,7 +364,7 @@ def show(release, mysqlcfg):
     """shows databases corresponding to release"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(mysql_info["host"], mysql_info["user"],
-                          mysql_info["passwd"])
+                          mysql_info["passwd"], port=mysql_info["port"])
     names = get_db_name(account=account, release=str(release))
     click.echo("Databases at host='%s' for release=%s" % (account.host, release))
     if names:
