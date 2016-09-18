@@ -46,7 +46,22 @@ species.tsv
     A tab delimited file with a species latin name and common name per line. This is used to define the common names that ``ensembldb3.Species`` uses for succinctly identifying species and their databases.
 
 ensembldb_download.cfg
-    A config file with sections for remote path, local path, release and the species of interest. In the latter case, their common names are used as the section title. The databases are specified by a comma separated line as core, variation, otherfeatures. The compara database has the same section title as the db name.
+    A config file with sections for remote path, local path, release and the species of interest. In the latter case, their common names are used as the section title. The databases are specified by a comma separated line as core, variation, otherfeatures. The compara database has the same section title as the db name. Here's an example ::
+
+        [remote path] # required
+        path=ftp.ensembl.org/ensembl/pub/
+        [local path] # required
+        path=/tmp/ensembldb_download
+        [release] # required
+        release=85
+        [S.cerevisiae]
+        db=core
+        [Xenopus]
+        db=core
+        [Human]
+        db=core,variation
+        [compara]
+        db=compara
 
 mysql.cfg
     A config file with sections for ``mysql`` and ``mysqlimport``. The sections include the command (full path) to the executable, including any command arguments and the account settings (username, password).
