@@ -24,7 +24,15 @@ Welcome to ``ensembldb3`` documentation!
 Overview
 ********
 
-``ensembldb3`` provides python 3 compatible bindings to the Ensembl_ MySQL databases. It also includes capabilities for administering these databases locally. Specifically, tools for downloading MySQL dumps, installing those locally and removing old releases. See the `EnsemblDb project page <https://bitbucket.org/pycogent3/ensembldb3>`_ for the latest version of the code.
+``ensembldb3`` provides python 3 compatible bindings to the Ensembl_ MySQL databases. It also includes capabilities for administering these databases locally. Specifically, tools for downloading MySQL dumps, installing those locally and removing old releases.
+
+See the `EnsemblDb project page <https://bitbucket.org/pycogent3/ensembldb3>`_ for the latest version of the code.
+
+*******
+History
+*******
+
+``ensembldb3`` began it's existence in 2009 as ``cogent.db.ensembl``, a part of PyCogent. With the port of PyCogent to Python 3 (resulting in `PyCogent3 <https://bitbucket.org/pycogent3/cogent3>`_), it was decided to split the Ensembl querying code out into it's own project. This will make it easier to increase features and improve the project visibility.
 
 .. todo::
 
@@ -47,7 +55,7 @@ When posting a ticket, please provide a minimum working example to reproduce the
 Citation
 ********
 
-For now, please continue to cite  `Knight et al., 2007, Genome Biol, 8, R171 <http://genomebiology.com/2007/8/8/R171>`_.
+For now, please continue to cite the PyCogent paper --  `Knight et al., 2007, Genome Biol, 8, R171 <http://genomebiology.com/2007/8/8/R171>`_.
 
 .. todo::
     
