@@ -23,7 +23,7 @@ Because PyCogent3 requires numpy be installed prior to installation, the followi
 Documentation
 *************
 
-At present the docs are only available in the repo, `requiring sphinx <http://www.sphinx-doc.org/>`_ to be built.
+The documentation can be viewed at `readthedocs <http://ensembldb3.rtfd.io>`_. You can build it yourself, but it `requires sphinx <http://www.sphinx-doc.org/>`_ and the `read the docs Sphinx theme <https://pypi.python.org/pypi/sphinx_rtd_theme>`_.
 
 .. todo: Update with readthedocs link when the repo is public.
 
