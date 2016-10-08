@@ -7,6 +7,7 @@ import shutil
 from glob import glob, glob1
 import configparser
 from collections import defaultdict
+from pprint import pprint
 
 import click
 from cogent3.util import parallel
@@ -176,6 +177,23 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs, forc
         pass
     
 
+def sorted_by_size(local_path, dbnames, debug=False):
+    """returns dbnames ordered by directory size"""
+    join = os.path.join
+    getsize = os.path.getsize
+    size_dbnames = []
+    for dbname in dbnames:
+        path = join(local_path, dbname.name)
+        size = sum(getsize(join(path, fname)) for fname in os.listdir(path))
+        size_dbnames.append([size, dbname])
+    size_dbnames.sort()
+    
+    if debug:
+        pprint(size_dbnames)
+    
+    sizes, dbnames = zip(*size_dbnames)
+    return dbnames
+
 ## can we get away with the ~/.my.cnf for the sql cursor?
 def read_mysql_config(config_path, section, verbose=False):
     """returns a dict with mysql config options
@@ -286,6 +304,7 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     release, remote_path, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     dbnames = reduce_dirnames(content, species_dbs)
+    dbnames = sorted_by_size(local_path, dbnames, debug=debug)
     for dbname in dbnames:
         server.ping(reconnect=True) # reconnect if server not alive
         cursor = server.cursor()
