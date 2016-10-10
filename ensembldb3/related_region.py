@@ -79,8 +79,8 @@ class RelatedGenes(_RelatedRegions):
         my_type = self.__class__.__name__
 
         display = ['%s:' % my_type,
-                   ' relationships=%s' % self.relationships]
-        display += ['  %s' % m for m in self.members]
+                   ' relationships=%s' % str(self.relationships)]
+        display += ['  %s %s' % (m, m.relationship) for m in self.members]
         return '\n'.join(display)
 
     def __repr__(self):
@@ -145,7 +145,10 @@ class RelatedGenes(_RelatedRegions):
             root = root.get_sub_tree(stableids)
         
         return root
-        
+    
+    def get_genes_by_relationship(self, relationship):
+        return [m for m in self.members if m.relationship in [relationship, None]]
+    
 
 
 class SyntenicRegion(LazyRecord):

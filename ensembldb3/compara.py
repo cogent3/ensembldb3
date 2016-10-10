@@ -251,11 +251,11 @@ class Compara(object):
             - relationship: the types of related genes sought"""
         assert gene_region is not None or stableid is not None,\
             "No identifier provided"
-        assert relationship is not None, "No relationship specified"
+        # assert relationship is not None, "No relationship specified"  # TODO: delete 
 
         # TODO understand why this has become necessary to suppress warnings
         # in SQLAlchemy 0.6
-        relationship = '%s' % relationship
+        # relationship = '%s' % relationship ## TODO: if still have relationship option
 
         stableid = stableid or gene_region.stableid
 
@@ -298,9 +298,9 @@ class Compara(object):
                         homology_table.c.description,
                         homology_table.c.method_link_species_set_id,
                         homology_table.c.gene_tree_root_id],
-                       sql.and_(homology_table.c.homology_id.in_(homology_ids),
-                                homology_table.c.description == relationship))
-
+                       sql.and_(homology_table.c.homology_id.in_(homology_ids)))#,
+                                # homology_table.c.description!=relationship)) 
+        
         homology_ids = []
         gene_tree_roots = set()
         for r in homology_records.execute():
@@ -313,7 +313,7 @@ class Compara(object):
             print("2 - homology_ids", homology_ids)
         if not homology_ids:
             return None
-
+            
         ortholog_ids = sql.select([homology_member_table.c[mem_id],
                                    homology_member_table.c.homology_id],
                                   homology_member_table.c.homology_id.in_(list(homology_ids.keys())))
@@ -321,33 +321,35 @@ class Compara(object):
         ortholog_ids = dict([(r[mem_id], r['homology_id'])
                              for r in ortholog_ids.execute()])
 
+        
         if DEBUG:
             print("ortholog_ids", ortholog_ids)
         if not ortholog_ids:
             return None
 
-        # could we have more than one here?
-        relationships = set()
-        for memid, homid in list(ortholog_ids.items()):
-            relationships.update([homology_ids[homid][0]])
-        relationships = tuple(relationships)
-
-        gene_set = sql.select([member_table],
+        gene_set = sql.select([member_table, homology_member_table.c.homology_id],
                               sql.and_(member_table.c[mem_id].in_(list(ortholog_ids.keys())),
-                                       member_table.c.taxon_id.in_(list(self.taxon_id_species.keys()))))
-        data = []
+                                       member_table.c.taxon_id.in_(list(self.taxon_id_species.keys())), 
+                                       member_table.c.gene_member_id == homology_member_table.c.gene_member_id, 
+                                       homology_member_table.c.homology_id.in_(list(homology_ids.keys()))))#, 
+                                       # member_table.c.stable_id != stableid))  ## TODO: exclude query gene?
+        data, relationships = {}, set()
         for record in gene_set.execute():
             genome = self.taxon_id_species[record['taxon_id']]
-            stableid = record['stable_id']
-            gene = list(genome.get_genes_matching(stableid=stableid))
-            assert len(gene) == 1, "Error in selecting genes: %s" % gene
-            gene = gene[0]
-            gene.location.strand = record[frag_strand]
-            data += [gene]
-
+            gene = genome.get_gene_by_stableid(record['stable_id'])
+            assert gene.location.strand == record[frag_strand]
+            if gene.stableid in data:  ## somehow, some genes have multiple record, usually the reference gene?
+                continue
+            
+            relationship, mid = homology_ids[record['homology_id']]
+            relationship = [relationship, None][gene.stableid==stableid] ## None or reference??
+            gene.__setattr__('relationship', relationship)
+            if relationship is not None:
+                relationships.update([relationship])
+            data[gene.stableid] = gene
         if not data:
             return None
-        return RelatedGenes(self, data, relationships=relationships,
+        return RelatedGenes(self, list(data.values()), relationships=relationships,
                             gene_tree_root=gene_tree_roots)
 
     def _get_dnafrag_id_for_coord(self, coord):
