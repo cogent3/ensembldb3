@@ -1,5 +1,6 @@
 __all__ = ['test_ensembl_admin', 'test_assembly', 'test_compara', 'test_database',
-           'test_feature_level', 'test_genome', 'test_host', 'test_species']
+           'test_feature_level', 'test_genome', 'test_host', 'test_species',
+           'test_variation']
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
