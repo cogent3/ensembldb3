@@ -10,9 +10,9 @@ This library provides capabilities for querying Ensembl MySQL databases and for 
 Installation
 ************
 
-Installation via pip into virtualenv's or conda environmenrs (via pip) has been tested and is described below.
+``ensembldb3`` requires python 3.5+. Installation via pip into virtualenv's or conda environments (via pip) has been tested and is described below.
 
-Because PyCogent3 requires numpy be installed prior to installation, the following steps are recommended.
+Because the PyCogent3 dependency requires numpy be installed prior to installation, the following steps are recommended.
 
 ::
 

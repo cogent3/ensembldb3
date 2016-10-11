@@ -3,19 +3,33 @@
 Installation
 ============
 
-Until the project is released onto PyPi or conda, you need to obtain the source from bitbucket.
+``ensembldb3`` requires python 3.5+. Until the project is released onto PyPi or conda, you need to obtain the source from bitbucket.
 
 Installation from bitbucket
 ---------------------------
 
-Clone the repository, or download a zip archive of the latest version in the mercurial repository on bitbucket. See the `EnsemblDb project page <https://bitbucket.org/pycogent3/ensembldb3>`_.
+Installing PyCogent3
+^^^^^^^^^^^^^^^^^^^^
 
-Then use pip
-------------
+Because PyCogent3 is also currently only available via bitbucket, I have included instructions for installing that also.
 
-1. Follow the instructions for `installing PyCogent3 <http://cogent3.readthedocs.io/en/latest/install.html>`_.
+`Download a PyCogent3 zip file <https://bitbucket.org/pycogent3/cogent3/downloads>`_ to your hard drive. Then:
 
-2. Using the downloaded zip, pip install as::
+1. Install numpy ::
+
+    $ pip install numpy
+
+2. Install PyCogent3 ::
+
+    $ DONT_USE_CYTHON=1 pip install /path/to/downloaded/pycogent3archive.zip
+
+
+Installing ``ensembldb3``
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+`Download a ensembldb3 zip file <https://bitbucket.org/pycogent3/ensembldb3/downloads>`_ to your hard drive. Then
+
+3. Install ``ensembldb3`` ::
 
     $ pip install /path/to/downloaded/ensembldb3archive.zip
 
