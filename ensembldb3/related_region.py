@@ -67,11 +67,11 @@ class _RelatedRegions(LazyRecord):
 class RelatedGenes(_RelatedRegions):
     type = 'related_genes'
 
-    def __init__(self, compara, members, relationships, gene_tree_root=None):
+    def __init__(self, compara, members, relationship, gene_tree_root=None):
         super(RelatedGenes, self).__init__()
         self.compara = compara
         self.members = tuple(m for m in members if m.location is not None)
-        self.relationships = relationships
+        self.relationship = relationship
         # gene_tree_root is the id from homology
         self._gene_tree_root = gene_tree_root
 
@@ -79,8 +79,8 @@ class RelatedGenes(_RelatedRegions):
         my_type = self.__class__.__name__
 
         display = ['%s:' % my_type,
-                   ' relationships=%s' % str(self.relationships)]
-        display += ['  %s %s' % (m, m.relationship) for m in self.members]
+                   ' relationship=%s' % str(self.relationship)]
+        display += ['  %s' % m for m in self.members]
         return '\n'.join(display)
 
     def __repr__(self):
@@ -145,9 +145,6 @@ class RelatedGenes(_RelatedRegions):
             root = root.get_sub_tree(stableids)
         
         return root
-    
-    def get_genes_by_relationship(self, relationship):
-        return [m for m in self.members if m.relationship in [relationship, None]]
     
 
 

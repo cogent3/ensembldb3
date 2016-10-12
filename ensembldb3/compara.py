@@ -251,11 +251,10 @@ class Compara(object):
             - relationship: the types of related genes sought"""
         assert gene_region is not None or stableid is not None,\
             "No identifier provided"
-        # assert relationship is not None, "No relationship specified"  # TODO: delete 
 
         # TODO understand why this has become necessary to suppress warnings
         # in SQLAlchemy 0.6
-        # relationship = '%s' % relationship ## TODO: if still have relationship option
+        relationship = None if relationship is None else str(relationship) 
 
         stableid = stableid or gene_region.stableid
 
@@ -273,33 +272,44 @@ class Compara(object):
         homology_table = self.ComparaDb.get_table('homology')
         # homolog.c.gene_tree_root_id "The root_id of the gene tree from which 
         # the homology is derived"
-        member_ids = sql.select([member_table.c[mem_id]],
+        member_ids = sql.select([member_table.c[mem_id], 
+                                 member_table.c.taxon_id],
                                 member_table.c.stable_id == str(stableid))
-
-        member_ids = [r[mem_id] for r in member_ids.execute()]
-        if not member_ids:
-            return None
-
+                                
+        member_records = member_ids.execute()
         if DEBUG:
-            print("member_ids", member_ids)
+            print("member_records", member_records)
+        
+        if not member_records:
+            return None
+        else:
+            member_record = asserted_one(member_records)
+            member_id = member_record[mem_id]
+        
+        ## in case query gene_region is not provided
+        if gene_region is None:
+            ref_genome = self.taxon_id_species[member_record['taxon_id']]
+            gene_region = ref_genome.get_gene_by_stableid(stableid)
+            print("getting reference gene: ", gene_region)
 
         homology_ids = sql.select([homology_member_table.c.homology_id,
                                    homology_member_table.c[mem_id]],
-                                  homology_member_table.c[mem_id].in_(member_ids))
+                                  homology_member_table.c[mem_id]==member_id)
         homology_ids = [r['homology_id'] for r in homology_ids.execute()]
         if not homology_ids:
             return None
 
         if DEBUG:
             print("1 - homology_ids", homology_ids)
-
+        
+        condition = homology_table.c.homology_id.in_(homology_ids)
+        if relationship is not None:
+            condition = sql.and_(condition, homology_table.c.description == relationship)
         homology_records = \
             sql.select([homology_table.c.homology_id,
                         homology_table.c.description,
                         homology_table.c.method_link_species_set_id,
-                        homology_table.c.gene_tree_root_id],
-                       sql.and_(homology_table.c.homology_id.in_(homology_ids)))#,
-                                # homology_table.c.description!=relationship)) 
+                        homology_table.c.gene_tree_root_id], condition)
         
         homology_ids = []
         gene_tree_roots = set()
@@ -331,26 +341,28 @@ class Compara(object):
                               sql.and_(member_table.c[mem_id].in_(list(ortholog_ids.keys())),
                                        member_table.c.taxon_id.in_(list(self.taxon_id_species.keys())), 
                                        member_table.c.gene_member_id == homology_member_table.c.gene_member_id, 
-                                       homology_member_table.c.homology_id.in_(list(homology_ids.keys()))))#, 
-                                       # member_table.c.stable_id != stableid))  ## TODO: exclude query gene?
-        data, relationships = {}, set()
+                                       homology_member_table.c.homology_id.in_(list(homology_ids.keys())), 
+                                       member_table.c.stable_id != stableid))  ## exclude query gene
+        # data, reltypes, homologs = {}, {}, defaultdict(list)
+        reltypes, stableids = defaultdict(list), set()
         for record in gene_set.execute():
-            genome = self.taxon_id_species[record['taxon_id']]
-            gene = genome.get_gene_by_stableid(record['stable_id'])
-            assert gene.location.strand == record[frag_strand]
-            if gene.stableid in data:  ## somehow, some genes have multiple record, usually the reference gene?
-                continue
+            homid = record['homology_id']
+            sid = record['stable_id']
+            assert sid not in stableids  ## no repeated record for the same gene
+            stableids.update([sid])
             
-            relationship, mid = homology_ids[record['homology_id']]
-            relationship = [relationship, None][gene.stableid==stableid] ## None or reference??
-            gene.__setattr__('relationship', relationship)
-            if relationship is not None:
-                relationships.update([relationship])
-            data[gene.stableid] = gene
-        if not data:
+            genome = self.taxon_id_species[record['taxon_id']]
+            gene = genome.get_gene_by_stableid(sid)
+            assert gene.location.strand == record[frag_strand]
+            reltype, mid = homology_ids[homid] # mid is method_link_species_set_id
+            reltypes[reltype].append(gene)
+        if not reltypes:
             return None
-        return RelatedGenes(self, list(data.values()), relationships=relationships,
-                            gene_tree_root=gene_tree_roots)
+        
+        for reltype in reltypes:
+            genes = reltypes[reltype] + [gene_region]
+            yield RelatedGenes(self, genes, relationship=reltype, gene_tree_root=gene_tree_roots)
+            
 
     def _get_dnafrag_id_for_coord(self, coord):
         """returns the dnafrag_id for the coordnate"""
