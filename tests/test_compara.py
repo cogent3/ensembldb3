@@ -65,6 +65,17 @@ class TestCompara(ComparaTestBase):
                                               relationship='ortholog_one2many')
         self.assertTrue(len(list(orthologs)[0].members) < 4)
 
+    def test_get_related_genes3(self):
+        """should get all relationships if relationship is not specified"""
+        stableid = "ENSG00000036828"
+        expect = dict(within_species_paralog=set([stableid, "ENSG00000283187"]), 
+                      ortholog_one2many=set([stableid, "ENSRNOG00000002265", "ENSMUSG00000051980", "ENSOANG00000010069"]))
+        orthologs = self.comp.get_related_genes(stableid=stableid)
+        for ortholog in orthologs:
+            relationship = ortholog.relationship
+            stableids = [gene.stableid for gene in ortholog.members]
+            self.assertEqual(set(stableids), expect[relationship])
+
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
