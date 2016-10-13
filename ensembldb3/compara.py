@@ -290,7 +290,6 @@ class Compara(object):
         if gene_region is None:
             ref_genome = self.taxon_id_species[member_record['taxon_id']]
             gene_region = ref_genome.get_gene_by_stableid(stableid)
-            print("getting reference gene: ", gene_region)
 
         homology_ids = sql.select([homology_member_table.c.homology_id,
                                    homology_member_table.c[mem_id]],
@@ -343,11 +342,10 @@ class Compara(object):
                                        member_table.c.gene_member_id == homology_member_table.c.gene_member_id, 
                                        homology_member_table.c.homology_id.in_(list(homology_ids.keys())), 
                                        member_table.c.stable_id != stableid))  ## exclude query gene
-        # data, reltypes, homologs = {}, {}, defaultdict(list)
-        reltypes, stableids = defaultdict(list), set()
+        related, stableids = defaultdict(list), set()
         for record in gene_set.execute():
             homid = record['homology_id']
-            sid = record['stable_id']
+            sid = record['stable_id'] ## stableid has been taken by the query gene
             assert sid not in stableids  ## no repeated record for the same gene
             stableids.update([sid])
             
@@ -355,12 +353,12 @@ class Compara(object):
             gene = genome.get_gene_by_stableid(sid)
             assert gene.location.strand == record[frag_strand]
             reltype, mid = homology_ids[homid] # mid is method_link_species_set_id
-            reltypes[reltype].append(gene)
-        if not reltypes:
+            related[reltype].append(gene)
+        if not related:
             return None
         
-        for reltype in reltypes:
-            genes = reltypes[reltype] + [gene_region]
+        for reltype in related:
+            genes = related[reltype] + [gene_region]
             yield RelatedGenes(self, genes, relationship=reltype, gene_tree_root=gene_tree_roots)
             
 
