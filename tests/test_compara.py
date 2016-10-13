@@ -53,9 +53,9 @@ class TestCompara(ComparaTestBase):
     def test_get_related_genes(self):
         """should correctly return the related gene regions from each genome"""
         brca2 = self.comp.Mouse.get_gene_by_stableid("ENSMUSG00000041147")
-        Orthologs = self.comp.get_related_genes(gene_region=brca2,
-                                              relationship="ortholog_one2one")
-        self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
+        Orthologs = list(self.comp.get_related_genes(gene_region=brca2,
+                                              relationship="ortholog_one2one"))[0]
+        self.assertEqual("ortholog_one2one", Orthologs.relationship)
 
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""
@@ -63,13 +63,13 @@ class TestCompara(ComparaTestBase):
             stableid='ENSMUSG00000030157')
         orthologs = self.comp.get_related_genes(gene_region=clec2d,
                                               relationship='ortholog_one2many')
-        self.assertTrue(len(orthologs.members) < 4)
+        self.assertTrue(len(list(orthologs)[0].members) < 4)
 
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
         Orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               relationship="ortholog_one2one")
-        collection = Orthologs.get_seq_collection()
+        collection = list(Orthologs)[0].get_seq_collection()
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
     def test_getting_alignment(self):
@@ -123,13 +123,13 @@ class TestCompara(ComparaTestBase):
         brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
         Orthologs = self.comp.get_related_genes(gene_region=brca1,
                                               relationship="ortholog_one2one")
-        self.assertEqual(Orthologs.get_species_set(), expect)
+        self.assertEqual(list(Orthologs)[0].get_species_set(), expect)
     
     def test_gene_tree(self):
         """gene tree should match one downloaded from ensembl web"""
         hbb = self.comp.Human.get_gene_by_stableid("ENSG00000244734")
-        paras = self.comp.get_related_genes(gene_region=hbb,
-                                        relationship="within_species_paralog")
+        paras = list(self.comp.get_related_genes(gene_region=hbb,
+                                        relationship="within_species_paralog"))[0]
         t = paras.get_tree()
         expect = LoadTree("data/HBB_gene_tree.nh")
         expect = expect.get_sub_tree(t.get_tip_names())

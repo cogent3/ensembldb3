@@ -35,7 +35,7 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0265298")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               relationship="ortholog_one2one")
-        self.assertEqual("ortholog_one2one", Orthologs.relationships[0])
+        self.assertEqual("ortholog_one2one", list(Orthologs)[0].relationship)
 
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""
@@ -44,14 +44,14 @@ class MZ_TestCompara(MZ_ComparaTestBase):
             stableid='FBgn0050169')
         orthologs = self.comp.get_related_genes(gene_region=brca2,
                                               relationship='ortholog_one2one')
-        self.assertEqual(len(orthologs.members), 2)
+        self.assertEqual(len(list(orthologs)[0].members), 2)
 
     def test_get_collection(self):
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid(
             stableid="FBgn0265298")
         Orthologs = self.comp.get_related_genes(gene_region=sc35,
                                               relationship="ortholog_one2one")
-        collection = Orthologs.get_seq_collection()
+        collection = list(Orthologs)[0].get_seq_collection()
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
 
