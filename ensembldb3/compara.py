@@ -95,7 +95,7 @@ class Compara(object):
         assert len(self._species_id_map) == len(self.species)
         return self._species_id_map
 
-    taxon_id_species = property(_make_species_id_map)
+    _taxon_id_species = property(_make_species_id_map)
 
     def _get_genome_db_ids(self):
         if self._species_db_map is not None:
@@ -103,13 +103,13 @@ class Compara(object):
         genome_db_table = self.ComparaDb.get_table('genome_db')
         query = sql.select([genome_db_table.c.genome_db_id,
                             genome_db_table.c.taxon_id],
-                           genome_db_table.c.taxon_id.in_(list(self.taxon_id_species.keys())))
+                           genome_db_table.c.taxon_id.in_(list(self._taxon_id_species.keys())))
         records = query.execute()
         self._species_db_map = \
             dict([(r['genome_db_id'], r['taxon_id']) for r in records])
         return self._species_db_map
 
-    genome_taxon = property(_get_genome_db_ids)
+    _genome_taxon = property(_get_genome_db_ids)
     
     def get_species_tree(self, just_members=True):
         """returns the species tree
@@ -181,7 +181,7 @@ class Compara(object):
         # we make sure the species set contains all species
         species_set_table = self.ComparaDb.get_table('species_set')
         query = sql.select([species_set_table],
-                           species_set_table.c.genome_db_id.in_(list(self.genome_taxon.keys())))
+                           species_set_table.c.genome_db_id.in_(list(self._genome_taxon.keys())))
         species_sets = {}
         for record in query.execute():
             gen_id = record['genome_db_id']
@@ -191,7 +191,7 @@ class Compara(object):
             else:
                 species_sets[sp_set_id] = set([gen_id])
 
-        expected = set(self.genome_taxon.keys())
+        expected = set(self._genome_taxon.keys())
         species_set_ids = []
         for sp_set, gen_id in list(species_sets.items()):
             if expected <= gen_id:
@@ -288,7 +288,7 @@ class Compara(object):
         
         ## in case query gene_region is not provided
         if gene_region is None:
-            ref_genome = self.taxon_id_species[member_record['taxon_id']]
+            ref_genome = self._taxon_id_species[member_record['taxon_id']]
             gene_region = ref_genome.get_gene_by_stableid(stableid)
 
         homology_ids = sql.select([homology_member_table.c.homology_id,
@@ -338,7 +338,7 @@ class Compara(object):
 
         gene_set = sql.select([member_table, homology_member_table.c.homology_id],
                               sql.and_(member_table.c[mem_id].in_(list(ortholog_ids.keys())),
-                                       member_table.c.taxon_id.in_(list(self.taxon_id_species.keys())), 
+                                       member_table.c.taxon_id.in_(list(self._taxon_id_species.keys())), 
                                        member_table.c.gene_member_id == homology_member_table.c.gene_member_id, 
                                        homology_member_table.c.homology_id.in_(list(homology_ids.keys())), 
                                        member_table.c.stable_id != stableid))  ## exclude query gene
@@ -349,7 +349,7 @@ class Compara(object):
             assert sid not in stableids  ## no repeated record for the same gene
             stableids.update([sid])
             
-            genome = self.taxon_id_species[record['taxon_id']]
+            genome = self._taxon_id_species[record['taxon_id']]
             gene = genome.get_gene_by_stableid(sid)
             assert gene.location.strand == record[frag_strand]
             reltype, mid = homology_ids[homid] # mid is method_link_species_set_id
@@ -414,7 +414,7 @@ class Compara(object):
                            sql.and_(genomic_align_table.c.genomic_align_block_id ==
                                     genomic_align_block_id,
                                     genomic_align_table.c.dnafrag_id == dnafrag_table.c.dnafrag_id,
-                                    dnafrag_table.c.genome_db_id.in_(list(self.genome_taxon.keys()))))
+                                    dnafrag_table.c.genome_db_id.in_(list(self._genome_taxon.keys()))))
         return query.execute().fetchall()
 
     def get_syntenic_regions(self, species=None, coord_name=None, start=None,
@@ -473,8 +473,8 @@ class Compara(object):
             members = []
             ref_location = None
             for record in records:
-                taxon_id = self.genome_taxon[record.genome_db_id]
-                genome = self.taxon_id_species[taxon_id]
+                taxon_id = self._genome_taxon[record.genome_db_id]
+                genome = self._taxon_id_species[taxon_id]
                 # we have a case where we getback different coordinate system
                 # results for the ref genome. We keep only those that match
                 # the coord_name of region
