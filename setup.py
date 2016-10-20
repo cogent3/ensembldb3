@@ -56,5 +56,9 @@ setup(
     entry_points={
         'console_scripts': ['ensembl_admin=ensembldb3.admin:main',
                             ],
-    }
+    },
+    package_dir={'ensembldb3': 'ensembldb3'},
+    package_data={'ensembldb3' : ['data/ensembldb_download.cfg',
+                                  'data/mysql.cfg',
+                                  'data/species.tsv']}
 )
