@@ -9,10 +9,10 @@ from pkg_resources import resource_filename
 from sqlalchemy import create_engine, MetaData, Table
 
 __author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2007-2012, The Cogent Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb Project"
 __credits__ = ["Gavin Huttley"]
-__license__ = "GPL"
-__version__ = "1.5.3-dev"
+__license__ = "BSD"
+__version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
