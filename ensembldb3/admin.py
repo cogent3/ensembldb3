@@ -345,7 +345,8 @@ def drop(configpath, mysqlcfg, verbose, debug):
     server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
     cursor = server.cursor()
     release, remote_path, local_path, species_dbs = read_config(configpath)
-    content = os.listdir(local_path)
+    content = get_db_name(account=account, release=str(release))
+    content = [str(n) for n in content]
     dbnames = reduce_dirnames(content, species_dbs)
     
     click.echo("The following databases will be deleted:")
