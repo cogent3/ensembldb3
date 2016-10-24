@@ -18,7 +18,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 85
+release = 86
 
 NULL_VALUE = None
 
@@ -190,8 +190,8 @@ class TestGene(GenomeTestBase):
         # complex. This case has a macaque gene which we correctly
         # infer the CDS boundaries for according to Ensembl, but the CDS
         # length is not divisible by 3.
-        gene = self.macaq.get_gene_by_stableid(stableid='ENSMMUG00000001551')
-        transcript = gene.get_member('ENSMMUT00000002194')
+        gene = self.macaq.get_gene_by_stableid(stableid='ENSMMUG00000043764')
+        transcript = gene.get_member('ENSMMUT00000061450')
         # the following works because we enforce the length being divisble by 3
         # in producing protein_seq
         prot_seq = transcript.protein_seq
@@ -201,8 +201,7 @@ class TestGene(GenomeTestBase):
         trunc_cds = transcript.cds[: l - (l % 3)]
         prot_seq = trunc_cds.get_translation()
         self.assertEqual(str(prot_seq),
-                         'MPSSPLRVAVVCSSNQNRSMEAHNILSKRGFSVRSFGTGTHVKLPGPAPDKPNVYDFKTT'
-                         'YDQMYNDLLRKDKELYTQNGILHMLDRNKRIKPRPERFQNCKDLFDLILTCEERVY')
+                         'QGVSLLPQQSRGRVLVCSSLNLSSPWMKGSLSLPFFFFVPV')
 
     def test_exon_phases(self):
         """correctly identify phase for an exon"""

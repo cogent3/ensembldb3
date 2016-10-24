@@ -157,7 +157,7 @@ class Compara(object):
         
         # convert tip-names to match genome db names
         if just_members:
-            root = root.get_sub_tree(self.species)
+            root = root.get_sub_tree(self.species, tipsonly=True)
         
         return root
     

@@ -15,7 +15,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 85
+release = 86
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -68,13 +68,17 @@ class TestCompara(ComparaTestBase):
     def test_get_related_genes3(self):
         """should get all relationships if relationship is not specified"""
         stableid = "ENSG00000036828"
-        expect = dict(within_species_paralog=set([stableid, "ENSG00000283187"]), 
-                      ortholog_one2many=set([stableid, "ENSRNOG00000002265", "ENSMUSG00000051980", "ENSOANG00000010069"]))
+        expect = dict(within_species_paralog=set([stableid,
+                                                  "ENSG00000283187",
+                                                  "ENSG00000173612"]), 
+                      ortholog_one2many=set([stableid,
+                                             "ENSRNOG00000002265",
+                                             "ENSMUSG00000051980",
+                                             "ENSOANG00000010069"]))
         orthologs = self.comp.get_related_genes(stableid=stableid)
         for ortholog in orthologs:
-            relationship = ortholog.relationship
             stableids = [gene.stableid for gene in ortholog.members]
-            self.assertEqual(set(stableids), expect[relationship])
+            self.assertEqual(set(stableids), expect[ortholog.relationship])
 
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
@@ -86,8 +90,12 @@ class TestCompara(ComparaTestBase):
     def test_getting_alignment(self):
         mid = "ENSMUSG00000041147"
         brca2 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
+        print(brca2)
         result = list(self.comp.get_syntenic_regions(region=brca2,
-                                                   align_method='PECAN', align_clade='vertebrates'))[0]
+                                                   align_method='PECAN',
+                                                   align_clade='vertebrates'))
+        print(result)
+        result = result[-1]
         aln = result.get_alignment(feature_types='gene')
         # to improve test robustness across Ensembl releases, where alignment
         # coordinates change due to inclusion of new species, we search for
@@ -234,7 +242,7 @@ class TestSyntenicRegions(TestCase):
         # print(self.comp.method_species_links)
         for coord, expect in coords_expected[1:]:
             syntenic = list(
-                self.comp.get_syntenic_regions(method_clade_id=756, **coord))[0]
+                self.comp.get_syntenic_regions(method_clade_id=830, **coord))[0]
             # check the slope computed from the expected and returned
             # coordinates is ~ 1
             got_names = dict([(n.split(':')[0], n.split(':'))
@@ -266,7 +274,7 @@ class TestSyntenicRegions(TestCase):
         gene = self.comp.Human.get_gene_by_stableid(stableid='ENSG00000104827')
         syntenic = list(
             self.comp.get_syntenic_regions(region=gene.canonical_transcript,
-                                         method_clade_id=756))[0]
+                                         method_clade_id=830))[0]
         species = syntenic.get_species_set()
         self.assertEqual(species, set(["Homo sapiens", "Pan troglodytes"]))
 
