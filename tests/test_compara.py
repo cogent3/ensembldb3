@@ -240,9 +240,9 @@ class TestSyntenicRegions(TestCase):
                  'AAGAAGCAAACAGGTTTATTTTATACACTGGGCCAGGCCGTGGGTCTGCCATGTGACTAGGGAATTTGGACC-----------CAGTCTCAGGCCAAGTA'}]
         ]
         # print(self.comp.method_species_links)
-        for coord, expect in coords_expected[1:]:
+        for coord, expect in coords_expected[1:-1]:
             syntenic = list(
-                self.comp.get_syntenic_regions(method_clade_id=830, **coord))[0]
+                self.comp.get_syntenic_regions(method_clade_id=822, **coord))[0]
             # check the slope computed from the expected and returned
             # coordinates is ~ 1
             got_names = dict([(n.split(':')[0], n.split(':'))
