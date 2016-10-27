@@ -88,13 +88,12 @@ class TestCompara(ComparaTestBase):
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
     def test_getting_alignment(self):
-        mid = "ENSMUSG00000041147"
-        brca2 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
-        print(brca2)
-        result = list(self.comp.get_syntenic_regions(region=brca2,
+        mid = "ENSMUSG00000017119"
+        nbr1 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
+        # print(nbr1)
+        result = list(self.comp.get_syntenic_regions(region=nbr1,
                                                    align_method='PECAN',
                                                    align_clade='vertebrates'))
-        print(result)
         result = result[-1]
         aln = result.get_alignment(feature_types='gene')
         # to improve test robustness across Ensembl releases, where alignment
@@ -102,13 +101,13 @@ class TestCompara(ComparaTestBase):
         # the mouse subseq and use the resulting coords to ensure we get the
         # same match as that from the Ensembl website
         mouse_name = [n for n in aln.names if "Mus musculus" in n][0]
-        start = aln.todict()[mouse_name].find('AAGTCAAACTCTACCACTGG')
+        start = aln.todict()[mouse_name].find('GCTTGTCCTCCAGAAGCCAC')
         sub_aln = aln[start: start + 20]
         seqs = list(sub_aln.todict().values())
-        expect = set(['AGGGCTGACTCTGCCGCTGT',  # human
-                      'AAGTCAAACTCTACCACTGG',  # mouse
-                      'AAGTCAAACTCTACCACTAG',  # rat
-                      'AAATGTGACTCTACCAGCCG'  # platypus
+        expect = set(['GCTTGTCCTCCAGAACCCAT',  # human
+                      'GCTTGTCCTCCAGAAGCCAC',  # mouse
+                      'GCTTGTCCTCCAGAAGCCAC',  # rat
+                      'GCTGAGCCTGCAGAGCCTGC'  # platypus
                       ])
         self.assertEqual(set(seqs), expect)
         self.assertTrue(len(aln) > 1000)
