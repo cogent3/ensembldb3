@@ -91,6 +91,7 @@ class TestCompara(ComparaTestBase):
         mid = "ENSMUSG00000017119"
         nbr1 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
         # print(nbr1)
+        ## previous test gene mouse brca2 doesn't have alignment to other species using PECAN since release 86. 
         result = list(self.comp.get_syntenic_regions(region=nbr1,
                                                    align_method='PECAN',
                                                    align_clade='vertebrates'))
@@ -192,13 +193,6 @@ class TestSyntenicRegions(TestCase):
         """should return the correct alignments"""
         # following cases have a mixture of strand between ref seq and others
         coords_expected = [
-            [{'coord_name': 4, 'end': 78207, 'species': 'human', 'start': 78107, 'strand': -1},
-             {'Homo sapiens:chromosome:4:77999-78099:-1':
-              'ATGTAAATCAAAACCAAAGTCTGCATTTATTTGCGGAAAGAGATGCTACATGTTCAAAGATAAATATGGAACATTTTTTAAAAGCATTCATGACTTAGAA',
-              'Macaca mulatta:chromosome:1:3891064-3891163:1':
-              'ATGTCAATCAAAACCAAAGTCTGTATTTATTTGCAGAAAGAGATACTGCATGTTCAAAGATAAATATGGAAC-TTTTTAAAAAGCATTAATGACTTATAC',
-              'Pan troglodytes:chromosome:4:102056-102156:-1':
-              'ATGTAAATCAAAACCAAAGTCTGCATTTATTTGCGGAAAGAGATGCTACATGTTCAAAGATAAATATGGAACATTTTTAAAAAGCATTCATGACTTAGAA'}],
             [{'coord_name': 18, 'end': 213739, 'species': 'human', 'start': 213639, 'strand': -1},
                 {'Homo sapiens:chromosome:18:213639-213739:-1':
                  'ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGAGTGAGTGCAGATTATTCGGTAAACACT----CTTA',
@@ -231,15 +225,10 @@ class TestSyntenicRegions(TestCase):
                  'Macaca mulatta:chromosome:18:13805604-13805703:1':
                  'GCGCAG-GGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGGCGGG',
                  'Pan troglodytes:chromosome:18:16546800-16546900:1':
-                 'GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGCGGGG'}],
-            [{'coord_name': 16, 'end': 57443, 'species': 'human', 'start': 57343, 'strand': -1},
-                {'Homo sapiens:chromosome:16:107343-107443:-1':
-                 'AAGAAGCAAACAGGTTTATTTTATACAGTGGGCCAGGCCGTGGGTCTGCCATGTGACTAGGGCATTTGGACCTAGGGAGAGGTCAGTCTCAGGCCAAGTA',
-                 'Pan troglodytes:chromosome:16:48943-49032:-1':
-                 'AAGAAGCAAACAGGTTTATTTTATACACTGGGCCAGGCCGTGGGTCTGCCATGTGACTAGGGAATTTGGACC-----------CAGTCTCAGGCCAAGTA'}]
+                 'GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGCGGGG'}]
         ]
         # print(self.comp.method_species_links)
-        for coord, expect in coords_expected[1:-1]:
+        for coord, expect in coords_expected:
             syntenic = list(
                 self.comp.get_syntenic_regions(method_clade_id=822, **coord))[0]
             # check the slope computed from the expected and returned
