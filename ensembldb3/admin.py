@@ -194,10 +194,11 @@ def sorted_by_size(local_path, dbnames, debug=False):
     sizes, dbnames = zip(*size_dbnames)
     return dbnames
 
-## can we get away with the ~/.my.cnf for the sql cursor?
+
+# can we get away with the ~/.my.cnf for the sql cursor?
 def read_mysql_config(config_path, section, verbose=False):
     """returns a dict with mysql config options
-    
+
     Parameters
     ----------
     config_path : str
@@ -205,6 +206,7 @@ def read_mysql_config(config_path, section, verbose=False):
     section : str
       section in config file to query
     """
+    config_path.seek(0)  # make sure at start of file
     opts = defaultdict(lambda: None)
     parser = configparser.ConfigParser(opts)
     parser.read_file(config_path)
