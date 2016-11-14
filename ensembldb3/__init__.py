@@ -4,6 +4,12 @@ from .genome import Genome
 from .compara import Compara
 from .util import NoItemError
 
+from warnings import filterwarnings
+filterwarnings("ignore", message="Not using MPI as mpi4py not found")
+filterwarnings("ignore", message="Can't drop database.*")
+
+
+
 __all__ = ['assembly', 'compara', 'database', 'genome', 'host', 'name',
            'region', 'related_region', 'sequence', 'species', 'util',
            'HostAccount', 'Species', 'Genome', 'Compara']

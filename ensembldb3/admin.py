@@ -1,21 +1,18 @@
-from warnings import filterwarnings
-filterwarnings("ignore", message="Not using MPI as mpi4py not found")
-filterwarnings("ignore", message="Can't drop database.*")
-
 import os
 import shutil
-from glob import glob, glob1
+from glob import glob1
 import configparser
 from collections import defaultdict
 from pprint import pprint
 
 import click
-from cogent3.util import parallel
 
 from . import HostAccount
 from .host import DbConnection, get_db_name
-from .util import exec_command, open_, abspath, ENSEMBLDBRC
+from .util import exec_command, open_, ENSEMBLDBRC
 from .download import download_dbs, read_config, reduce_dirnames, _cfg
+
+from cogent3.util import parallel
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
