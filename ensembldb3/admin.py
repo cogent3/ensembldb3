@@ -49,18 +49,17 @@ def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport",
     """
     info = read_mysql_config(mysqlcfg, "mysqlimport", verbose=verbose)
     command = info["command"] or r"mysqlimport --fields_escaped_by=\\"
-    if None in [info["user"], info["passwd"]]:
-        acct = r" -u %(user)s -p%(passwd)s "
-    else:
-        acct = ""
-
+    acct = r" -u %(user)s -p%(passwd)s "
     host = "" if info["host"] is None else r" -h %(host)s "
+    port = "" if info["port"] is None else r" --port %(port)s "
 
-    cmnd_template = command + host + acct + " %(dbname)s -L %(tablename)s"
+    cmnd_template = command + port + host + acct + \
+        " %(dbname)s -L %(tablename)s"
     kwargs = dict(host=info["host"] or account.host,
                   user=info["user"] or account.user,
                   passwd=info["passwd"] or account.passwd,
-                  dbname=dbname)
+                  dbname=dbname,
+                  port=info["port"] or account.port)
 
     def install_table(tablename):
         """installs a single table"""
