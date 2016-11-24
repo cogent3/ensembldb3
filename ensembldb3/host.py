@@ -21,10 +21,8 @@ except ImportError:
         connect_template = 'mysql+mysqldb://%(account)s/%(db_name)s'
         password_arg = 'passwd'
 
-from cogent3.util.table import Table
 from .species import Species
 from .name import EnsemblDbName
-from .util import asserted_one
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -44,6 +42,9 @@ class HostAccount(object):
         self.host = host
         self.user = user
         self.passwd = passwd
+        if port is not None:
+            port = int(port)
+
         self.port = port or 3306
         self._hash = hash((self.host, self.user, self.port))
 
