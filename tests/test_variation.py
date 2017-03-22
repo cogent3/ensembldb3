@@ -18,7 +18,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 86
+release = 87
 
 NULL_VALUE = None
 

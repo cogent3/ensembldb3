@@ -15,7 +15,7 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 86
+release = 87
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -69,8 +69,7 @@ class TestCompara(ComparaTestBase):
         """should get all relationships if relationship is not specified"""
         stableid = "ENSG00000036828"
         expect = dict(within_species_paralog=set([stableid,
-                                                  "ENSG00000283187",
-                                                  "ENSG00000173612"]), 
+                                                  "ENSG00000283187"]), 
                       ortholog_one2many=set([stableid,
                                              "ENSRNOG00000002265",
                                              "ENSMUSG00000051980",
