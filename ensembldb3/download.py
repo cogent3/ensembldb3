@@ -27,7 +27,7 @@ __status__ = "alpha"
 
 def get_download_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
-    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DONWLOADED")
+    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DOWNLOADED")
     return checkpoint_file
 
 def is_downloaded(local_path, dbname):

@@ -88,7 +88,7 @@ For the very large databases (e.g. compara or human variation) the download time
     
 .. note:
     
-    An empty file called ``ENSEMBLDB_DONWLOADED`` is written in each directory. This is used as a checkpoint marker to prevent needlessly downloading again.
+    An empty file called ``ENSEMBLDB_DOWNLOADED`` is written in each directory. This is used as a checkpoint marker to prevent needlessly downloading again.
 
 ``ensembl_admin install``
 =========================
