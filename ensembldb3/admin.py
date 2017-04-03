@@ -1,3 +1,6 @@
+from warnings import filterwarnings
+filterwarnings("ignore", ".*MPI")
+
 import os
 import shutil
 from glob import glob1
@@ -10,8 +13,10 @@ import click
 from . import HostAccount
 from .host import DbConnection, get_db_name
 from .util import exec_command, open_, ENSEMBLDBRC
-from .download import download_dbs, read_config, reduce_dirnames, _cfg
+from .download import (download_dbs, read_config, reduce_dirnames,
+                       is_downloaded, _cfg)
 
+from cogent3 import LoadTable
 from cogent3.util import parallel
 
 __author__ = "Gavin Huttley"
@@ -411,6 +416,26 @@ def show(release, mysqlcfg):
         click.echo("\n".join(["  %s" % n for n in names]))
     else:
         click.echo("  None")
+
+
+@main.command()
+@_cfgpath
+def status(configpath):
+    """checks download/install status using checkpoint files and config"""
+    release, remote_path, local_path, species_dbs = read_config(configpath)
+    content = os.listdir(local_path)
+    dbnames = reduce_dirnames(content, species_dbs)
+    rows = []
+    for db in dbnames:
+        row = [db.name, is_downloaded(local_path, db.name),
+               is_installed(local_path, db.name)]
+        rows.append(row)
+
+    table = LoadTable(header=["dbname", "Downloaded", "Installed"], rows=rows,
+                      title="Status of download and install",
+                      legend="config=%s; local_path=%s" % (configpath.name,
+                                                           local_path))
+    print(table)
 
 
 if __name__ == "__main__":
