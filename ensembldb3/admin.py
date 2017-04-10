@@ -136,15 +136,25 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
         r = cursor.execute("DROP TABLE IF EXISTS %s" % table)
 
     # create the table definitions
-    num_tables = sql.count("CREATE")
+    num_tables = sql.count("CREATE TABLE")
     r = cursor.execute(sql)
 
-    # the following step seems necessary for mysql to actually create all
-    # the table definitions... wtf?
-    # cursor.commit()
     r = cursor.execute("SHOW TABLES")
-    if r != num_tables:
-        click.echo(str(cursor.fetchall()))
+    if r < num_tables:
+        result = cursor.fetchall()
+        expected = set()
+        for line in sql.splitlines():
+            if "CREATE TABLE" in line:
+                table = line.replace("`", "").split()[2]
+                expected.update([table])
+        
+        got = set(str(g[0]) for g in result)
+        
+        diff = got ^ expected  # symmetric diff
+        msg = ["ERR: The symmetric difference in tables between SQL statement and actually created:",
+              "\t%s" % str(diff)]
+        click.secho("\n".join(msg), fg="red")
+        
         raise RuntimeError(
             "number of created tables doesn't match number in sql")
 
