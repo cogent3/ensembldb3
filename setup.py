@@ -54,7 +54,7 @@ setup(
               'PyMySQL',
               'sqlalchemy'],
     entry_points={
-        'console_scripts': ['ensembl_admin=ensembldb3.admin:main',
+        'console_scripts': ['ensembldb3=ensembldb3.admin:main',
                             ],
     },
     package_dir={'ensembldb3': 'ensembldb3'},

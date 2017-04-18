@@ -11,36 +11,37 @@ Installing MySQL
 
 The bottom line is you need to install and configure MySQL yourself. `Ensembl offers some instructions <http://asia.ensembl.org/info/docs/webcode/mirror/install/ensembl-data.html>`_.
 
-ensembl_admin command line tool
-===============================
+``ensembldb3`` command line tool
+================================
 
-Install of ``ensembldb3`` places a new executable ``ensembl_admin`` on your path. This tool provides a number of capabilities as illustrated on the command line::
+Install of ``ensembldb3`` places a new executable ``ensembldb3`` on your path. This tool provides a number of capabilities as illustrated on the command line::
     
-     $ ensembl_admin 
-    Usage: ensembl_admin [OPTIONS] COMMAND [ARGS]...
+   $ ensembldb3
+  Usage: ensembldb3 [OPTIONS] COMMAND [ARGS]...
 
-      admin tools for an Ensembl MySQL installation
+    admin tools for an Ensembl MySQL installation
 
-    Options:
-      --help  Show this message and exit.
+  Options:
+    --help  Show this message and exit.
 
-    Commands:
-      download  download databases from Ensembl using rsync,...
-      drop      drop databases from a MySQL server
-      exportrc  exports the rc directory to the nominated...
-      install   install ensembl databases into a MySQL server
-      show      shows databases corresponding to release
+  Commands:
+    download  download databases from Ensembl using rsync,...
+    drop      drop databases from a MySQL server
+    exportrc  exports the rc directory to the nominated...
+    install   install ensembl databases into a MySQL server
+    show      shows databases corresponding to release
+    status    checks download/install status using...
     
 .. _exportrc:
 
-``ensembl_admin exportrc``
-==========================
+``ensembldb3 exportrc``
+=======================
 
 The command::
 
-    $ ensembl_admin exportrc -o /path/to/ensembldbrc
+    $ ensembldb3 exportrc -o /path/to/ensembldbrc
     
-produces a directory ``ensembldbrc`` containing 3 files that can be used by ``ensembl_admin``:
+produces a directory ``ensembldbrc`` containing 3 files that can be used by ``ensembldb3``:
 
 species.tsv
     A tab delimited file with a species latin name and common name per line. This is used to define the common names that ``ensembldb3.Species`` uses for succinctly identifying species and their databases.
@@ -71,12 +72,12 @@ If you wish to use the contents of this directory you can create an environment 
 .. note::
     If ``ENSEMBLDBRC`` is defined in your environment, the ``species.tsv`` file within that directory will be used *for all ensembldb3 applications*.
 
-``ensembl_admin download``
-==========================
+``ensembldb3 download``
+=======================
 
 The command::
     
-    $ ensembl_admin download -c /path/to/edited/ensembldb_download.cfg -n 3
+    $ ensembldb3 download -c /path/to/edited/ensembldb_download.cfg -n 3
 
 will download databases for the species specified in the ``ensembldb_download.cfg`` config. The specific databases for the Ensembl release, remote and local paths must all be defined in that file (see :ref:`exportrc`). The ``-n`` option indicates the number of parallel processors to use for the download (maximum allowed is 5).
 
@@ -90,12 +91,12 @@ For the very large databases (e.g. compara or human variation) the download time
     
     An empty file called ``ENSEMBLDB_DOWNLOADED`` is written in each directory. This is used as a checkpoint marker to prevent needlessly downloading again.
 
-``ensembl_admin install``
-=========================
+``ensembldb3 install``
+======================
 
 The command::
     
-    $ ensembl_admin install -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg -n 3
+    $ ensembldb3 install -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg -n 3
     
 installs databases specified in the ``ensembldb_download.cfg`` config, into the mysql server specified by ``mysql.cfg``. In this instance, 3 processors are used for separate gzipping and ``mysqlimport`` of tables in parallel.
 
@@ -105,23 +106,32 @@ For the very large databases (e.g. compara or human variation) the install times
     
     An empty file called ``ENSEMBLDB_INSTALLED`` is written in each directory. This is used as a checkpoint marker to prevent installing again unless overridden by the ``-f`` (force overwrite) flag.
 
-``ensembl_admin drop``
-======================
+``ensembldb3 drop``
+===================
 
 The command::
 
-    $ ensembl_admin drop -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg
+    $ ensembldb3 drop -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg
 
 will drop the databases specified in the ``ensembldb_download.cfg`` from the mysql server specified by ``mysql.cfg``. You are required to confirm dropping listed databases.
 
-``ensembl_admin show``
-======================
+``ensembldb3 show``
+===================
 
 The command::
 
-    $ ensembl_admin show --release 85 -m /path/to/mysql.cfg
+    $ ensembldb3 show --release 85 -m /path/to/mysql.cfg
 
 will display all databases from release 85 on the mysql host in the server specified by ``mysql.cfg``.
+
+``ensembldb3 status``
+=====================
+
+The command::
+
+    $ ensembldb3 status -c /path/to/edited/ensembldb_download.cfg
+
+will display the download/install status of the databases specified by ``ensembldb_download.cfg``.
 
 Trouble shooting
 ================

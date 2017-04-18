@@ -31,7 +31,7 @@ The documentation can be viewed at `readthedocs <http://ensembldb3.rtfd.io>`_. Y
 Usage
 *****
 
-Install adds an experimental download script ``ensembl_admin`` which provides functions for downloading, installing and dropping databases. It uses rsync to download mysql dumps from the `ensembl ftp site <ftp://ftp.ensembl.org/pub/>`_. ``ensembl_download``  requires the user to specify a config file indicating the release, species and their databases to download. A sample config file is included for demonstration purposes. Here's an example ::
+Install adds an admin script ``ensembldb3`` which provides functions for downloading, installing and dropping databases. It uses rsync to download mysql dumps from the `ensembl ftp site <ftp://ftp.ensembl.org/pub/>`_. ``ensembl_download`` based on a user provided config file indicating the release, species and their databases to download. (A sample config file is included for demonstration purposes.) The structure of the config file is::
 
     [remote path] # required
     path=ftp.ensembl.org/ensembl/pub/
@@ -52,13 +52,13 @@ Install adds an experimental download script ``ensembl_admin`` which provides fu
 
 You then download the corresponding databases as ::
 
-    $ ensembl_admin -c /path/to/your.cfg -v
+    $ ensembldb3 -c /path/to/your.cfg -v
 
 The ``-v`` option means verbose. Use ``--help`` for more information.
 
 If you are running this on a server, then we suggest using ``nohup`` to execute the command such that it doesn't die if, for instance, you close the laptop you use to login to the server... Doh! Here's an example ::
 
-    $ nohup ensembl_admin install -c download.cfg -m mysql.cfg -v > install.out 2>&1 &
+    $ nohup ensembldb3 install -c download.cfg -m mysql.cfg -v > install.out 2>&1 &
     $ exit
 
 When you log back in, the download progress will be in ``install.out``.
