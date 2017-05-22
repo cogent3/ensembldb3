@@ -231,6 +231,11 @@ class GenericRegion(_Region):
         record = asserted_one(record.execute().fetchall())
         self._table_rows['seq_region'] = record
 
+    @property
+    def species(self):
+        """returns species"""
+        return self.genome.species
+
 
 class _StableRegion(GenericRegion):
     """region with a stable_id"""

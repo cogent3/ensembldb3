@@ -8,6 +8,7 @@ from ensembldb3.util import convert_strand
 from ensembldb3.genome import Genome
 from ensembldb3.sequence import _assemble_seq
 from ensembldb3.util import asserted_one
+from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -433,6 +434,13 @@ class TestGene(GenomeTestBase):
             intron_seq = str(seq.get_region_covering_all(intron).get_slice())
             self.assertEqual(intron_seq[:10], exp_seq5.upper())
             self.assertEqual(intron_seq[-10:], exp_seq3.upper())
+
+    def test_species_attr(self):
+        """gene has species attribute"""
+        self.assertEqual(self.brca2.species, "Homo sapiens")
+        mac = self.macaq.get_gene_by_stableid("ENSMMUG00000008639")
+        sp_name = Species.get_species_name("macaque")
+        self.assertEqual(mac.species, sp_name)
 
 
 
