@@ -37,7 +37,8 @@ class Compara(object):
         self._account = account
         self._pool_recycle = pool_recycle
         self._compara_db = None
-        sp = sorted([_Species.get_species_name(sp) for sp in set(species)])
+        sp = sorted([_Species.get_species_name(sp, level='raise')
+                     for sp in set(species)])
         self.species = tuple(sp)
         self._genomes = {}
         self._attach_genomes()
