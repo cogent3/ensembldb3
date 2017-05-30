@@ -1,10 +1,7 @@
 import os
-import sys
 import warnings
-import subprocess
 from pprint import pprint
 import configparser
-from pkg_resources import resource_filename
 
 import click
 
@@ -30,17 +27,19 @@ def get_download_checkpoint_path(local_path, dbname):
     checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DOWNLOADED")
     return checkpoint_file
 
+
 def is_downloaded(local_path, dbname):
     """returns True if checkpoint file exists for dbname"""
     chk = get_download_checkpoint_path(local_path, dbname)
     return os.path.exists(chk)
+
 
 def rsync_listdir(remote_path, dirname="", debug=True):
     if dirname:
         cmnd = "%s%s" % (remote_path, dirname)
     else:
         cmnd = remote_path
-    
+
     cmnd = r"rsync --list-only rsync://%s" % cmnd
     if debug:
         print(cmnd)
@@ -48,30 +47,32 @@ def rsync_listdir(remote_path, dirname="", debug=True):
     r = result.splitlines()
     return r
 
+
 def _sort_dbs(dbnames):
     """returns the dbnames sorted by their type"""
     order = {'compara': 2, 'variation': 3, 'otherfeatures': 1}
     names = [(order.get(n.type, 0), n.name, n) for n in dbnames]
-    dbs = [db for i,n,db in sorted(names)]
+    dbs = [db for i, n, db in sorted(names)]
     return dbs
+
 
 def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
     """returns EnsemblNames corresponding to species db's and sort by type
-    
+
     sort order put's core db's first, compara and variation last"""
     if debug:
         pprint(dirnames)
-    
+
     db_names = []
     for record in dirnames:
         record = record.strip()
         if not record:
             continue
-        
+
         record = record.split()[-1]
         if not record[0].isalpha():
             continue
-        
+
         try:
             name = EnsemblDbName(record)
         except (TypeError, RuntimeError):
@@ -79,7 +80,7 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
             if debug:
                 print(record)
             continue
-        
+
         if name.species in species_dbs:
             if name.type not in species_dbs[name.species] and\
                species_dbs[name.species]:
@@ -90,18 +91,19 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
             db_names.append(name)
         elif name.type == 'compara' and 'compara' in species_dbs:
             db_names.append(name)
-    
+
     db_names = _sort_dbs(db_names)
     return db_names
 
+
 def download_db(remote_path, local_path, verbose=False, debug=False):
     """downloads a db from remote_path to local_path
-    
+
     Parameters
     ----------
     remote_path : str
        The Ensembl ftp path for the db
-    
+
     local_path : str
        local path to write to the data to
     """
@@ -111,13 +113,15 @@ def download_db(remote_path, local_path, verbose=False, debug=False):
         kwargs = dict(stderr=None, stdout=None)
     else:
         kwargs = {}
-    
+
     r = exec_command(cmnd, **kwargs)
     if debug or verbose and r:
         print(r)
-    
+
+
 def read_config(config_path, verbose=False):
-    """returns ensembl release, local path, and db specifics from the provided config path"""
+    """returns ensembl release, local path, and db specifics from the provided
+    config path"""
     parser = configparser.ConfigParser()
     parser.read_file(config_path)
     release = parser.get('release', 'release')
@@ -128,24 +132,27 @@ def read_config(config_path, verbose=False):
     for section in parser.sections():
         if section in ('release', 'remote path', 'local path'):
             continue
-        
+
         if section != 'compara':
             species = Species.get_species_name(section, level='raise')
         else:
             species = "compara"
         dbs = [db.strip() for db in parser.get(section, 'db').split(',')]
         species_dbs[species] = dbs
-    
+
     if verbose:
         click.secho("DOWNLOADING\n  ensembl release=%s" % release, fg="green")
         click.secho("\n".join(["  %s" % d for d in species_dbs]), fg="green")
         click.secho("\nWRITING to output path=%s\n" % local_path, fg="green")
     return release, remote_path, local_path, species_dbs
 
+
 _cfg = os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg')
 
+
 def WrapDownload(remote_template, local_base, release, verbose, debug):
-    """returns a callback function, that takes the database name and rsync downloads"""
+    """returns a callback function, that takes the database name and
+    rsync downloads"""
     def rsync_call_wrapper(dbname):
         if is_downloaded(local_base, dbname):
             if verbose or debug:
@@ -153,41 +160,42 @@ def WrapDownload(remote_template, local_base, release, verbose, debug):
                     "Already downloaded: %s, skipping" % dbname,
                     fg="green")
             return
-        
+
         props = {'dbname': dbname, 'release': release}
         remote_db_path = remote_template % props
         local_db_path = os.path.join(local_base, dbname)
         run_args = dict(remote_path=remote_db_path, local_path=local_db_path,
                         verbose=verbose, debug=debug)
         download_db(**run_args)
-        checkpoint_file = get_download_checkpoint_path(local_base, dbname)    
+        checkpoint_file = get_download_checkpoint_path(local_base, dbname)
         with open(checkpoint_file, "w") as checked:
             pass
-        
+
         click.secho("Completed download: %s" % dbname, fg="green")
-    
+
     return rsync_call_wrapper
+
 
 def download_dbs(configpath, numprocs, verbose, debug):
     if configpath.name == _cfg:
         warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
-    
+
     release, remote_path, local_path, sp_db = read_config(configpath,
                                                           verbose=verbose)
     makedirs(local_path)
-    
+
     props = dict(release=release)
     contents = rsync_listdir(remote_path,
                              'release-%(release)s/mysql/' % props, debug=debug)
     db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
     if verbose or debug:
         pprint(db_names)
-    
+
     if numprocs > 1:
         numprocs = min(numprocs, len(db_names), 5)
         # should print warning if ask for more than 5
         parallel.use_multiprocessing(numprocs)
-    
+
     remote_template = 'release-%(release)s/mysql/%(dbname)s/'
     remote_template = os.path.join(remote_path, remote_template)
     rsync = WrapDownload(remote_template, local_path, release, verbose=verbose,
@@ -197,4 +205,3 @@ def download_dbs(configpath, numprocs, verbose, debug):
         pass
 
     click.secho("\nWROTE to output path=%s\n" % local_path, fg="green")
-    

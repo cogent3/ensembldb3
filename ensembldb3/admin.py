@@ -144,14 +144,15 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
             if "CREATE TABLE" in line:
                 table = line.replace("`", "").split()[2]
                 expected.update([table])
-        
+
         got = set(str(g[0]) for g in result)
-        
+
         diff = got ^ expected  # symmetric diff
-        msg = ["ERR: The symmetric difference in tables between SQL statement and actually created:",
-              "\t%s" % str(diff)]
+        msg = ["ERR: The symmetric difference in tables between "
+               "SQL statement and actually created:",
+               "\t%s" % str(diff)]
         click.secho("\n".join(msg), fg="red")
-        
+
         raise RuntimeError(
             "number of created tables doesn't match number in sql")
 
