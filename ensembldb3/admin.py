@@ -1,6 +1,3 @@
-from warnings import filterwarnings
-filterwarnings("ignore", ".*MPI")
-
 import os
 import shutil
 from glob import glob1
