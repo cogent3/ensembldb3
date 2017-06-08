@@ -4,7 +4,8 @@ import sqlalchemy as sql
 
 try:
     import mysql.connector as mysql_connect
-    connect_template = 'mysql+mysqlconnector://%(account)s/%(db_name)s?raise_on_warnings=False'
+    connect_template = 'mysql+mysqlconnector://'
+    '%(account)s/%(db_name)s?raise_on_warnings=False'
     password_arg = 'password'
     sql_version = tuple([int(v)
                          for v in sql.__version__.split(".") if v.isdigit()])
@@ -89,11 +90,14 @@ class EngineCache(object):
         if account not in self._db_account.get(db_name, []):
             if db_name == "PARENT":
                 args = {password_arg: account.passwd}
-                engine = mysql_connect.connect(host=account.host, user=account.user,
+                engine = mysql_connect.connect(host=account.host,
+                                               user=account.user,
                                                port=account.port, **args)
             else:
-                engine = sql.create_engine(connect_template % dict(account=account,
-                                                                   db_name=db_name), pool_recycle=pool_recycle)
+                engine = sql.create_engine(connect_template %
+                                           dict(account=account,
+                                                db_name=db_name),
+                                           pool_recycle=pool_recycle)
             if db_name not in self._db_account:
                 self._db_account[db_name] = {}
             self._db_account[db_name][account] = engine
@@ -161,8 +165,3 @@ def get_latest_release(account=None):
     for name in names:
         compara += [int(name.release)]
     return str(max(compara))
-
-if __name__ == "__main__":
-    eaccount = get_ensembl_account(release='48')
-    print(get_db_name(account=eaccount, release="48", db_type='compara'))
-    print(get_latest_release())
