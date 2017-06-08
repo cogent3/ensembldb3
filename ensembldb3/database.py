@@ -22,7 +22,8 @@ class Database(object):
                  pool_recycle=None, division=None):
         self._tables = {}
         self.db_name = get_db_name(account=account, species=species,
-                                   release=release, db_type=db_type, division=division)
+                                   release=release, db_type=db_type,
+                                   division=division)
         if not self.db_name:
             raise RuntimeError("%s db doesn't exist for '%s' on '%s'" %
                                (db_type, species, account.host))
@@ -118,15 +119,17 @@ class Database(object):
 # used to store commonly looked up attribs
 # there are restrictions imposed at present but a
 # key structure
+
+
 class _CachedDbAttribs(defaultdict):
     """used to store common lookups"""
+
     def __init__(self):
         super(_CachedDbAttribs, self).__init__(lambda: None)
-    
+
     def add_to_cache(self, db, key, val):
         """just ensure we have 2 element keys"""
         self[(db, key)] = val
-    
+
 
 cached_attribs = _CachedDbAttribs()
-
