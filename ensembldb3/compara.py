@@ -2,15 +2,14 @@ from collections import defaultdict
 import sqlalchemy as sql
 from numpy import empty
 
-from cogent3 import LoadTree
 from cogent3.core.tree import PhyloNode
 from cogent3.util.table import Table
 
 from .species import Species as _Species
 from .util import NoItemError, asserted_one
-from .host import get_ensembl_account, get_latest_release
+from .host import get_ensembl_account
 from .database import Database
-from .assembly import Coordinate, location_query
+from .assembly import location_query
 from .genome import Genome
 from .related_region import RelatedGenes, SyntenicRegions
 
@@ -57,7 +56,7 @@ class Compara(object):
                             account=self._account)
             if self.general_release is None:
                 self.general_release = genome.general_release
-            
+
             self._genomes[species] = genome
             setattr(self, attr_name, genome)
 
@@ -80,14 +79,15 @@ class Compara(object):
         return self._compara_db
 
     ComparaDb = property(_get_compara_db)
-    
+
     @property
     def _dbid_genome_map(self):
         """maps genome_db id to Genome instances"""
         if self._dbid_species_map is not None:
             return self._dbid_species_map
-        
-        db_species = dict([(_Species.get_ensembl_db_prefix(n), n) for n in self.species])
+
+        db_species = dict([(_Species.get_ensembl_db_prefix(n), n)
+                           for n in self.species])
         db_prefixes = list(db_species.keys())
         genome_db_table = self.ComparaDb.get_table('genome_db')
         query = sql.select([genome_db_table.c.genome_db_id,
@@ -97,10 +97,10 @@ class Compara(object):
         data = dict((r[0], self._genomes[db_species[r[1]]]) for r in records)
         self._dbid_species_map = data
         return self._dbid_species_map
-    
+
     def get_species_tree(self, just_members=True):
         """returns the species tree
-        
+
         Arguments:
         ----------
           - just_members: limits tips to just members of self
@@ -112,13 +112,13 @@ class Compara(object):
         records = query.execute().fetchall()
         assert len(records) == 1, records
         root_id = records[0]["root_id"]
-        
+
         # get the tree nodes
         sptn = self.ComparaDb.get_table("species_tree_node")
-        condition = sql.and_(sptn.c.root_id==root_id)
+        condition = sql.and_(sptn.c.root_id == root_id)
         query = sql.select([sptn], whereclause=condition)
         records = query.execute().fetchall()
-        
+
         # get the genome db -> name map
         gen_db = self.ComparaDb.get_table('genome_db')
         db_ids = [r["genome_db_id"] for r in records]
@@ -128,7 +128,7 @@ class Compara(object):
         for id_, name in id_name.items():
             name = _Species.get_species_name(name)
             id_name[id_] = None if name == 'None' else name
-        
+
         nodes = {}
         parents = defaultdict(list)
         for record in records:
@@ -142,33 +142,35 @@ class Compara(object):
             node = PhyloNode(length=length, name=name)
             nodes[node_id] = node
             parents[parent_id].append(node)
-        
+
         root = None
         for parent in parents:
             if parent not in nodes:
                 node = PhyloNode(name='root')
                 nodes[parent] = node
-            
+
             node = nodes[parent]
             for child in parents[parent]:
                 child.parent = node
-            
+
             if len(parents[parent]) == 1:
                 root = node
-        
+
         # convert tip-names to match genome db names
         if just_members:
             root = root.get_sub_tree(self.species, tipsonly=True)
-        
+
         return root
-    
+
     def _get_species_set(self):
         if self._species_set is not None:
             return self._species_set
         # we make sure the species set contains all species
         species_set_table = self.ComparaDb.get_table('species_set')
-        query = sql.select([species_set_table],
-                           species_set_table.c.genome_db_id.in_(list(self._dbid_genome_map.keys())))
+        query = sql.select(
+            [species_set_table],
+            species_set_table.c.genome_db_id.in_(
+                list(self._dbid_genome_map.keys())))
         species_sets = {}
         for record in query.execute():
             gen_id = record['genome_db_id']
@@ -193,8 +195,9 @@ class Compara(object):
             return self._method_species_link
 
         method_link_table = self.ComparaDb.get_table('method_link')
-        query = sql.select([method_link_table],
-                           method_link_table.c['class'].like('%' + 'alignment' + '%'))
+        query = sql.select(
+            [method_link_table],
+            method_link_table.c['class'].like('%' + 'alignment' + '%'))
         methods = query.execute().fetchall()
         method_link_ids = dict([(r['method_link_id'], r) for r in methods])
         method_link_species_table = \
@@ -229,7 +232,7 @@ class Compara(object):
     method_species_links = property(_get_method_link_species_set)
 
     def get_related_genes(self, gene_region=None, stableid=None,
-                        relationship=None, DEBUG=False):
+                          relationship=None, DEBUG=False):
         """returns a RelatedGenes instance.
 
         Arguments:
@@ -241,7 +244,7 @@ class Compara(object):
 
         # TODO understand why this has become necessary to suppress warnings
         # in SQLAlchemy 0.6
-        relationship = None if relationship is None else str(relationship) 
+        relationship = None if relationship is None else str(relationship)
 
         stableid = stableid or gene_region.stableid
 
@@ -257,98 +260,107 @@ class Compara(object):
         member_table = self.ComparaDb.get_table(mem_name)
         homology_member_table = self.ComparaDb.get_table('homology_member')
         homology_table = self.ComparaDb.get_table('homology')
-        # homolog.c.gene_tree_root_id "The root_id of the gene tree from which 
+        # homolog.c.gene_tree_root_id "The root_id of the gene tree from which
         # the homology is derived"
-        member_ids = sql.select([member_table.c[mem_id], 
+        member_ids = sql.select([member_table.c[mem_id],
                                  member_table.c.taxon_id,
                                  member_table.c.genome_db_id],
                                 member_table.c.stable_id == str(stableid))
-                                
+
         member_records = member_ids.execute()
         if DEBUG:
             print("member_records", member_records)
-        
+
         if not member_records:
             return None
         else:
             member_record = asserted_one(member_records)
             member_id = member_record[mem_id]
-        
-        ## in case query gene_region is not provided
+
+        # in case query gene_region is not provided
         if gene_region is None:
             ref_genome = self._dbid_genome_map[member_record['genome_db_id']]
             gene_region = ref_genome.get_gene_by_stableid(stableid)
 
         homology_ids = sql.select([homology_member_table.c.homology_id,
                                    homology_member_table.c[mem_id]],
-                                  homology_member_table.c[mem_id]==member_id)
+                                  homology_member_table.c[mem_id] == member_id)
         homology_ids = [r['homology_id'] for r in homology_ids.execute()]
         if not homology_ids:
             return None
 
         if DEBUG:
             print("1 - homology_ids", homology_ids)
-        
+
         condition = homology_table.c.homology_id.in_(homology_ids)
         if relationship is not None:
-            condition = sql.and_(condition, homology_table.c.description == relationship)
+            condition = sql.and_(
+                condition, homology_table.c.description == relationship)
         homology_records = \
             sql.select([homology_table.c.homology_id,
                         homology_table.c.description,
                         homology_table.c.method_link_species_set_id,
                         homology_table.c.gene_tree_root_id], condition)
-        
+
         homology_ids = []
         gene_tree_roots = set()
         for r in homology_records.execute():
             homology_ids.append((r["homology_id"],
-                                 (r["description"], r["method_link_species_set_id"])))
+                                 (r["description"],
+                                  r["method_link_species_set_id"])))
             gene_tree_roots.update([r["gene_tree_root_id"]])
         homology_ids = dict(homology_ids)
-        
+
         if DEBUG:
             print("2 - homology_ids", homology_ids)
         if not homology_ids:
             return None
-            
-        ortholog_ids = sql.select([homology_member_table.c[mem_id],
-                                   homology_member_table.c.homology_id],
-                                  homology_member_table.c.homology_id.in_(list(homology_ids.keys())))
+
+        ortholog_ids = sql.select(
+            [homology_member_table.c[mem_id],
+             homology_member_table.c.homology_id],
+            homology_member_table.c.homology_id.in_(list(homology_ids.keys())))
 
         ortholog_ids = dict([(r[mem_id], r['homology_id'])
                              for r in ortholog_ids.execute()])
 
-        
         if DEBUG:
             print("ortholog_ids", ortholog_ids)
         if not ortholog_ids:
             return None
 
-        gene_set = sql.select([member_table, homology_member_table.c.homology_id],
-                              sql.and_(member_table.c[mem_id].in_(list(ortholog_ids.keys())),
-                                       member_table.c.genome_db_id.in_(list(self._dbid_genome_map.keys())), 
-                                       member_table.c.gene_member_id == homology_member_table.c.gene_member_id, 
-                                       homology_member_table.c.homology_id.in_(list(homology_ids.keys())), 
-                                       member_table.c.stable_id != stableid))  ## exclude query gene
+        gene_set = sql.select(
+            [member_table, homology_member_table.c.homology_id],
+            sql.and_(member_table.c[mem_id].in_(list(ortholog_ids.keys())),
+                     member_table.c.genome_db_id.in_(
+                list(self._dbid_genome_map.keys())),
+                member_table.c.gene_member_id ==
+                homology_member_table.c.gene_member_id,
+                homology_member_table.c.homology_id.in_(
+                list(homology_ids.keys())),
+                member_table.c.stable_id != stableid))  # exclude query gene
         related, stableids = defaultdict(list), set()
         for record in gene_set.execute():
             homid = record['homology_id']
-            sid = record['stable_id'] ## stableid has been taken by the query gene
-            assert sid not in stableids  ## no repeated record for the same gene
+            # stableid has been taken by the query gene
+            sid = record['stable_id']
+            assert sid not in stableids  # no repeated record for the same gene
             stableids.update([sid])
-            
+
             genome = self._dbid_genome_map[record['genome_db_id']]
             gene = genome.get_gene_by_stableid(sid)
             assert gene.location.strand == record[frag_strand]
-            reltype, mid = homology_ids[homid] # mid is method_link_species_set_id
+            # mid is method_link_species_set_id
+            reltype, mid = homology_ids[homid]
             related[reltype].append(gene)
         if not related:
             return None
-        
+
         for reltype in related:
             genes = related[reltype] + [gene_region]
-            yield RelatedGenes(self, genes, relationship=reltype, gene_tree_root=gene_tree_roots)
-            
+            yield RelatedGenes(self, genes,
+                               relationship=reltype,
+                               gene_tree_root=gene_tree_roots)
 
     def _get_dnafrag_id_for_coord(self, coord):
         """returns the dnafrag_id for the coordnate"""
@@ -360,12 +372,13 @@ class Compara(object):
         if int(self.release) > 58:
             prefix = _Species.get_ensembl_db_prefix(prefix)
 
-        query = sql.select([dnafrag_table.c.dnafrag_id,
-                            dnafrag_table.c.coord_system_name],
-                           sql.and_(dnafrag_table.c.genome_db_id ==
-                                    genome_db_table.c.genome_db_id,
-                                    genome_db_table.c.name == prefix,
-                                    dnafrag_table.c.name == str(coord.coord_name)))
+        query = sql.select(
+            [dnafrag_table.c.dnafrag_id,
+             dnafrag_table.c.coord_system_name],
+            sql.and_(dnafrag_table.c.genome_db_id ==
+                     genome_db_table.c.genome_db_id,
+                     genome_db_table.c.name == prefix,
+                     dnafrag_table.c.name == str(coord.coord_name)))
         try:
             record = asserted_one(query.execute().fetchall())
             dnafrag_id = record['dnafrag_id']
@@ -376,11 +389,12 @@ class Compara(object):
     def _get_genomic_align_blocks_for_dna_frag_id(self, method_clade_id,
                                                   dnafrag_id, coord):
         genomic_align_table = self.ComparaDb.get_table('genomic_align')
-        query = sql.select([genomic_align_table.c.genomic_align_id,
-                            genomic_align_table.c.genomic_align_block_id],
-                           sql.and_(genomic_align_table.c.method_link_species_set_id ==
-                                    method_clade_id,
-                                    genomic_align_table.c.dnafrag_id == dnafrag_id))
+        query = sql.select(
+            [genomic_align_table.c.genomic_align_id,
+             genomic_align_table.c.genomic_align_block_id],
+            sql.and_(genomic_align_table.c.method_link_species_set_id ==
+                     method_clade_id,
+                     genomic_align_table.c.dnafrag_id == dnafrag_id))
         query = location_query(genomic_align_table,
                                coord.ensembl_start,
                                coord.ensembl_end,
@@ -393,21 +407,25 @@ class Compara(object):
     def _get_joint_genomic_align_dnafrag(self, genomic_align_block_id):
         genomic_align_table = self.ComparaDb.get_table('genomic_align')
         dnafrag_table = self.ComparaDb.get_table('dnafrag')
-        query = sql.select([genomic_align_table.c.genomic_align_id,
-                            genomic_align_table.c.genomic_align_block_id,
-                            genomic_align_table.c.dnafrag_start,
-                            genomic_align_table.c.dnafrag_end,
-                            genomic_align_table.c.dnafrag_strand,
-                            dnafrag_table],
-                           sql.and_(genomic_align_table.c.genomic_align_block_id ==
-                                    genomic_align_block_id,
-                                    genomic_align_table.c.dnafrag_id == dnafrag_table.c.dnafrag_id,
-                                    dnafrag_table.c.genome_db_id.in_(list(self._dbid_genome_map.keys()))))
+        query = sql.select(
+            [genomic_align_table.c.genomic_align_id,
+             genomic_align_table.c.genomic_align_block_id,
+             genomic_align_table.c.dnafrag_start,
+             genomic_align_table.c.dnafrag_end,
+             genomic_align_table.c.dnafrag_strand,
+             dnafrag_table],
+            sql.and_(genomic_align_table.c.genomic_align_block_id ==
+                     genomic_align_block_id,
+                     genomic_align_table.c.dnafrag_id ==
+                     dnafrag_table.c.dnafrag_id,
+                     dnafrag_table.c.genome_db_id.in_(
+                         list(self._dbid_genome_map.keys()))))
         return query.execute().fetchall()
 
     def get_syntenic_regions(self, species=None, coord_name=None, start=None,
-                           end=None, strand=1, ensembl_coord=False, region=None,
-                           align_method=None, align_clade=None, method_clade_id=None):
+                             end=None, strand=1, ensembl_coord=False,
+                             region=None, align_method=None,
+                             align_clade=None, method_clade_id=None):
         """returns a SyntenicRegions instance
 
         Arguments:
@@ -437,8 +455,9 @@ class Compara(object):
         if region is None:
             ref_genome = self._genomes[_Species.get_species_name(species)]
             region = ref_genome.make_location(coord_name=coord_name,
-                                             start=start, end=end, strand=strand,
-                                             ensembl_coord=ensembl_coord)
+                                              start=start, end=end,
+                                              strand=strand,
+                                              ensembl_coord=ensembl_coord)
         elif hasattr(region, 'location'):
             region = region.location
 
@@ -447,12 +466,15 @@ class Compara(object):
         if ref_genome is not region.genome:
             # recreate region from our instance
             region = ref_genome.make_location(coord_name=region.coord_name,
-                                             start=region.start, end=region.end,
-                                             strand=region.strand)
+                                              start=region.start,
+                                              end=region.end,
+                                              strand=region.strand)
 
         ref_dnafrag_id = self._get_dnafrag_id_for_coord(region)
-        blocks = self._get_genomic_align_blocks_for_dna_frag_id(method_clade_id,
-                                                                ref_dnafrag_id, region)
+        blocks = self._get_genomic_align_blocks_for_dna_frag_id(
+            method_clade_id,
+            ref_dnafrag_id, region)
+
         for block in blocks:
             genomic_align_block_id = block['genomic_align_block_id']
             # we get joint records for these identifiers from
