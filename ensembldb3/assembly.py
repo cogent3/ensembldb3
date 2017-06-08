@@ -1,9 +1,7 @@
 import sqlalchemy as sql
-from cogent3.core.location import Map
 
 from .species import Species as _Species
 from .util import asserted_one, convert_strand, DisplayString
-from .host import DbConnection
 
 __author__ = "Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -16,13 +14,15 @@ __status__ = "alpha"
 
 
 def location_query(table, query_start, query_end,
-                   start_col='seq_region_start', end_col='seq_region_end', query=None,
+                   start_col='seq_region_start',
+                   end_col='seq_region_end',
+                   query=None,
                    where='overlap'):
     # TODO should we allow for spans, overlaps, within?
-    # the union result is a complex query and has be appended to any other queries
-    # in which it's being employed
-    # should we be setting default values here regarding the columns that start/end
-    # are pulled from, or explicitly state which columns
+    # the union result is a complex query and has be appended to any
+    # other queries in which it's being employed
+    # should we be setting default values here regarding the columns
+    # that start/end are pulled from, or explicitly state which columns
     if query is None:
         query = sql.select([table])
 
@@ -81,9 +81,9 @@ class Coordinate(object):
         # TODO allow creation with just seq_region_id
         self.species = genome.species
         self.coord_type = DisplayString(coord_type, repr_length=4,
-                                       with_quotes=False)
+                                        with_quotes=False)
         self.coord_name = DisplayString(coord_name, repr_length=4,
-                                       with_quotes=False)
+                                        with_quotes=False)
         # if start == end, we +1 to end, unless these are ensembl_coord's
         if ensembl_coord:
             start -= 1
@@ -123,14 +123,16 @@ class Coordinate(object):
 
     def __str__(self):
         return '%s:%s:%s:%d-%d:%d' % (self.species, self.coord_type,
-                                      self.coord_name, self.start, self.end, self.strand)
+                                      self.coord_name, self.start,
+                                      self.end, self.strand)
 
     def __repr__(self):
         my_type = self.__class__.__name__
         name = _Species.get_common_name(self.species)
         coord_type = self.coord_type
         c = '%s(%r,%r,%r,%d-%d,%d)' % (my_type, name, coord_type,
-                                       self.coord_name, self.start, self.end, self.strand)
+                                       self.coord_name, self.start,
+                                       self.end, self.strand)
         return c.replace("'", "")
 
     def adopted(self, other, shift=False):
@@ -158,8 +160,10 @@ class Coordinate(object):
     def copy(self):
         """returns a copy"""
         return self.__class__(genome=self.genome, coord_name=self.coord_name,
-                              start=self.start, end=self.end, strand=self.strand,
-                              coord_type=self.coord_type, seq_region_id=self.seq_region_id)
+                              start=self.start, end=self.end,
+                              strand=self.strand,
+                              coord_type=self.coord_type,
+                              seq_region_id=self.seq_region_id)
 
     def resized(self, from_start, from_end):
         """returns a new resized Coordinate with the
@@ -192,19 +196,19 @@ class Coordinate(object):
         return self.__class__(other.genome, coord_name=other.coord_name,
                               start=start, end=end, strand=other.strand,
                               seq_region_id=other.seq_region_id)
-    
+
     def union(self, other):
         """returns union of self and other coordinate
-        
+
         None if other is different species, strand or coordinate name"""
         if not all([other.strand == self.strand,
                     other.genome.species == self.genome.species,
                     other.coord_name == self.coord_name]):
             return None
-        
+
         start = min(self.start, other.start)
         end = max(self.end, other.end)
-        
+
         new = self.__class__(self.genome, coord_name=self.coord_name,
                              start=start, end=end, strand=self.strand)
         return new
@@ -235,7 +239,8 @@ class CoordSystemCache(object):
     (3) to get which level of system is used for storing dna table, check
         'attrib' column of coord_system as default_version, sequence_level.
     """
-    # Problem: multiple species (for compara) --> organized as {species: coordsystem}
+    # Problem: multiple species (for compara) --> organized
+    # as {species: coordsystem}
     # TODO: simplify _species_coord_systems?
     # we place each species coord-system in _species_coord_systems, once, so
     # this attribute is a very _public_ attribute, and serves as a cache to
@@ -251,7 +256,8 @@ class CoordSystemCache(object):
             return
         self._species_coord_systems[species] = {}
         coord_table = core_db.get_table('coord_system')
-        records = sql.select([coord_table]).where(coord_table.c.attrib.like('default%')).\
+        records = sql.select([coord_table]).\
+            where(coord_table.c.attrib.like('default%')).\
             execute().fetchall()    # only select default version
         for record in records:
             attr = self._species_coord_systems[species]
@@ -363,7 +369,8 @@ def _get_equivalent_coords(query_coord, assembly_row, query_prefix,
                             seq_region_id=q_seq_region_id,
                             genome=query_coord.genome, ensembl_coord=True)
     t_location = Coordinate(coord_name=assembly_row['name'], start=t_start,
-                            end=t_end, strand=t_strand, coord_type=target_coord_type,
+                            end=t_end, strand=t_strand,
+                            coord_type=target_coord_type,
                             seq_region_id=t_seq_region_id,
                             genome=query_coord.genome,
                             ensembl_coord=True)
@@ -390,8 +397,9 @@ def assembly_exception_coordinate(loc):
     return conv_loc
 
 
-def get_coord_conversion(query_location, target_coord_type, core_db, where=None):
-    """returns the ???"""
+def get_coord_conversion(query_location, target_coord_type, core_db,
+                         where=None):
+    """returns the converted coordinates"""
     where = where or 'overlap'
     # TODO better function name
     species = core_db.db_name.species
@@ -402,17 +410,20 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
                                          species=species).coord_system_id
 
     query_prefix, target_prefix = _rank_checking(query_location.coord_type,
-                                                 target_coord_type, core_db, species)
+                                                 target_coord_type, core_db,
+                                                 species)
     if query_prefix == target_prefix:
         return [[query_location, query_location]]
     # TODO: deal with query_prefix == target_prefix == '' --> could happen
     # when query features.
-    query = sql.select([assembly, seq_region.c.name], sql.and_(assembly.c
-                                                               ['%s_seq_region_id' %
-                                                                   target_prefix] == seq_region.c.seq_region_id,
-                                                               seq_region.c.coord_system_id == target_coord_system_id,
-                                                               assembly.c['%s_seq_region_id' % query_prefix] ==
-                                                               query_location.seq_region_id))
+    query = sql.select(
+        [assembly, seq_region.c.name],
+        sql.and_(assembly.c
+                 ['%s_seq_region_id' %
+                  target_prefix] == seq_region.c.seq_region_id,
+                 seq_region.c.coord_system_id == target_coord_system_id,
+                 assembly.c['%s_seq_region_id' % query_prefix] ==
+                 query_location.seq_region_id))
     query = location_query(assembly, query_location.ensembl_start,
                            query_location.ensembl_end,
                            start_col="%s_start" % query_prefix,
@@ -422,5 +433,6 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
     results = []
     for assembly_row in assembly_rows:
         results.append(_get_equivalent_coords(query_location, assembly_row,
-                                              query_prefix, target_prefix, target_coord_type))
+                                              query_prefix, target_prefix,
+                                              target_coord_type))
     return results
