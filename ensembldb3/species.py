@@ -14,13 +14,14 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
+
 def load_species(species_path):
     """returns [[latin_name, common_name],..] from species_path
-    
+
     if species_path does not exist, defaults to default one"""
     if not os.path.exists(species_path):
         species_path = resource_filename("data", "species.tsv")
-    
+
     with open(species_path, "r") as infile:
         data = []
         for line in infile:
@@ -33,8 +34,8 @@ def load_species(species_path):
                 raise ValueError(
                     "species file should be "
                     "<latin name>\t<common name>\t<optional species synonym>"
-                    " per line")                
-        
+                    " per line")
+
     return data
 
 _species_common_map = load_species(os.path.join(ENSEMBLDBRC, "species.tsv"))
@@ -64,36 +65,36 @@ class SpeciesNameMap(dict):
             species = self._common_species[common]
             ensembl = self._species_ensembl[species]
             syn = syns.get(species, '')
-            
+
             rows += [[common, species, ensembl, syn]]
-        display = str(Table(['Common name', 'Species name', 'Ensembl Db Prefix',
-                             'Synonymns'],
+        display = str(Table(['Common name', 'Species name',
+                             'Ensembl Db Prefix', 'Synonymns'],
                             rows=rows, space=2).sorted())
         return display
 
     def __repr__(self):
-        return 'Available species: %s' % ("'" +
-                                          "'; '".join(list(self._common_species.keys())) + "'")
-    
+        return 'Available species: %s' % \
+            ("'" + "'; '".join(list(self._common_species.keys())) + "'")
+
     def add_synonym(self, species, synonym):
         """add a synonym for a species name
-        
+
         This provides an additional mapping to common names and ensembl
         db names"""
         species = CaseInsensitiveString(species)
         synonym = CaseInsensitiveString(synonym)
         self._synonyms[synonym] = species
-    
+
     def get_common_name(self, name, level='raise'):
         """returns the common name for the given name (which can be either a
         species name or the ensembl version)"""
         name = CaseInsensitiveString(name)
         if name in self._ensembl_species:
             name = self._ensembl_species[name]
-        
+
         if name in self._synonyms:
             name = self._synonyms[name]
-        
+
         if name in self._species_common:
             common_name = self._species_common[name]
         elif name in self._common_species:
@@ -115,11 +116,11 @@ class SpeciesNameMap(dict):
         name = CaseInsensitiveString(name)
         if name in self._species_common:
             return str(name)
-        
+
         if name in self._synonyms:
             name = self._synonyms[name]
             return str(name)
-        
+
         species_name = None
         level = level.lower().strip()
         name = name
@@ -191,7 +192,7 @@ class SpeciesNameMap(dict):
         self._ensembl_species[ensembl_name] = species_name
         if synonym:
             self.add_synonym(species_name, CaseInsensitiveString(synonym))
-        
+
         return
 
 Species = SpeciesNameMap()
