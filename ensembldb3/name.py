@@ -28,6 +28,7 @@ def get_version_from_name(name):
 
     return release, b
 
+
 _name_delim = re.compile("_")
 
 
@@ -94,8 +95,10 @@ class EnsemblDbName(object):
 
     def __repr__(self):
         build = ['', "; build='%s'" % self.build][self.build is not None]
-        s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (self.prefix, self.type,
-                                                            self.release, build)
+        s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (self.prefix,
+                                                            self.type,
+                                                            self.release,
+                                                            build)
         return s
 
     def __str__(self):
