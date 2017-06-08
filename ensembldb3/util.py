@@ -1,12 +1,10 @@
 import os
 import gzip
 import bz2
-import re
 import subprocess
 import sys
 
 from pkg_resources import resource_filename
-from sqlalchemy import create_engine, MetaData, Table
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -17,33 +15,38 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
+
 def get_resource_dir():
     """returns path to resource directory"""
     if "ENSEMBLDBRC" in os.environ:
         path = os.environ["ENSEMBLDBRC"]
     else:
         path = resource_filename("ensembldb3", "data")
-    
+
     path = os.path.abspath(os.path.expanduser(path))
     if not os.path.exists(path):
         raise ValueError("ENSEMBLDBRC directory '%s' does not exist")
-    
+
     return path
+
 
 # the following is where essential files live, such as
 # the species/common name map and sample download.cfg
 ENSEMBLDBRC = get_resource_dir()
 
+
 def open_(filename, mode="r"):
-    func = {'gz': gzip.open, 'bz2': bz2.open}.get(filename.split('.')[-1], open)
+    func = {'gz': gzip.open, 'bz2': bz2.open}.get(
+        filename.split('.')[-1], open)
     return func(filename, mode=mode)
+
 
 def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """executes shell command and returns stdout if completes exit code 0
-    
+
     Parameters
     ----------
-    
+
     cmnd : str
       shell command to be executed
     stdout, stderr : streams
@@ -61,12 +64,14 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         r = None
     return r
 
+
 def makedirs(path):
     """creates directory path if it doesn't exist"""
     if os.path.exists(path):
         return
-    
+
     os.makedirs(path)
+
 
 def abspath(path):
     path = os.path.abspath(os.path.expanduser(path))
