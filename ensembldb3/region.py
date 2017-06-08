@@ -9,7 +9,7 @@ from cogent3.util.table import Table
 from .util import LazyRecord, asserted_one, DisplayString, \
     NoItemError
 from .assembly import Coordinate, CoordSystem, \
-    location_query, assembly_exception_coordinate
+    assembly_exception_coordinate
 from .sequence import get_sequence
 from .database import cached_attribs
 
@@ -24,9 +24,14 @@ __status__ = "alpha"
 
 DEFAULT_PARENT_LENGTH = 2 ** 30
 
+
 # some common string display formatting
-_quoted = lambda x: DisplayString(x, with_quotes=True)
-_limit_words = lambda x: DisplayString(x, with_quotes=True, num_words=3)
+def _quoted(x):
+    return DisplayString(x, with_quotes=True)
+
+
+def _limit_words(x):
+    return DisplayString(x, with_quotes=True, num_words=3)
 
 
 class _Region(LazyRecord):
@@ -126,9 +131,9 @@ class _Region(LazyRecord):
         where_feature: the returned region can either lie 'within' this region,
         'overlap' this region, or 'span' this region"""
         return self.genome.get_features(self.location,
-                                       feature_types=feature_types,
-                                       where_feature=where_feature,
-                                       limit=limit)
+                                        feature_types=feature_types,
+                                        where_feature=where_feature,
+                                        limit=limit)
 
     def _get_variants(self):
         """constructs the variants attribute"""
@@ -156,7 +161,7 @@ class _Region(LazyRecord):
 
     def get_annotated_seq(self, feature_types=None, where_feature=None):
         regions = list(self.get_features(feature_types=feature_types,
-                                        where_feature=where_feature))
+                                         where_feature=where_feature))
         # seq_map is on the + strand, regardless the actual strand of sequence
         seq_map = Map(locations=[(self.location.start, self.location.end)],
                       parent_length=DEFAULT_PARENT_LENGTH)
@@ -168,7 +173,8 @@ class _Region(LazyRecord):
                 continue
             # this will consider the strand information of actual sequence
             feature_map = [data[-1],
-                           data[-1].nucleic_reversed()][self.location.strand == -1]
+                           data[-1].nucleic_reversed()
+                           ][self.location.strand == -1]
             self.seq.add_annotation(Feature, data[0], data[1], feature_map)
 
             if region.type == 'gene':  # TODO: SHOULD be much simplified
@@ -179,7 +185,7 @@ class _Region(LazyRecord):
                         # needed.
                         feature_map = feature_map.nucleic_reversed()
                     self.seq.add_annotation(Feature, feature_type,
-                                           feature_name, feature_map)
+                                            feature_name, feature_map)
 
         return self.seq
 
@@ -214,8 +220,10 @@ class GenericRegion(_Region):
         return "%s(species='%s'; coord_name='%s'; start=%s; end=%s;"\
                " length=%s; strand='%s')" % (my_type,
                                              self.genome.species,
-                                             self.location.coord_name, self.location.start,
-                                             self.location.end, len(self), '-+'[self.location.strand > 0])
+                                             self.location.coord_name,
+                                             self.location.start,
+                                             self.location.end, len(self),
+                                             '-+'[self.location.strand > 0])
 
     def _get_seq_region_record(self, coord_name):
         # override the _Region class method, since, we take the provided start
@@ -225,9 +233,10 @@ class GenericRegion(_Region):
         seq_region_table = self.genome.db.get_table('seq_region')
         coord_systems = CoordSystem(core_db=self.genome.CoreDb)
         coord_system_ids = [k for k in coord_systems if not isinstance(k, str)]
-        record = sql.select([seq_region_table],
-                            sql.and_(seq_region_table.c.name == coord_name,
-                                     seq_region_table.c.coord_system_id.in_(coord_system_ids)))
+        record = sql.select(
+            [seq_region_table],
+            sql.and_(seq_region_table.c.name == coord_name,
+                     seq_region_table.c.coord_system_id.in_(coord_system_ids)))
         record = asserted_one(record.execute().fetchall())
         self._table_rows['seq_region'] = record
 
@@ -299,17 +308,18 @@ class Gene(_StableRegion):
     type = 'gene'
     _member_types = ['transcripts']
 
-    def __init__(self, genome, db, stableid=None, symbol=None, location=None, data=None):
+    def __init__(self, genome, db, stableid=None, symbol=None,
+                 location=None, data=None):
         """constructed by a genome instance"""
         super(Gene, self).__init__(genome, db, location=location)
 
-        self._attr_ensembl_table_map = dict(stableid=['gene_stable_id',
-                                                      'gene'][genome.general_release >= 65],
-                                            symbol='xref',
-                                            description='gene', biotype='gene', location='gene',
-                                            canonical_transcript='gene',
-                                            transcripts='transcript',
-                                            exons='transcript')
+        self._attr_ensembl_table_map = dict(
+            stableid=['gene_stable_id', 'gene'][genome.general_release >= 65],
+            symbol='xref',
+            description='gene', biotype='gene', location='gene',
+            canonical_transcript='gene',
+            transcripts='transcript',
+            exons='transcript')
 
         if data is None:
             args = [dict(stableid=stableid), dict(
@@ -358,8 +368,8 @@ class Gene(_StableRegion):
     def _get_gene_stable_id_record(self):
         """adds the gene_stable_id data to self._table_rows"""
         attr_column_map = [('stableid', 'stable_id', _quoted)]
-        self._populate_cache_from_record(attr_column_map,
-                                         self._attr_ensembl_table_map['stableid'])
+        self._populate_cache_from_record(
+            attr_column_map, self._attr_ensembl_table_map['stableid'])
         return
 
     def _get_xref_record(self):
@@ -453,9 +463,9 @@ class Gene(_StableRegion):
         returns None if no transcripts."""
         if self.transcripts is self.NULL_VALUE:
             return None
-        l = [ts.get_cds_length() for ts in self.transcripts
-             if ts.biotype == self.biotype]
-        return l
+        lengths = [ts.get_cds_length() for ts in self.transcripts
+                   if ts.biotype == self.biotype]
+        return lengths
 
     def get_longest_cds_transcript(self):
         """returns the Transcript with the longest cds and the same biotype"""
@@ -476,11 +486,12 @@ class Transcript(_StableRegion):
         """created by Gene"""
         super(Transcript, self).__init__(genome, db, location=location)
 
-        self._attr_ensembl_table_map = dict(stableid=['transcript_stable_id',
-                                                      'transcript'][genome.general_release >= 65],
-                                            location='transcript',
-                                            status='transcript',
-                                            translated_exons='translation')
+        self._attr_ensembl_table_map = dict(
+            stableid=['transcript_stable_id',
+                      'transcript'][genome.general_release >= 65],
+            location='transcript',
+            status='transcript',
+            translated_exons='translation')
 
         self._am_prot_coding = None
         self.transcript_id = transcript_id
@@ -529,8 +540,9 @@ class Transcript(_StableRegion):
     def _get_exon_transcript_records(self):
         transcript_id = self.transcript_id
         exon_transcript_table = self.db.get_table('exon_transcript')
-        query = sql.select([exon_transcript_table],
-                           exon_transcript_table.c.transcript_id == transcript_id)
+        query = sql.select(
+            [exon_transcript_table],
+            exon_transcript_table.c.transcript_id == transcript_id)
         records = query.execute()
         exons = []
         for record in records:
@@ -568,7 +580,8 @@ class Transcript(_StableRegion):
             intron_positions.reverse()
         for s, e in intron_positions:
             coord = self.genome.make_location(coord_name=chrom, start=s, end=e,
-                                             strand=strand, ensembl_coord=False)
+                                              strand=strand,
+                                              ensembl_coord=False)
             introns.append(Intron(self.genome, self.db, rank, self.stableid,
                                   coord))
             rank += 1
@@ -663,7 +676,8 @@ class Transcript(_StableRegion):
         translated_exons = self.translated_exons
         num_exons = len(self.exons)
         if not translated_exons:
-            self._set_null_values(["untranslated_exons_5", "untranslated_exons_3"])
+            self._set_null_values(["untranslated_exons_5",
+                                  "untranslated_exons_3"])
             return
         untranslated_5exons, untranslated_3exons = [], []
         start_exon, end_exon = translated_exons[0], translated_exons[-1]
@@ -677,7 +691,8 @@ class Transcript(_StableRegion):
                 coord.end = [start_exon.location.start, coord.end][flip_coords]
             if len(coord) != 0:
                 untranslated_5exons.append(Exon(self.genome, self.db,
-                                                exon.exon_id, exon.rank, location=coord))
+                                                exon.exon_id, exon.rank,
+                                                location=coord))
         for exon in exons[end_exon.rank - 1: num_exons]:  # get 3'UTR
             coord = exon.location.copy()
             if exon.stableid == end_exon.stableid:
@@ -685,7 +700,8 @@ class Transcript(_StableRegion):
                 coord.end = [coord.end, end_exon.location.start][flip_coords]
             if len(coord) != 0:
                 untranslated_3exons.append(Exon(self.genome, self.db,
-                                                exon.exon_id, exon.rank, location=coord))
+                                                exon.exon_id, exon.rank,
+                                                location=coord))
 
         self._cached["untranslated_exons_5"] = tuple(untranslated_5exons)
         self._cached["untranslated_exons_3"] = tuple(untranslated_3exons)
@@ -703,7 +719,8 @@ class Transcript(_StableRegion):
     untranslated_exons_3 = property(_get_3prime_untranslated_exons)
 
     def _make_utr_seq(self):
-        if self.untranslated_exons_5 is None and self.untranslated_exons_3 is None:
+        if self.untranslated_exons_5 is None and\
+           self.untranslated_exons_3 is None:
             self._cached["utr5"] = self.NULL_VALUE
             self._cached["utr3"] = self.NULL_VALUE
             return
@@ -879,9 +896,8 @@ class Exon(_StableRegion):
     def __init__(self, genome, db, exon_id, rank, location=None):
         """created by a Gene"""
         _StableRegion.__init__(self, genome, db, location=location)
-
-        self._attr_ensembl_table_map = dict(stableid=['exon_stable_id',
-                                                      'exon'][genome.general_release >= 65],
+        stableid = 'exon_stable_id' if genome.general_release < 65 else 'exon'
+        self._attr_ensembl_table_map = dict(stableid=stableid,
                                             location='exon')
 
         self.exon_id = exon_id
@@ -967,7 +983,8 @@ class Intron(GenericRegion):
     def __repr__(self):
         my_type = self.__class__.__name__
         return '%s(TranscriptId=%s, rank=%s)' % (my_type,
-                                                 self.TranscriptStableId, self.rank)
+                                                 self.TranscriptStableId,
+                                                 self.rank)
 
     def _make_symbol(self):
         self._cached['symbol'] = '%s-%s' % (self.TranscriptStableId, self.rank)
@@ -1018,16 +1035,17 @@ class Variation(_Region):
         else:
             self._get_flanking_seq_data = self._get_flanking_seq_data_ge_70
 
-        self._attr_ensembl_table_map = dict(effect='variation_feature',
-                                            symbol='variation_feature',
-                                            validation='variation_feature',
-                                            map_weight='variation_feature',
-                                            flanking_seq='flanking_sequence',
-                                            peptide_alleles='transcript_variation',
-                                            translation_location='transcript_variation',
-                                            location='variation_feature',
-                                            allele_freqs='allele',
-                                            ancestral='variation')
+        self._attr_ensembl_table_map = dict(
+            effect='variation_feature',
+            symbol='variation_feature',
+            validation='variation_feature',
+            map_weight='variation_feature',
+            flanking_seq='flanking_sequence',
+            peptide_alleles='transcript_variation',
+            translation_location='transcript_variation',
+            location='variation_feature',
+            allele_freqs='allele',
+            ancestral='variation')
 
         assert data is not None, 'Variation record created in an unusual way'
         for name, value, func in \
@@ -1061,13 +1079,15 @@ class Variation(_Region):
                          ('symbol', 'variation_name', _quoted),
                          ('map_weight', 'map_weight', int),
                          ('somatic', 'somatic', bool)]
-        
+
         if self.genome.general_release < 83:
             attr_name_map.append(
-                         ('validation', 'validation_status', _set_to_string))
+                                ('validation', 'validation_status',
+                                 _set_to_string))
         else:
-            attr_name_map.append(('validation', 'evidence_attribs', lambda x: x))            
-        
+            attr_name_map.append(('validation',
+                                  'evidence_attribs', lambda x: x))
+
         self._populate_cache_from_record(attr_name_map, 'variation_feature')
         # TODO handle obtaining the variation_feature if we were created in
         # any way other than through the symbol or effect
@@ -1098,8 +1118,8 @@ class Variation(_Region):
 
     def _get_flanking_seq_data_ge_70(self):
         """return the flanking sequence data if release >= 70"""
-        # variation_feature.alignment_quality == 1, means flanks match reference
-        # genome, 0 means they don't
+        # variation_feature.alignment_quality == 1, means flanks match
+        # reference genome, 0 means they don't
         aligned_ref = self._table_rows[
             'variation_feature']['alignment_quality'] == 1
         if not aligned_ref:
@@ -1116,7 +1136,8 @@ class Variation(_Region):
             seq = flanking.seq
             seqs[name] = seq
 
-        self._cached[('flanking_seq')] = (seqs['up'][-300:], seqs['down'][:300])
+        self._cached[('flanking_seq')] = (seqs['up'][-300:],
+                                          seqs['down'][:300])
 
     def _get_flanking_seq_data_lt_70(self):
         # maps to flanking_sequence through variation_feature_id
@@ -1146,7 +1167,8 @@ class Variation(_Region):
                 seq = flanking.seq
             seqs[name] = seq
 
-        self._cached[('flanking_seq')] = (seqs['up'][-300:], seqs['down'][:300])
+        self._cached[('flanking_seq')] = (seqs['up'][-300:],
+                                          seqs['down'][:300])
 
     def _get_flanking_seq(self):
         return self._get_cached_value('flanking_seq',
@@ -1207,8 +1229,9 @@ class Variation(_Region):
             if allele_code is None:
                 allele = rec['allele']
             else:
-                allele_query = sql.select([allele_code.c.allele],
-                                          allele_code.c.allele_code_id == rec['allele_code_id'])
+                allele_query = sql.select(
+                    [allele_code.c.allele],
+                    allele_code.c.allele_code_id == rec['allele_code_id'])
                 allele = list(allele_query.execute())[0][0]
 
             data.append((allele, rec['frequency'], rec[sample_id]))
@@ -1235,26 +1258,26 @@ class Variation(_Region):
     @property
     def validation(self):
         result = self._get_cached_value('validation',
-                                        self._get_variation_table_record)        
+                                        self._get_variation_table_record)
         if self.genome.general_release < 83:
             # we need to access cached descriptions
             return result
-        
+
         mapping = cached_attribs[(self.genome, "validation")]
         if mapping is None:
             attr = self.attr_table
             attr_ty = self.attrib_type_tab
-            query = sql.select([attr.c.attrib_id, attr.c.value],
-                               sql.and_(attr.c.attrib_type_id==attr_ty.c.attrib_type_id,
-                                        attr_ty.c.name == 'Variant evidence status'))
-            mapping = dict((str(i), v) for i,v in query.execute().fetchall())
+            query = sql.select(
+                [attr.c.attrib_id, attr.c.value],
+                sql.and_(attr.c.attrib_type_id == attr_ty.c.attrib_type_id,
+                         attr_ty.c.name == 'Variant evidence status'))
+            mapping = dict((str(i), v) for i, v in query.execute().fetchall())
             cached_attribs.add_to_cache(self.genome, "validation", mapping)
-        
+
         out = [mapping[k] for k in sorted(result)]
         result = set(out)
-        
+
         return result
-            
 
     def _get_map_weight(self):
         return self._get_cached_value('map_weight',
@@ -1280,7 +1303,9 @@ class Variation(_Region):
             return
 
         table_name = self._attr_ensembl_table_map['peptide_alleles']
-        loc = lambda x: int(x) - 1
+
+        def loc(x):
+            return int(x) - 1
 
         # column name changed between releases, so we check to see which
         # one is being used for this instance and set the column strings
@@ -1308,23 +1333,24 @@ class Variation(_Region):
         table = self.genome.VarDb.get_table(table_name)
         self_effect = set([self.effect, [self.effect]]
                           [type(self.effect) == str])
-        query = sql.select([table.c.variation_feature_id,
-                            table.columns[pep_allele_string],
-                            table.c.translation_start,
-                            table.columns[consequence_type]],
-                           sql.and_(table.c.variation_feature_id == var_feature_id,
-                                    table.columns[pep_allele_string] is not None))
+        query = sql.select(
+            [table.c.variation_feature_id,
+             table.columns[pep_allele_string],
+             table.c.translation_start,
+             table.columns[consequence_type]],
+            sql.and_(table.c.variation_feature_id == var_feature_id,
+                     table.columns[pep_allele_string] is not None))
         records = query.execute().fetchall()
         pep_alleles = []
         translation_location = []
         for record in records:
             if not record[consequence_type] & self_effect:
                 continue
-            
+
             allele = record[pep_allele_string]
             if not allele:
                 continue
-            
+
             pep_alleles += [allele]
             translation_location += [record['translation_start']]
 
@@ -1332,7 +1358,7 @@ class Variation(_Region):
             self._cached['peptide_alleles'] = self.NULL_VALUE
             self._cached['translation_location'] = self.NULL_VALUE
             return
-        
+
         # we only want unique allele strings
         allele_location = dict(list(zip(pep_alleles, translation_location)))
         pep_alleles = list(set(pep_alleles))
@@ -1343,8 +1369,9 @@ class Variation(_Region):
         else:
             translation_location = allele_location[pep_alleles]
 
-        self._table_rows[table_name] = dict(pep_allele_string=pep_alleles,
-                                            translation_start=translation_location)
+        self._table_rows[table_name] = dict(
+            pep_allele_string=pep_alleles,
+            translation_start=translation_location)
         self._populate_cache_from_record(attr_column_map, table_name)
 
     def _get_peptide_variation(self):
@@ -1386,7 +1413,8 @@ class CpGisland(GenericRegion):
                                               self.location.start,
                                               self.location.end,
                                               len(self),
-                                              '-+'[self.location.strand > 0], self.Score)
+                                              '-+'[self.location.strand > 0],
+                                              self.Score)
 
 
 class Repeat(GenericRegion):
@@ -1409,19 +1437,26 @@ class Repeat(GenericRegion):
         return "%s(coord_name='%s'; start=%s; end=%s; length=%s;"\
                " strand='%s', Score=%.1f)" % (my_type,
                                               self.location.coord_name,
-                                              self.location.start, self.location.end, len(
-                                                  self),
-                                              '-+'[self.location.strand > 0], self.Score)
+                                              self.location.start,
+                                              self.location.end,
+                                              len(self),
+                                              '-+'[self.location.strand > 0],
+                                              self.Score)
 
     def _get_repeat_consensus_record(self):
         repeat_consensus_table = self.db.get_table('repeat_consensus')
         repeat_consensus_id = self._table_rows[
             'repeat_feature']['repeat_consensus_id']
-        record = sql.select([repeat_consensus_table],
-                            repeat_consensus_table.c.repeat_consensus_id == repeat_consensus_id)
+        record = sql.select(
+            [repeat_consensus_table],
+            repeat_consensus_table.c.repeat_consensus_id ==
+            repeat_consensus_id)
         record = asserted_one(record.execute().fetchall())
         self._table_rows['repeat_consensus'] = record
-        limit_length = lambda x: DisplayString(x, repr_length=10)
+
+        def limit_length(x):
+            return DisplayString(x, repr_length=10)
+
         attr_column_map = [('symbol', 'repeat_name', _quoted),
                            ('repeat_class', 'repeat_class', _quoted),
                            ('repeat_type', 'repeat_type', _quoted),
