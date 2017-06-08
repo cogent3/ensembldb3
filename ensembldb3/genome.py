@@ -37,14 +37,14 @@ class FeatureTypeCache(LazyRecord):
     def _get_cpg_island_analysis_id(self):
         analysis_description_table = \
             self.genome.CoreDb.get_table('analysis_description')
-        query = sql.select([analysis_description_table.c.analysis_id],
-                           analysis_description_table.c.display_label.like('%CpG%'))
+        query = sql.select(
+            [analysis_description_table.c.analysis_id],
+            analysis_description_table.c.display_label.like('%CpG%'))
         record = asserted_one(query.execute())
         self._table_rows['analysis_description'] = record
-        quoted_limited = lambda x: DisplayString(x, with_quotes=True,
-                                                 num_words=2)
         self._populate_cache_from_record(
-            [('CpGisland', 'analysis_id', quoted_limited)],
+            [('CpGisland', 'analysis_id',
+                lambda x: DisplayString(x, with_quotes=True, num_words=2))],
             'analysis_description')
 
     def _get_cpg_island_id(self):
@@ -120,7 +120,8 @@ class Genome(object):
 
     def _connect_db(self, db_type):
         connection = dict(account=self._account, release=self.release,
-                          species=self.species, pool_recycle=self._pool_recycle)
+                          species=self.species,
+                          pool_recycle=self._pool_recycle)
         if self._core_db is None and db_type == 'core':
             self._core_db = Database(db_type='core', **connection)
             gen_rel = self.CoreDb.db_name.general_release
@@ -158,7 +159,9 @@ class Genome(object):
 
         return self._gen_release
 
-    def _get_biotype_description_condition(self, gene_table, description=None, biotype=None, like=True):
+    def _get_biotype_description_condition(self, gene_table,
+                                           description=None,
+                                           biotype=None, like=True):
         assert description or biotype, "no valid argument provided"
         btype, descr = None, None
 
@@ -183,7 +186,8 @@ class Genome(object):
 
         return condition
 
-    def _build_gene_query(self, db, condition, gene_table, gene_id_table, xref_table=None):
+    def _build_gene_query(self, db, condition, gene_table,
+                          gene_id_table, xref_table=None):
         if gene_id_table is None:  # Ensembl releases later than >= 65
             join_obj = gene_table
             select_obj = [gene_table]
@@ -194,7 +198,8 @@ class Genome(object):
 
         if db.type == 'core':
             join_obj = join_obj.outerjoin(
-                xref_table, gene_table.c.display_xref_id == xref_table.c.xref_id)
+                xref_table,
+                gene_table.c.display_xref_id == xref_table.c.xref_id)
             select_obj.append(xref_table.c.display_label)
         query = sql.select(select_obj, from_obj=[
                            join_obj], whereclause=condition)
@@ -205,7 +210,8 @@ class Genome(object):
         synonym_table = db.get_table('external_synonym')
         xref_table = db.get_table('xref')
         joinclause = xref_table.join(synonym_table,
-                                     xref_table.c.xref_id == synonym_table.c.xref_id)
+                                     xref_table.c.xref_id ==
+                                     synonym_table.c.xref_id)
         whereclause = synonym_table.c.synonym == synonym
         query = sql.select([xref_table.c.display_label], from_obj=[joinclause],
                            whereclause=whereclause).distinct()
@@ -224,15 +230,16 @@ class Genome(object):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
 
-        # after release 65, the gene_id_table is removed. The following is to maintain
-        # support for earlier releases
+        # after release 65, the gene_id_table is removed. The following is to
+        # maintain support for earlier releases
         release_ge_65 = self.general_release >= 65
         if release_ge_65:
             gene_id_table = None
         else:
             gene_id_table = db.get_table('gene_stable_id')
 
-        assert symbol or description or stableid or biotype, "no valid argument provided"
+        assert symbol or description or stableid or biotype,\
+            "no valid argument provided"
         if symbol:
             condition = xref_table.c.display_label == symbol
         elif stableid and release_ge_65:
@@ -249,7 +256,7 @@ class Genome(object):
         return query
 
     def make_location(self, coord_name, start=None, end=None, strand=1,
-                     ensembl_coord=False):
+                      ensembl_coord=False):
         """returns a location in the genome"""
         return Coordinate(self, coord_name=coord_name, start=start, end=end,
                           strand=strand, ensembl_coord=ensembl_coord)
@@ -265,9 +272,9 @@ class Genome(object):
         return gene
 
     def get_genes_matching(self, symbol=None, description=None, stableid=None,
-                         biotype=None, like=True, limit=None):
+                           biotype=None, like=True, limit=None):
         """returns a generator of Gene instances
-        
+
         Arguments:
             - symbol: HGC gene symbol, case doesn't matter
             - description: a functional description
@@ -295,7 +302,7 @@ class Genome(object):
         query = self._get_gene_query(self.CoreDb, **args)
         if limit is not None:
             query = query.limit(limit)
-        
+
         records = query.execute()
         if records.rowcount == 0 and symbol is not None:
             # see if the symbol has a synonym
@@ -311,7 +318,8 @@ class Genome(object):
             yield gene
 
     def get_transcript_by_stableid(self, stableid):
-        """returns the transcript matching stableid, or None if no record found"""
+        """returns the transcript matching stableid,
+        or None if no record found"""
         query = self._get_transcript_query(self.CoreDb, stableid=stableid)
         try:
             record = list(query.execute())[0]
@@ -322,20 +330,22 @@ class Genome(object):
             transcript = None
         return transcript
 
-    def _get_transcript_query(self, db, symbol=None, description=None, stableid=None,
-                              biotype=None, synonym=None, like=True):
+    def _get_transcript_query(self, db, symbol=None, description=None,
+                              stableid=None, biotype=None, synonym=None,
+                              like=True):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         transcript_table = db.get_table('transcript')
 
-        # after release 65, the transcript_id_table is removed. The following is to maintain
-        # support for earlier releases
+        # after release 65, the transcript_id_table is removed. The following
+        # is to maintain support for earlier releases
         release_ge_65 = self.general_release >= 65
         if release_ge_65:
             transcript_id_table = None
         else:
             transcript_id_table = db.get_table('transcript_stable_id')
 
-        assert symbol or description or stableid or biotype, "no valid argument provided"
+        assert symbol or description or stableid or biotype,\
+            "no valid argument provided"
         if symbol:
             condition = xref_table.c.display_label == symbol
         elif stableid and release_ge_65:
@@ -351,18 +361,22 @@ class Genome(object):
 
         return query
 
-    def _build_transcript_query(self, db, condition, transcript_table, transcript_id_table, xref_table=None):
+    def _build_transcript_query(self, db, condition, transcript_table,
+                                transcript_id_table, xref_table=None):
         if transcript_id_table is None:  # Ensembl releases later than >= 65
             join_obj = transcript_table
             select_obj = [transcript_table]
         else:
             join_obj = transcript_id_table.join(
-                transcript_table, transcript_id_table.c.gene_id == transcript_table.c.transcript_id)
+                transcript_table,
+                transcript_id_table.c.gene_id ==
+                transcript_table.c.transcript_id)
             select_obj = [transcript_id_table.c.stable_id, transcript_table]
 
         if db.type == 'core':
             join_obj = join_obj.outerjoin(
-                xref_table, transcript_table.c.display_xref_id == xref_table.c.xref_id)
+                xref_table,
+                transcript_table.c.display_xref_id == xref_table.c.xref_id)
             select_obj.append(xref_table.c.display_label)
         query = sql.select(select_obj, from_obj=[
                            join_obj], whereclause=condition)
@@ -373,7 +387,8 @@ class Genome(object):
         query = self._get_gene_query(self.OtherFeaturesDb, stableid=stableid)
         records = query.execute()
         for record in records:
-            yield Est(self, self.OtherFeaturesDb, stableid=stableid, data=record)
+            yield Est(self, self.OtherFeaturesDb,
+                      stableid=stableid, data=record)
 
     def _get_seq_region_id(self, coord_name):
         """returns the seq_region_id for the provided coord_name"""
@@ -381,9 +396,10 @@ class Genome(object):
         coord_systems = CoordSystem(core_db=self.CoreDb)
         coord_system_ids = [
             k for k in coord_systems if type(k) not in (str, str)]
-        record = sql.select([seq_region_table.c.seq_region_id],
-                            sql.and_(seq_region_table.c.name == coord_name,
-                                     seq_region_table.c.coord_system_id.in_(coord_system_ids)))
+        record = sql.select(
+            [seq_region_table.c.seq_region_id],
+            sql.and_(seq_region_table.c.name == coord_name,
+                     seq_region_table.c.coord_system_id.in_(coord_system_ids)))
         record = asserted_one(record.execute().fetchall())
         return record['seq_region_id']
 
@@ -397,15 +413,17 @@ class Genome(object):
         feature_type_ids = [str(self._feature_type_ids.get(f))
                             for f in feature_types]
         # fix the following
-        query = sql.select([simple_feature_table],
-                           sql.and_(simple_feature_table.c.analysis_id.in_(feature_type_ids),
-                                    simple_feature_table.c.seq_region_id == query_coord.seq_region_id))
+        query = sql.select(
+            [simple_feature_table],
+            sql.and_(simple_feature_table.c.analysis_id.in_(feature_type_ids),
+                     simple_feature_table.c.seq_region_id ==
+                     query_coord.seq_region_id))
         query = location_query(simple_feature_table, query_coord.ensembl_start,
                                query_coord.ensembl_end, query=query,
                                where=where_feature)
         if limit is not None:
             query = query.limit(limit)
-        
+
         records = query.execute()
         for record in records:
             coord = Coordinate(self, coord_name=query_coord.coord_name,
@@ -418,8 +436,6 @@ class Genome(object):
                 coord = asserted_one(get_coord_conversion(
                     coord, target_coord.coord_type, self.CoreDb))[1]
 
-            # coord = coord.make_relative_to(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
-            # coord = coord.make_relative_to(target_coord, False)
             yield klass(self, db, location=coord, Score=record['score'])
 
     def _get_repeat_features(self, db, klass, target_coord, query_coord,
@@ -429,13 +445,15 @@ class Genome(object):
         # the repeat_consensus_id is required to get the repeat name, class
         # and type
         repeat_feature_table = db.get_table('repeat_feature')
-        query = sql.select([repeat_feature_table],
-                           repeat_feature_table.c.seq_region_id == query_coord.seq_region_id)
+        query = sql.select(
+            [repeat_feature_table],
+            repeat_feature_table.c.seq_region_id == query_coord.seq_region_id)
         query = location_query(repeat_feature_table, query_coord.ensembl_start,
-                               query_coord.ensembl_end, query=query, where=where_feature)
+                               query_coord.ensembl_end,
+                               query=query, where=where_feature)
         if limit is not None:
             query = query.limit(limit)
-        
+
         for record in query.execute():
             coord = Coordinate(self, coord_name=query_coord.coord_name,
                                start=record['seq_region_start'],
@@ -446,8 +464,6 @@ class Genome(object):
             if query_coord.coord_name != target_coord.coord_name:
                 coord = asserted_one(get_coord_conversion(
                     coord, target_coord.coord_type, self.CoreDb))[1]
-            # coord = coord.make_relative_to(query_coord) # TODO: fix here if query_coord and target_coord have different coordName
-            # coord = coord.make_relative_to(target_coord, False)
             yield klass(self, db, location=coord, Score=record['score'],
                         data=record)
 
@@ -457,8 +473,8 @@ class Genome(object):
         xref_table = [None, db.get_table('xref')][db.type == 'core']
         gene_table = db.get_table('gene')
 
-        # after release 65, the gene_id_table is removed. The following is to maintain
-        # support for earlier releases.
+        # after release 65, the gene_id_table is removed. The following is
+        # to maintain support for earlier releases.
         if self.general_release >= 65:
             gene_id_table = None
         else:
@@ -469,10 +485,11 @@ class Genome(object):
         query = self._build_gene_query(
             db, condition, gene_table, gene_id_table, xref_table)
         query = location_query(gene_table, query_coord.ensembl_start,
-                               query_coord.ensembl_end, query=query, where=where_feature)
+                               query_coord.ensembl_end,
+                               query=query, where=where_feature)
         if limit is not None:
             query = query.limit(limit)
-        
+
         for record in query.execute():
             new = Coordinate(self, coord_name=query_coord.coord_name,
                              start=record['seq_region_start'],
@@ -490,13 +507,15 @@ class Genome(object):
         # variation features at supercontig level
         var_feature_table = self.VarDb.get_table('variation_feature')
         # note gene records are at chromosome, not contig, level
-        query = sql.select([var_feature_table],
-                           var_feature_table.c.seq_region_id == query_coord.seq_region_id)
+        query = sql.select(
+            [var_feature_table],
+            var_feature_table.c.seq_region_id == query_coord.seq_region_id)
         query = location_query(var_feature_table, query_coord.ensembl_start,
-                               query_coord.ensembl_end, query=query, where=where_feature)
+                               query_coord.ensembl_end,
+                               query=query, where=where_feature)
         if limit is not None:
             query = query.limit(limit)
-        
+
         for record in query.execute():
             yield klass(self, self.CoreDb, symbol=record['variation_name'],
                         data=record)
@@ -507,8 +526,9 @@ class Genome(object):
             dbs["var_db"] = self.VarDb
         if 'est' in feature_types:
             dbs["otherfeature_db"] = self.OtherFeaturesDb
-        feature_coord_levels = self._feature_coord_levels(self.species,
-                                                          feature_types=feature_types, **dbs)
+        feature_coord_levels = self._feature_coord_levels(
+            self.species,
+            feature_types=feature_types, **dbs)
         return feature_coord_levels
 
     def _feature_coord_levels(self):
@@ -521,8 +541,8 @@ class Genome(object):
     feature_coord_levels = property(_feature_coord_levels)
 
     def get_features(self, region=None, feature_types=None, where_feature=None,
-                    coord_name=None, start=None, end=None, strand=None,
-                    ensembl_coord=False, limit=None):
+                     coord_name=None, start=None, end=None, strand=None,
+                     ensembl_coord=False, limit=None):
         """returns region instances for the specified location"""
         if isinstance(feature_types, str):
             feature_types = [feature_types]
@@ -563,7 +583,8 @@ class Genome(object):
             feature_coords = feature_coord_levels[feature_type].levels
             for feature_coord in feature_coords:
                 chrom_other_coords = get_coord_conversion(coord, feature_coord,
-                                                          db, where=where_feature)
+                                                          db,
+                                                          where=where_feature)
                 for chrom_coord, other_coord in chrom_other_coords:
                     for region in target_func(db, target_class, chrom_coord,
                                               other_coord, where_feature,
@@ -571,8 +592,8 @@ class Genome(object):
                         yield region
 
     def get_variation(self, effect=None, symbol=None, like=True,
-                     validated=False, somatic=False, flanks_match_ref=False,
-                     limit=None):
+                      validated=False, somatic=False, flanks_match_ref=False,
+                      limit=None):
         """returns a generator of Variation instances
 
         Arguments:
@@ -608,7 +629,7 @@ class Genome(object):
             validated_col = "evidence_attribs"
             if self.general_release < 83:
                 validated_col = "validation_status"
-            
+
             # in release 65, the default validated status is now ''
             # why?? thanks Ensembl!
             null = None
@@ -624,8 +645,9 @@ class Genome(object):
         if flanks_match_ref:
             query = sql.and_(query, var_feature_table.c.alignment_quality == 1)
 
-        query = sql.select([var_feature_table],
-                           query).order_by(var_feature_table.c.seq_region_start)
+        query = sql.select(
+            [var_feature_table],
+            query).order_by(var_feature_table.c.seq_region_start)
 
         if limit:
             query = query.limit(limit)
@@ -635,7 +657,7 @@ class Genome(object):
                             data=record)
 
     def get_region(self, region=None, coord_name=None, start=None, end=None,
-                  strand=None, ensembl_coord=False):
+                   strand=None, ensembl_coord=False):
         """returns a single generic region for the specified coordinates
         Arguments:
             - region: a genomic region or a Coordinate instance
