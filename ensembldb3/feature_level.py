@@ -50,8 +50,11 @@ class FeatureCoordLevelsCache(object):
     def _get_meta_coord_records(self, db):
         meta_coord = db.get_table('meta_coord')
         if 'core' in str(db.db_name):
-            query = sql.select([meta_coord]).where(meta_coord.c.table_name.
-                                                   in_(['gene', 'simple_feature', 'repeat_feature']))
+            query = sql.select(
+                [meta_coord]).where(meta_coord.c.table_name.
+                                    in_(['gene',
+                                         'simple_feature',
+                                         'repeat_feature']))
             query = query.order_by(meta_coord.c.table_name)
         elif 'variation' in str(db.db_name):
             query = sql.select([meta_coord]).where(
@@ -63,7 +66,8 @@ class FeatureCoordLevelsCache(object):
         records = query.execute().fetchall()
         return records
 
-    def _add_species_feature_levels(self, species, records, db_type, coord_system):
+    def _add_species_feature_levels(self, species,
+                                    records, db_type, coord_system):
         if db_type == 'core':
             features = ['cpg', 'repeat', 'gene', 'est']
             tables = ['simple_feature', 'repeat_feature', 'gene', 'gene']
@@ -75,14 +79,16 @@ class FeatureCoordLevelsCache(object):
 
         for feature, table_name in zip(features, tables):
             feature_coord_ids = [r['coord_system_id']
-                                 for r in records if r['table_name'] == table_name]
+                                 for r in records
+                                 if r['table_name'] == table_name]
             feature_coord_systems = [coord_system[coord_id]
                                      for coord_id in feature_coord_ids]
             levels = [s.name for s in feature_coord_systems]
             self._species_feature_levels[species][
                 feature] = _FeatureLevelRecord(feature, levels)
 
-    def _set_species_feature_levels(self, species, core_db, feature_types, var_db, otherfeature_db):
+    def _set_species_feature_levels(self, species, core_db,
+                                    feature_types, var_db, otherfeature_db):
         if species not in self._species_feature_levels:
             self._species_feature_levels[species] = {}
             self._species_feature_dbs[species] = []
@@ -108,7 +114,9 @@ class FeatureCoordLevelsCache(object):
                 self._add_species_feature_levels(
                     species, records, 'otherfeature', coord_system)
 
-    def __call__(self, species=None, core_db=None, feature_types=None, var_db=None, otherfeature_db=None):
+    def __call__(self, species=None, core_db=None,
+                 feature_types=None, var_db=None,
+                 otherfeature_db=None):
         if 'variation' in feature_types:
             assert var_db is not None
         species = _Species.get_species_name(core_db.db_name.species or species)
