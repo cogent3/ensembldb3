@@ -66,7 +66,7 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
     db_names = []
     for record in dirnames:
         record = record.strip()
-        if not record:
+        if not record or record.endswith(".gz"):
             continue
 
         record = record.split()[-1]
