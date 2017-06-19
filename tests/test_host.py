@@ -6,6 +6,7 @@ from ensembldb3.name import EnsemblDbName
 from ensembldb3.host import get_db_name, get_latest_release,\
     DbConnection, HostAccount, get_ensembl_account
 from ensembldb3.species import Species
+from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -16,8 +17,6 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 87
-
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
     host, username, password = args[0:3]
@@ -26,7 +25,7 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=release)
+    account = get_ensembl_account(release=ENSEMBL_RELEASE)
 
 
 class TestEnsemblDbName(TestCase):
@@ -85,7 +84,7 @@ class TestDBconnects(TestCase):
     def test_get_ensembl_account(self):
         """return an HostAccount with correct port"""
         for release in [48, '48', None]:
-            act_new = get_ensembl_account(release=release)
+            act_new = get_ensembl_account(release=ENSEMBL_RELEASE)
             self.assertEqual(act_new.port, 5306)
 
         for release in [45, '45']:

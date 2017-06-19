@@ -10,3 +10,6 @@ __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
+
+ENSEMBL_RELEASE = 87
+ENSEMBL_GENOMES_RELEASE = 32

@@ -7,6 +7,7 @@ from ensembldb3.host import HostAccount, get_ensembl_account
 from ensembldb3.genome import Genome
 from ensembldb3.assembly import CoordSystem, Coordinate, get_coord_conversion
 from ensembldb3.feature_level import FeatureCoordLevels
+from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -17,7 +18,6 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 87
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -27,13 +27,13 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=release)
+    account = get_ensembl_account(release=ENSEMBL_RELEASE)
 
 
 class TestFeatureCoordLevels(TestCase):
 
     def setUp(self):
-        self.chicken = Genome(species='chicken', release=release,
+        self.chicken = Genome(species='chicken', release=ENSEMBL_RELEASE,
                               account=account)
 
     def test_feature_levels(self):

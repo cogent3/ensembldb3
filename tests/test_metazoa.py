@@ -2,6 +2,7 @@ from cogent3.util.unit_test import TestCase, main
 
 from ensembldb3.host import HostAccount, get_ensembl_account
 from ensembldb3.compara import Compara, Genome
+from . import ENSEMBL_GENOMES_RELEASE
 
 __author__ = "Jason Merkin"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -12,13 +13,13 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 32
 account = HostAccount('mysql-eg-publicsql.ebi.ac.uk',
                       'anonymous', '', port=4157)
 
 
 class MZ_ComparaTestBase(TestCase):
-    comp = Compara(['D.grimshawi', 'D.melanogaster'], release=release,
+    comp = Compara(['D.grimshawi', 'D.melanogaster'],
+                   release=ENSEMBL_GENOMES_RELEASE,
                    account=account, division='metazoa')
 
 

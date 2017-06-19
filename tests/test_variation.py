@@ -8,6 +8,7 @@ from ensembldb3.util import convert_strand
 from ensembldb3.genome import Genome
 from ensembldb3.sequence import _assemble_seq
 from ensembldb3.util import asserted_one
+from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -17,8 +18,6 @@ __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
-
-release = 87
 
 NULL_VALUE = None
 
@@ -33,15 +32,16 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=release)
+    account = get_ensembl_account(release=ENSEMBL_RELEASE)
 
 
 class GenomeTestBase(TestCase):
-    human = Genome(species="human", release=release, account=account)
-    mouse = Genome(species="mouse", release=release, account=account)
-    rat = Genome(species="rat", release=release, account=account)
-    macaq = Genome(species="macaque", release=release, account=account)
-    gorilla = Genome(species="gorilla", release=release, account=account)
+    human = Genome(species="human", release=ENSEMBL_RELEASE, account=account)
+    mouse = Genome(species="mouse", release=ENSEMBL_RELEASE, account=account)
+    rat = Genome(species="rat", release=ENSEMBL_RELEASE, account=account)
+    macaq = Genome(species="macaque", release=ENSEMBL_RELEASE, account=account)
+    gorilla = Genome(species="gorilla", release=ENSEMBL_RELEASE,
+                     account=account)
     brca2 = human.get_gene_by_stableid(stableid="ENSG00000139618")
 
 

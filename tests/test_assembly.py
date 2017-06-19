@@ -6,6 +6,8 @@ from ensembldb3.host import HostAccount, get_ensembl_account
 from ensembldb3.assembly import Coordinate, CoordSystem, \
     get_coord_conversion
 from ensembldb3.genome import Genome
+from . import ENSEMBL_RELEASE
+
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -16,7 +18,6 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 87
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -26,10 +27,10 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=release)
+    account = get_ensembl_account(release=ENSEMBL_RELEASE)
 
-human = Genome(species='human', release=release, account=account)
-platypus = Genome(species='platypus', release=release, account=account)
+human = Genome(species='human', release=ENSEMBL_RELEASE, account=account)
+platypus = Genome(species='platypus', release=ENSEMBL_RELEASE, account=account)
 
 
 class TestLocation(TestCase):

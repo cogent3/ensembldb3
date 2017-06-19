@@ -5,6 +5,7 @@ from cogent3.util.unit_test import TestCase, main
 
 from ensembldb3.host import HostAccount, get_ensembl_account
 from ensembldb3.compara import Compara
+from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -15,7 +16,6 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-release = 87
 
 if 'ENSEMBL_ACCOUNT' in os.environ:
     args = os.environ['ENSEMBL_ACCOUNT'].split()
@@ -25,7 +25,7 @@ if 'ENSEMBL_ACCOUNT' in os.environ:
         kwargs['port'] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
-    account = get_ensembl_account(release=release)
+    account = get_ensembl_account(release=ENSEMBL_RELEASE)
 
 
 def calc_slope(x1, y1, x2, y2):
@@ -39,7 +39,8 @@ def calc_slope(x1, y1, x2, y2):
 
 
 class ComparaTestBase(TestCase):
-    comp = Compara(['human', 'mouse', 'rat', 'platypus'], release=release,
+    comp = Compara(['human', 'mouse', 'rat', 'platypus'],
+                   release=ENSEMBL_RELEASE,
                    account=account)
 
 
@@ -121,7 +122,8 @@ class TestCompara(ComparaTestBase):
 
     def test_no_method_clade_data(self):
         """generate a Table with no rows if no alignment data"""
-        compara = Compara(['S.cerevisiae'], release=release, account=account)
+        compara = Compara(['S.cerevisiae'], release=ENSEMBL_RELEASE,
+                          account=account)
         self.assertEqual(compara.method_species_links.shape[0], 0)
 
     def test_get_syntenic_returns_nothing(self):
@@ -155,7 +157,8 @@ class TestCompara(ComparaTestBase):
     
     def test_species_tree(self):
         """should match the one used by ensembl"""
-        comp = Compara(["human", "mouse", "dog", "platypus"], release=release,
+        comp = Compara(["human", "mouse", "dog", "platypus"],
+                       release=ENSEMBL_RELEASE,
                        account=account)
         
         # sub-tree should have correct species
@@ -180,13 +183,14 @@ class TestCompara(ComparaTestBase):
     
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
-        dog = Compara(['chimp', 'dog'], release=release, account=account,
+        dog = Compara(['chimp', 'dog'], release=ENSEMBL_RELEASE,
+                      account=account,
                       pool_recycle=1000)
 
 
 class TestSyntenicRegions(TestCase):
     comp = Compara(['human', 'chimp', 'macaque'], account=account,
-                   release=release)
+                   release=ENSEMBL_RELEASE)
 
     def test_correct_alignments(self):
         """should return the correct alignments"""
