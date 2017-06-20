@@ -6,7 +6,7 @@ from . import ENSEMBL_GENOMES_RELEASE
 
 __author__ = "Jason Merkin"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
-__credits__ = ["Gavin Huttley", "Hua Ying"]
+__credits__ = ["Jason Merkin", "Gavin Huttley", "Hua Ying"]
 __license__ = "BSD"
 __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
