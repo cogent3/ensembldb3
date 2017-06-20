@@ -290,7 +290,14 @@ class TestGene(GenomeTestBase):
         constructed"""
         description = 'brca2'
         results = list(self.human.get_genes_matching(description=description))
-        self._eval_brca2(results[0])
+        brca2 = None
+        for gene in results:
+            if gene.symbol.lower() == "brca2":
+                brca2 = gene
+                break
+
+        self.assertTrue(brca2 is not None)
+        self._eval_brca2(brca2)
 
     def test_get_member(self):
         """should return correct exon and translated exon"""

@@ -68,17 +68,12 @@ class TestCompara(ComparaTestBase):
 
     def test_get_related_genes3(self):
         """should get all relationships if relationship is not specified"""
-        stableid = "ENSG00000036828"
-        expect = dict(within_species_paralog=set([stableid,
-                                                  "ENSG00000283187"]), 
-                      ortholog_one2many=set([stableid,
-                                             "ENSRNOG00000002265",
-                                             "ENSMUSG00000051980",
-                                             "ENSOANG00000010069"]))
+        stableid = "ENSG00000244734"
+        expect = set(["within_species_paralog", "ortholog_many2many",
+                      "ortholog_one2many"])
         orthologs = self.comp.get_related_genes(stableid=stableid)
-        for ortholog in orthologs:
-            stableids = [gene.stableid for gene in ortholog.members]
-            self.assertEqual(set(stableids), expect[ortholog.relationship])
+        got = set([ortholog.relationship for ortholog in orthologs])
+        self.assertEqual(got, expect)
 
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
@@ -149,12 +144,12 @@ class TestCompara(ComparaTestBase):
         """gene tree should match one downloaded from ensembl web"""
         hbb = self.comp.Human.get_gene_by_stableid("ENSG00000244734")
         paras = list(self.comp.get_related_genes(gene_region=hbb,
-                                        relationship="within_species_paralog"))[0]
-        t = paras.get_tree()
+                                        relationship="within_species_paralog"))
+        t = paras[0].get_tree()
         expect = LoadTree("data/HBB_gene_tree.nh")
         expect = expect.get_sub_tree(t.get_tip_names())
         self.assertTrue(expect.same_topology(t))
-    
+
     def test_species_tree(self):
         """should match the one used by ensembl"""
         comp = Compara(["human", "mouse", "dog", "platypus"],

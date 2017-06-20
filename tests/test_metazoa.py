@@ -34,25 +34,18 @@ class MZ_TestCompara(MZ_ComparaTestBase):
         """should correctly return the related gene regions from each genome"""
         # using sc35, a splicing factor
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid("FBgn0265298")
-        Orthologs = self.comp.get_related_genes(gene_region=sc35,
-                                              relationship="ortholog_one2one")
-        self.assertEqual("ortholog_one2one", list(Orthologs)[0].relationship)
-
-    def test_get_related_genes2(self):
-        """should handle case where gene is absent from one of the genomes"""
-        # here, it is brca2
-        brca2 = self.comp.Dmelanogaster.get_gene_by_stableid(
-            stableid='FBgn0050169')
-        orthologs = self.comp.get_related_genes(gene_region=brca2,
-                                              relationship='ortholog_one2one')
-        self.assertEqual(len(list(orthologs)[0].members), 2)
+        orthologs = self.comp.get_related_genes(
+            gene_region=sc35, relationship="ortholog_one2one")
+        self.assertEqual("ortholog_one2one", list(orthologs)[0].relationship)
 
     def test_get_collection(self):
+        """return a sequence collection"""
         sc35 = self.comp.Dmelanogaster.get_gene_by_stableid(
             stableid="FBgn0265298")
-        Orthologs = self.comp.get_related_genes(gene_region=sc35,
-                                              relationship="ortholog_one2one")
-        collection = list(Orthologs)[0].get_seq_collection()
+        orthologs = self.comp.get_related_genes(
+            gene_region=sc35, relationship="ortholog_one2one")
+        collection = list(orthologs)[0].get_seq_collection()
+        self.assertTrue(len(collection.seqs) == 2)
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
 
@@ -60,10 +53,11 @@ class MZ_Genome(TestCase):
 
     def test_get_general_release(self):
         """should correctly infer the general release"""
-        rel_gt_65 = Genome('D.melanogaster', release=32, account=account)
-        self.assertEqual(rel_gt_65.general_release, 85)
+        rel_gt_65 = Genome('D.melanogaster', release=ENSEMBL_GENOMES_RELEASE,
+                           account=account)
+        self.assertEqual(rel_gt_65.general_release, 89)
         self.assertEqual(rel_gt_65.CoreDb.db_name.name,
-                         'drosophila_melanogaster_core_32_85_6')
+                         'drosophila_melanogaster_core_36_89_6')
 
 
 if __name__ == "__main__":

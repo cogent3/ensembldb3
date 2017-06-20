@@ -48,7 +48,7 @@ class GenomeTestBase(TestCase):
 class TestVariation(GenomeTestBase):
     snp_names = ['rs34213141', 'rs12791610',
         'rs10792769', 'rs11545807', 'rs11270496']
-    snp_nt_alleles = ['G/A/C', 'C/T', 'A/G', 'C/A', 'CAGCTCCAGCTC/-']
+    snp_nt_alleles = ['G/A', 'C/T', 'A/G', 'C/A', 'CAGCTCCAGCTC/-']
     snp_aa_alleles = ['G/R', 'P/L', 'Y/C', 'V/F', 'GAGAV/V']
     snp_effects = [['missense_variant'],
                    ['missense_variant'],
@@ -67,7 +67,7 @@ class TestVariation(GenomeTestBase):
          'CTGCTGCAAGCCCGTGTGCTGCTGTGTTCCAGCCTGTTCCTGCTCTAGCTGTGGCAAGCGGGGCTGTGGCTCCTGTGGGGGCTCCAAGGGAGGCTGTGGTTCTTGTGGCTGCTCCCAGTGCAGTTGCTGCAAGCCCTGCTGTTGCTCTTCAGGCTGTGGGTCATCCTGCTGCCAGTGCAGCTGCTGCAAGCCCTACTGCTCCCAGTGCAGCTGCTGTAAGCCCTGTTGCTCCTCCTCGGGTCGTGGGTCATCCTGCTGCCAATCCAGCTGCTGCAAGCCCTGCTGCTCATCCTCAGGCTG'),
         ('GCTGAAGAAACCATTTCAAACAGGATTGGAATAGGGAAACCCGGCACTCAGCTCGGCGCAAGCCGGCGGTGCCTTCAGACTAGAGAGCCTCTCCTCCGGTGCGCTGCAAGTAGGGCCTCGGCTCGAGGTCAACATTCTAGTTGTCCAGCGCTCCCTCTCCGGCACCTCGGTGAGGCTAGTTGACCCGACAGGCGCGGATCATGAGCAGCTGCAGGAGAATGAAGAGCGGGGACGTAATGAGGCCGAACCAGAGCTCCCGAGTCTGCTCCGCCAGCTTCTGGCACAACAGCATCTCGAAGA',
          'GAACTTGAGACTCAGGACCGTAAGTACCCAGAAAAGGCGGAGCACCGCCAGCCGCTTCTCTCCATCCTGGAAGAGGCGCACGGACACGATGGTGGTGAAGTAGGTGCTGAGCCCGTCAGCGGCGAAGAAAGGCACGAACACGTTCCACCAGGAGAGGCCCGGGACCAGGCCATCCACACGCAGTGCCAGCAGCACAGAGAACACCAACAGGGCCAGCAGGTGCACGAAGATCTCGAAGGTGGCGAAGCCTAGCCACTGCACCAGCTCCCGGAGCGAGAAGAGCATCGCGCCCGTTGAGCG')]
-    ancestral = ['G', 'C', 'G', 'C', None]
+    ancestral = [None, 'C', None, 'C', None]
 
     cached_snps = {}
     
@@ -104,16 +104,16 @@ class TestVariation(GenomeTestBase):
         # peptide alleles
         for i in range(4):
             snp = self._get_snp(self.snp_names[i])
-            self.assertEqual(snp.ancestral, self.ancestral[i])
-            self.assertEqual(snp.symbol, self.snp_names[i])
+            self.assertEqual(snp.ancestral, self.ancestral[i], snp)
+            self.assertEqual(snp.symbol, self.snp_names[i], snp)
             if isinstance(snp.effect, str):
                 effect = set([snp.effect])
             else:
                 effect = set(snp.effect)
             
-            self.assertEqual(effect, set(self.snp_effects[i]))
-            self.assertEqual(snp.alleles, self.snp_nt_alleles[i])
-            self.assertEqual(snp.map_weight, self.map_weights[i])
+            self.assertEqual(effect, set(self.snp_effects[i]), snp)
+            self.assertEqual(snp.alleles, self.snp_nt_alleles[i], snp)
+            self.assertEqual(snp.map_weight, self.map_weights[i], snp)
 
     def test_somatic_attribute_correct(self):
         """somatic attribute of variants should be correct"""

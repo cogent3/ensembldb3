@@ -61,9 +61,9 @@ class TestDatabase(TestCase):
 
     def test_get_table_row_counts(self):
         """should return correct row counts for some tables"""
-        expect = {'homo_sapiens_core_87_38.analysis': 61,
-                  'homo_sapiens_core_87_38.seq_region': 55616,
-                  'homo_sapiens_core_87_38.assembly': 102090}
+        expect = {'homo_sapiens_core_89_38.analysis': 61,
+                  'homo_sapiens_core_89_38.seq_region': 55616,
+                  'homo_sapiens_core_89_38.assembly': 102090}
         human = Database(account=account, release=ENSEMBL_RELEASE,
                          species='human', db_type='core')
         table_names = [n.split('.')[1] for n in expect]

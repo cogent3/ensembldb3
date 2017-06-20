@@ -11,5 +11,5 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-ENSEMBL_RELEASE = 87
-ENSEMBL_GENOMES_RELEASE = 32
+ENSEMBL_RELEASE = 89
+ENSEMBL_GENOMES_RELEASE = 36
