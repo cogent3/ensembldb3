@@ -1259,6 +1259,9 @@ class Variation(_Region):
     def validation(self):
         result = self._get_cached_value('validation',
                                         self._get_variation_table_record)
+        if result is None:
+            return None
+
         if self.genome.general_release < 83:
             # we need to access cached descriptions
             return result

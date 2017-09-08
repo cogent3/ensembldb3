@@ -161,11 +161,16 @@ class TestVariation(GenomeTestBase):
                  func),
                 ('rs10792769', set(['ESP', '1000Genomes', 'Frequency', 'HapMap',
                                     'ExAC']),
-                 func))
-        for name, status, conv in data:
+                 func),
+                ('rs868440790', set(), func))
+        for name, status, conv in data[-1:]:
             snp = self._get_snp(name)
-            got = conv(snp.validation)
-            self.assertTrue(status & got)
+            if snp.validation:
+                got = conv(snp.validation)
+                self.assertTrue(status & got)
+            else:
+                # not validated, should return None
+                self.assertEqual(snp.validation, None)
 
     def test_get_flanking_seq(self):
         """should correctly get the flanking sequence if matches reference genome"""
