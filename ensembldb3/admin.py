@@ -236,7 +236,7 @@ def read_mysql_config(config_path, section, verbose=False):
             continue
 
         val = parser.get(section, k) or opts[k]
-        if k == "port":
+        if k == "port" and val is not None:
             val = int(val)
 
         opts[k] = val
@@ -414,6 +414,12 @@ def exportrc(outpath):
 @_mysqlcfg
 def show(release, mysqlcfg):
     """shows databases corresponding to release"""
+    if mysqlcfg.name == _mycfg:
+        click.secho("%s\n" % show.help)
+        click.secho("use --help for more options")
+        
+        exit()
+
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(mysql_info["host"], mysql_info["user"],
                           mysql_info["passwd"], port=mysql_info["port"])
