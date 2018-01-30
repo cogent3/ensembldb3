@@ -2,6 +2,8 @@ import warnings
 
 import sqlalchemy as sql
 
+_engine_kwargs = {}
+
 try:
     import mysql.connector as mysql_connect
     connect_template = 'mysql+mysqlconnector://'
@@ -15,8 +17,11 @@ try:
 except ImportError:
     try:
         import pymysql as mysql_connect
+        from pymysql.constants.CLIENT import MULTI_STATEMENTS
         connect_template = 'mysql+pymysql://%(account)s/%(db_name)s'
         password_arg = 'passwd'
+        # handle change in pymysql default value from version 0.8
+        _engine_kwargs['client_flag'] = MULTI_STATEMENTS
     except ImportError:
         import MySQLdb as mysql_connect
         connect_template = 'mysql+mysqldb://%(account)s/%(db_name)s'
@@ -90,6 +95,7 @@ class EngineCache(object):
         if account not in self._db_account.get(db_name, []):
             if db_name == "PARENT":
                 args = {password_arg: account.passwd}
+                args.update(_engine_kwargs)
                 engine = mysql_connect.connect(host=account.host,
                                                user=account.user,
                                                port=account.port, **args)
