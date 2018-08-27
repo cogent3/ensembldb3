@@ -71,7 +71,7 @@ class Database(object):
 
         Arguments:
             - table_name: the data base table name
-            - column: valid values are biotype, status"""
+            - column: valid values are biotype, status (pre release 90)"""
         table = self.get_table(table_name)
         query = sql.select([table.c[column]], distinct=True)
         records = set()

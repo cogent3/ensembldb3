@@ -153,7 +153,8 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.stableid, 'ENSG00000139618')
         self.assertEqual(brca2.biotype.lower(), 'protein_coding')
         self.assertContains(brca2.description.lower(), 'dna repair associated')
-        self.assertEqual(brca2.status, 'KNOWN')
+        if ENSEMBL_RELEASE < 90:
+            self.assertEqual(brca2.status, 'KNOWN')
         self.assertEqual(brca2.canonical_transcript.stableid,
                          'ENST00000380152')
         # note length can change between genome builds

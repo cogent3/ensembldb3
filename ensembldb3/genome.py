@@ -630,8 +630,6 @@ class Genome(object):
             if self.general_release < 83:
                 validated_col = "validation_status"
 
-            # in release 65, the default validated status is now ''
-            # why?? thanks Ensembl!
             null = None
             if int(self.release) >= 65:
                 null = ''
@@ -682,7 +680,8 @@ class Genome(object):
         property_type.
 
         Arguments:
-            - property_type: valid values are biotype, status, effect"""
+            - property_type: valid values are biotype, status (pre release 90)
+              effect"""
         property_type = property_type.lower()
         if property_type == 'effect':
             db = self.VarDb
@@ -694,8 +693,10 @@ class Genome(object):
             consequence_type += 's'  # change to plural column name
 
         property_map = {'effect': ('variation_feature', consequence_type),
-                        'biotype': ('gene', 'biotype'),
-                        'status': ('gene', 'status')}
+                        'biotype': ('gene', 'biotype')}
+
+        if self.general_release < 90:
+            property_map['status'] = ('gene', 'status')
 
         if property_type not in property_map:
             raise RuntimeError(

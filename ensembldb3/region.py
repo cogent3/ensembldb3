@@ -361,6 +361,11 @@ class Gene(_StableRegion):
         attr_column_map = [('biotype', 'biotype', _quoted),
                            ('status', 'status', _quoted),
                            ('description', 'description', _limit_words)]
+
+        if self.genome.general_release >= 90:
+            del(attr_column_map[1])
+            self._cached['status'] = self.NULL_VALUE
+
         # we set all the attributes that derive from this
         self._populate_cache_from_record(attr_column_map, 'gene')
         return
@@ -502,6 +507,10 @@ class Transcript(_StableRegion):
     def _set_transcript_record(self):
         attr_column_map = [('biotype', 'biotype', _quoted),
                            ('status', 'status', _quoted)]
+        if self.genome.general_release >= 90:
+            del(attr_column_map[-1])
+            self._cached['status'] = self.NULL_VALUE
+
         self._populate_cache_from_record(attr_column_map, 'transcript')
         self._am_prot_coding = self._cached[
             'biotype'].lower() == 'protein_coding'
