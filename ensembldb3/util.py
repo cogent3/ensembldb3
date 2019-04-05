@@ -3,6 +3,7 @@ import gzip
 import bz2
 import subprocess
 import sys
+import numpy
 
 from pkg_resources import resource_filename
 
@@ -57,7 +58,7 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     if proc.returncode != 0:
         msg = err
         sys.stderr.writelines("FAILED: %s\n%s" % (cmnd, msg))
-        exit(proc.returncode)
+        sys.exit(proc.returncode)
     if out is not None:
         r = out.decode('utf8')
     else:
@@ -204,3 +205,17 @@ def yield_selected(sqlalchemy_select, limit=100):
         offset += limit
         if count == 0 or count < limit:
             break
+
+def flatten(data):
+    """returns 1D list
+
+    Removes nesting via numpy and 1D traversal
+    """
+    data = numpy.array(data).flatten().tolist()
+    result = []
+    for element in data:
+        try:
+            result.extend(element)
+        except Exception:
+            result.append(element)
+    return result

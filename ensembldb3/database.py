@@ -2,8 +2,8 @@ from collections import defaultdict
 import sqlalchemy as sql
 
 from cogent3.util import table as cogent_table
-from cogent3.util.misc import flatten
 from .host import DbConnection, get_db_name
+from .util import flatten
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"

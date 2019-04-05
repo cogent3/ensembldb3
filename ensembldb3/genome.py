@@ -1,11 +1,10 @@
 import re
 
 import sqlalchemy as sql
-from cogent3.util.misc import flatten
 
 from .species import Species as _Species
 from .util import LazyRecord, asserted_one,\
-    convert_strand, DisplayString
+    convert_strand, DisplayString, flatten
 from .host import get_ensembl_account, get_latest_release
 from .database import Database
 from .assembly import CoordSystem, Coordinate, \

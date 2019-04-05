@@ -61,9 +61,9 @@ class TestDatabase(TestCase):
 
     def test_get_table_row_counts(self):
         """should return correct row counts for some tables"""
-        expect = {'homo_sapiens_core_89_38.analysis': 61,
-                  'homo_sapiens_core_89_38.seq_region': 55616,
-                  'homo_sapiens_core_89_38.assembly': 102090}
+        expect = {f'homo_sapiens_core_{ENSEMBL_RELEASE}_38.analysis': 61,
+                  f'homo_sapiens_core_{ENSEMBL_RELEASE}_38.seq_region': 55616,
+                  f'homo_sapiens_core_{ENSEMBL_RELEASE}_38.assembly': 102090}
         human = Database(account=account, release=ENSEMBL_RELEASE,
                          species='human', db_type='core')
         table_names = [n.split('.')[1] for n in expect]
@@ -73,7 +73,7 @@ class TestDatabase(TestCase):
 
     def test_table_has_column(self):
         """return correct values for whether a Table has a column"""
-        vardb = Database(account=account, release=85, species='human',
+        vardb = Database(account=account, release=ENSEMBL_RELEASE, species='human',
                          db_type='variation')
 
         self.assertTrue(vardb.table_has_column('variation',
