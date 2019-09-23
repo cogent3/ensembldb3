@@ -5,7 +5,6 @@ import configparser
 
 import click
 
-os.environ['DONT_USE_MPI'] = "1"
 from cogent3.util import parallel
 
 from ensembldb3.species import Species
@@ -150,30 +149,35 @@ def read_config(config_path, verbose=False):
 _cfg = os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg')
 
 
-def WrapDownload(remote_template, local_base, release, verbose, debug):
+class WrapDownload:
     """returns a callback function, that takes the database name and
     rsync downloads"""
-    def rsync_call_wrapper(dbname):
-        if is_downloaded(local_base, dbname):
-            if verbose or debug:
+    def __init__(self, remote_template, local_base, release, verbose, debug):
+        self._remote_template = remote_template
+        self._local_base = local_base
+        self._release = release
+        self._verbose = verbose
+        self._debug = debug
+
+    def __call__(self, dbname):
+        if is_downloaded(self._local_base, dbname):
+            if self._verbose or self._debug:
                 click.secho(
                     "Already downloaded: %s, skipping" % dbname,
                     fg="green")
             return
 
-        props = {'dbname': dbname, 'release': release}
-        remote_db_path = remote_template % props
-        local_db_path = os.path.join(local_base, dbname)
+        props = {'dbname': dbname, 'release': self._release}
+        remote_db_path = self._remote_template % props
+        local_db_path = os.path.join(self._local_base, dbname)
         run_args = dict(remote_path=remote_db_path, local_path=local_db_path,
-                        verbose=verbose, debug=debug)
+                        verbose=self._verbose, debug=self._debug)
         download_db(**run_args)
-        checkpoint_file = get_download_checkpoint_path(local_base, dbname)
+        checkpoint_file = get_download_checkpoint_path(self._local_base, dbname)
         with open(checkpoint_file, "w") as checked:
             pass
 
         click.secho("Completed download: %s" % dbname, fg="green")
-
-    return rsync_call_wrapper
 
 
 def download_dbs(configpath, numprocs, verbose, debug):
@@ -193,15 +197,16 @@ def download_dbs(configpath, numprocs, verbose, debug):
 
     if numprocs > 1:
         numprocs = min(numprocs, len(db_names), 5)
-        # should print warning if ask for more than 5
-        parallel.use_multiprocessing(numprocs)
+    else:
+        numprocs = 1
 
     remote_template = 'release-%(release)s/mysql/%(dbname)s/'
     remote_template = os.path.join(remote_path, remote_template)
     rsync = WrapDownload(remote_template, local_path, release, verbose=verbose,
                          debug=debug)
     dbnames = [n.name for n in db_names]
-    for r in parallel.imap(rsync, dbnames):
+
+    for r in parallel.imap(rsync, dbnames, max_workers=numprocs):
         pass
 
     click.secho("\nWROTE to output path=%s\n" % local_path, fg="green")
