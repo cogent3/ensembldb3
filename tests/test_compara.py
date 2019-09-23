@@ -147,23 +147,23 @@ class TestCompara(ComparaTestBase):
                                         relationship="within_species_paralog"))
         t = paras[0].get_tree()
         expect = LoadTree("data/HBB_gene_tree.nh")
-        expect = expect.get_sub_tree(t.get_tip_names())
+        expect = expect.get_sub_tree(t.get_tip_names(), ignore_missing=True)
         self.assertTrue(expect.same_topology(t))
 
     def test_species_tree(self):
         """should match the one used by ensembl"""
-        comp = Compara(["human", "mouse", "dog", "platypus"],
+        comp = Compara(["human", "rat", "dog", "platypus"],
                        release=ENSEMBL_RELEASE,
                        account=account)
         
         # sub-tree should have correct species
         sub_species = comp.get_species_tree(just_members=True)
         self.assertEqual(set(sub_species.get_tip_names()),
-                         set(["Homo sapiens", "Mus musculus",
+                         set(["Homo sapiens", "Rattus norvegicus",
                               "Canis familiaris", "Ornithorhynchus anatinus"]))
         # topology should match current topology belief
         expect = LoadTree(
-            treestring="(((Homo_sapiens,Mus_musculus),"\
+            treestring="(((Homo_sapiens,Rattus_norvegicus),"\
             "Canis_familiaris),Ornithorhynchus_anatinus)",
             underscore_unmunge=True)
         self.assertTrue(sub_species.same_topology(expect))
@@ -174,7 +174,7 @@ class TestCompara(ComparaTestBase):
         sptree = comp.get_species_tree(just_members=False)
         expect = LoadTree("data/ensembl_all_species.nh",
                           underscore_unmunge=True)
-        self.assertTrue(len(sptree.get_tip_names()) == len(expect.get_tip_names()))
+        self.assertTrue(len(sptree.get_tip_names()) > len(expect.get_tip_names()))
     
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
