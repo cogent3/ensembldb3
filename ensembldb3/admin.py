@@ -108,7 +108,6 @@ def install_one_db(
     account,
     dbname,
     local_path,
-    numprocs,
     force_overwrite=False,
     verbose=False,
     debug=False,
@@ -192,13 +191,8 @@ def install_one_db(
         mysqlcfg, account, dbname, verbose=verbose, debug=debug
     )
 
-    if numprocs > 1:
-        procs = parallel.MultiprocessingParallelContext(numprocs)
-    else:
-        procs = parallel.NonParallelContext()
-
     # we do the table install in parallel
-    for r in procs.imap(install_table, tablenames):
+    for r in map(install_table, tablenames):
         pass
 
     # existence of this file signals completion of the install without failure
@@ -355,11 +349,10 @@ def download(configpath, numprocs, verbose, debug):
 @main.command()
 @_cfgpath
 @_mysqlcfg
-@_numprocs
 @_force
 @_verbose
 @_debug
-def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
+def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
     """install ensembl databases into a MySQL server"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
     account = HostAccount(
@@ -396,7 +389,6 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
             account,
             dbname.name,
             local_path,
-            numprocs,
             force_overwrite=force_overwrite,
             verbose=verbose,
             debug=debug,
