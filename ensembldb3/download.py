@@ -1,15 +1,15 @@
 import configparser
 import os
+import sys
 import warnings
 from pprint import pprint
 
 import click
 
-from cogent3.util import parallel
 from ensembldb3.name import EnsemblDbName
 from ensembldb3.species import Species
-
-from .util import ENSEMBLDBRC, abspath, exec_command, makedirs
+from ensembldb3.util import (ENSEMBLDBRC, abspath, exec_command,
+                             lftp_installed, makedirs)
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -31,6 +31,30 @@ def is_downloaded(local_path, dbname):
     """returns True if checkpoint file exists for dbname"""
     chk = get_download_checkpoint_path(local_path, dbname)
     return os.path.exists(chk)
+
+
+def do_lftp_command(host, remote_dir, db_name, local_dir, numprocs):
+    command = (
+        f'lftp -e "cd {remote_dir}; mirror -c '
+        f'--use-pget-n={numprocs} --parallel={numprocs} {db_name} {local_dir}; bye" {host}'
+    )
+    result = exec_command(command)
+    if result != "":
+        result = result.split("\n")
+    else:
+        result = []
+
+    return result
+
+
+def lftp_listdir(host, dirname="", debug=True):
+    """returns directory listing"""
+    cmnd = f'lftp -e "cd {dirname}; nlist; bye;" ftp://{host}'
+    if debug:
+        print(cmnd)
+    result = exec_command(cmnd)
+    r = result.splitlines()
+    return r
 
 
 def rsync_listdir(remote_path, dirname="", debug=True):
@@ -94,29 +118,6 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
     return db_names
 
 
-def download_db(remote_path, local_path, verbose=False, debug=False):
-    """downloads a db from remote_path to local_path
-
-    Parameters
-    ----------
-    remote_path : str
-       The Ensembl ftp path for the db
-
-    local_path : str
-       local path to write to the data to
-    """
-    cmnd = "rsync --progress -av rsync://%s %s" % (remote_path, local_path)
-    if debug or verbose:
-        print(cmnd)
-        kwargs = dict(stderr=None, stdout=None)
-    else:
-        kwargs = {}
-
-    r = exec_command(cmnd, **kwargs)
-    if debug or verbose and r:
-        print(r)
-
-
 def read_config(config_path, verbose=False):
     """returns ensembl release, local path, and db specifics from the provided
     config path"""
@@ -148,16 +149,19 @@ def read_config(config_path, verbose=False):
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
-class WrapDownload:
-    """returns a callback function, that takes the database name and
-    rsync downloads"""
+class Download:
+    """callable instance that takes the database name and lftp downloads"""
 
-    def __init__(self, remote_template, local_base, release, verbose, debug):
-        self._remote_template = remote_template
+    def __init__(
+        self, host, local_base, release, numprocs, verbose, debug, dry_run=False
+    ):
+        self._host = host
         self._local_base = local_base
         self._release = release
+        self._numprocs = numprocs
         self._verbose = verbose
         self._debug = debug
+        self._dry_run = dry_run
 
     def __call__(self, dbname):
         if is_downloaded(self._local_base, dbname):
@@ -165,51 +169,40 @@ class WrapDownload:
                 click.secho("Already downloaded: %s, skipping" % dbname, fg="green")
             return
 
-        props = {"dbname": dbname, "release": self._release}
-        remote_db_path = self._remote_template % props
-        local_db_path = os.path.join(self._local_base, dbname)
-        run_args = dict(
-            remote_path=remote_db_path,
-            local_path=local_db_path,
-            verbose=self._verbose,
-            debug=self._debug,
+        commands = do_lftp_command(
+            self._host,
+            f"release-{self._release}/mysql/",
+            dbname,
+            os.path.join(self._local_base, dbname),
+            self._numprocs,
         )
-        download_db(**run_args)
         checkpoint_file = get_download_checkpoint_path(self._local_base, dbname)
         with open(checkpoint_file, "w") as checked:
             pass
-
         click.secho("Completed download: %s" % dbname, fg="green")
 
 
 def download_dbs(configpath, numprocs, verbose, debug):
+    if not lftp_installed():
+        click.secho("download requires lftp", fg="red")
+        sys.exit(1)
+
     if configpath.name == _cfg:
         warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
 
     release, remote_path, local_path, sp_db = read_config(configpath, verbose=verbose)
     makedirs(local_path)
-
-    props = dict(release=release)
-    contents = rsync_listdir(
-        remote_path, "release-%(release)s/mysql/" % props, debug=debug
+    contents = lftp_listdir(
+        remote_path, dirname=f"release-{release}/mysql/", debug=debug
     )
     db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
     if verbose or debug:
         pprint(db_names)
 
-    if numprocs > 1:
-        numprocs = min(numprocs, len(db_names), 5)
-    else:
-        numprocs = 1
-
-    remote_template = "release-%(release)s/mysql/%(dbname)s/"
-    remote_template = os.path.join(remote_path, remote_template)
-    rsync = WrapDownload(
-        remote_template, local_path, release, verbose=verbose, debug=debug
+    lftp = Download(
+        remote_path, local_path, release, numprocs, verbose=verbose, debug=debug
     )
-    dbnames = [n.name for n in db_names]
-
-    for r in parallel.imap(rsync, dbnames, max_workers=numprocs):
-        pass
+    for db in db_names:
+        lftp(db.name)
 
     click.secho("\nWROTE to output path=%s\n" % local_path, fg="green")
