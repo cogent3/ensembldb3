@@ -368,6 +368,14 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
 
     release, remote_path, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
+    cursor = server.cursor()
+    sql_for_speed = [
+        "SET FOREIGN_KEY_CHECKS=0;",
+        "SET AUTOCOMMIT=0;",
+        "SET UNIQUE_CHECKS=0;",
+    ]
+    cursor.execute("\n".join(sql_for_speed))
+    cursor.close()
     dbnames = reduce_dirnames(content, species_dbs)
     dbnames = sorted_by_size(local_path, dbnames, debug=debug)
     for dbname in dbnames:
@@ -401,6 +409,13 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
         display_dbs(cursor, release)
         click.echo(server)
 
+    cursor = server.cursor()
+    undo_sql_for_speed = [
+        "SET FOREIGN_KEY_CHECKS=1;",
+        "SET UNIQUE_CHECKS=1;",
+        "COMMIT;",
+    ]
+    cursor.execute("\n".join(undo_sql_for_speed))
     cursor.close()
 
 
