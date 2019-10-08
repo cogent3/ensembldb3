@@ -1,15 +1,15 @@
+import configparser
 import os
 import warnings
 from pprint import pprint
-import configparser
 
 import click
 
 from cogent3.util import parallel
-
-from ensembldb3.species import Species
 from ensembldb3.name import EnsemblDbName
-from .util import exec_command, abspath, makedirs, ENSEMBLDBRC
+from ensembldb3.species import Species
+
+from .util import ENSEMBLDBRC, abspath, exec_command, makedirs
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -49,7 +49,7 @@ def rsync_listdir(remote_path, dirname="", debug=True):
 
 def _sort_dbs(dbnames):
     """returns the dbnames sorted by their type"""
-    order = {'compara': 2, 'variation': 3, 'otherfeatures': 1}
+    order = {"compara": 2, "variation": 3, "otherfeatures": 1}
     names = [(order.get(n.type, 0), n.name, n) for n in dbnames]
     dbs = [db for i, n, db in sorted(names)]
     return dbs
@@ -81,14 +81,13 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
             continue
 
         if name.species in species_dbs:
-            if name.type not in species_dbs[name.species] and\
-               species_dbs[name.species]:
+            if name.type not in species_dbs[name.species] and species_dbs[name.species]:
                 if debug or verbose:
                     print("Skipping", name)
                 continue
 
             db_names.append(name)
-        elif name.type == 'compara' and 'compara' in species_dbs:
+        elif name.type == "compara" and "compara" in species_dbs:
             db_names.append(name)
 
     db_names = _sort_dbs(db_names)
@@ -123,20 +122,20 @@ def read_config(config_path, verbose=False):
     config path"""
     parser = configparser.ConfigParser()
     parser.read_file(config_path)
-    release = parser.get('release', 'release')
-    remote_path = parser.get('remote path', 'path')
-    local_path = parser.get('local path', 'path')
+    release = parser.get("release", "release")
+    remote_path = parser.get("remote path", "path")
+    local_path = parser.get("local path", "path")
     local_path = abspath(local_path)
     species_dbs = {}
     for section in parser.sections():
-        if section in ('release', 'remote path', 'local path'):
+        if section in ("release", "remote path", "local path"):
             continue
 
-        if section != 'compara':
-            species = Species.get_species_name(section, level='raise')
+        if section != "compara":
+            species = Species.get_species_name(section, level="raise")
         else:
             species = "compara"
-        dbs = [db.strip() for db in parser.get(section, 'db').split(',')]
+        dbs = [db.strip() for db in parser.get(section, "db").split(",")]
         species_dbs[species] = dbs
 
     if verbose:
@@ -146,12 +145,13 @@ def read_config(config_path, verbose=False):
     return release, remote_path, local_path, species_dbs
 
 
-_cfg = os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg')
+_cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
 class WrapDownload:
     """returns a callback function, that takes the database name and
     rsync downloads"""
+
     def __init__(self, remote_template, local_base, release, verbose, debug):
         self._remote_template = remote_template
         self._local_base = local_base
@@ -162,16 +162,18 @@ class WrapDownload:
     def __call__(self, dbname):
         if is_downloaded(self._local_base, dbname):
             if self._verbose or self._debug:
-                click.secho(
-                    "Already downloaded: %s, skipping" % dbname,
-                    fg="green")
+                click.secho("Already downloaded: %s, skipping" % dbname, fg="green")
             return
 
-        props = {'dbname': dbname, 'release': self._release}
+        props = {"dbname": dbname, "release": self._release}
         remote_db_path = self._remote_template % props
         local_db_path = os.path.join(self._local_base, dbname)
-        run_args = dict(remote_path=remote_db_path, local_path=local_db_path,
-                        verbose=self._verbose, debug=self._debug)
+        run_args = dict(
+            remote_path=remote_db_path,
+            local_path=local_db_path,
+            verbose=self._verbose,
+            debug=self._debug,
+        )
         download_db(**run_args)
         checkpoint_file = get_download_checkpoint_path(self._local_base, dbname)
         with open(checkpoint_file, "w") as checked:
@@ -184,13 +186,13 @@ def download_dbs(configpath, numprocs, verbose, debug):
     if configpath.name == _cfg:
         warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
 
-    release, remote_path, local_path, sp_db = read_config(configpath,
-                                                          verbose=verbose)
+    release, remote_path, local_path, sp_db = read_config(configpath, verbose=verbose)
     makedirs(local_path)
 
     props = dict(release=release)
-    contents = rsync_listdir(remote_path,
-                             'release-%(release)s/mysql/' % props, debug=debug)
+    contents = rsync_listdir(
+        remote_path, "release-%(release)s/mysql/" % props, debug=debug
+    )
     db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
     if verbose or debug:
         pprint(db_names)
@@ -200,10 +202,11 @@ def download_dbs(configpath, numprocs, verbose, debug):
     else:
         numprocs = 1
 
-    remote_template = 'release-%(release)s/mysql/%(dbname)s/'
+    remote_template = "release-%(release)s/mysql/%(dbname)s/"
     remote_template = os.path.join(remote_path, remote_template)
-    rsync = WrapDownload(remote_template, local_path, release, verbose=verbose,
-                         debug=debug)
+    rsync = WrapDownload(
+        remote_template, local_path, release, verbose=verbose, debug=debug
+    )
     dbnames = [n.name for n in db_names]
 
     for r in parallel.imap(rsync, dbnames, max_workers=numprocs):

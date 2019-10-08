@@ -2,9 +2,9 @@ import os
 
 from cogent3 import LoadTree
 from cogent3.util.unit_test import TestCase, main
-
-from ensembldb3.host import HostAccount, get_ensembl_account
 from ensembldb3.compara import Compara
+from ensembldb3.host import HostAccount, get_ensembl_account
+
 from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
@@ -17,12 +17,12 @@ __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
 
-if 'ENSEMBL_ACCOUNT' in os.environ:
-    args = os.environ['ENSEMBL_ACCOUNT'].split()
+if "ENSEMBL_ACCOUNT" in os.environ:
+    args = os.environ["ENSEMBL_ACCOUNT"].split()
     host, username, password = args[0:3]
     kwargs = {}
     if len(args) > 3:
-        kwargs['port'] = int(args[3])
+        kwargs["port"] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
     account = get_ensembl_account(release=ENSEMBL_RELEASE)
@@ -39,46 +39,50 @@ def calc_slope(x1, y1, x2, y2):
 
 
 class ComparaTestBase(TestCase):
-    comp = Compara(['human', 'mouse', 'rat', 'platypus'],
-                   release=ENSEMBL_RELEASE,
-                   account=account)
+    comp = Compara(
+        ["human", "mouse", "rat", "platypus"], release=ENSEMBL_RELEASE, account=account
+    )
 
 
 class TestCompara(ComparaTestBase):
-
     def test_query_genome(self):
         """compara should attach valid genome attributes by common name"""
         brca2 = self.comp.Mouse.get_gene_by_stableid("ENSMUSG00000041147")
-        self.assertEqual(brca2.symbol.lower(), 'brca2')
+        self.assertEqual(brca2.symbol.lower(), "brca2")
 
     def test_get_related_genes(self):
         """should correctly return the related gene regions from each genome"""
         brca2 = self.comp.Mouse.get_gene_by_stableid("ENSMUSG00000041147")
-        Orthologs = list(self.comp.get_related_genes(gene_region=brca2,
-                                              relationship="ortholog_one2one"))[0]
+        Orthologs = list(
+            self.comp.get_related_genes(
+                gene_region=brca2, relationship="ortholog_one2one"
+            )
+        )[0]
         self.assertEqual("ortholog_one2one", Orthologs.relationship)
 
     def test_get_related_genes2(self):
         """should handle case where gene is absent from one of the genomes"""
-        clec2d = self.comp.Mouse.get_gene_by_stableid(
-            stableid='ENSMUSG00000030157')
-        orthologs = self.comp.get_related_genes(gene_region=clec2d,
-                                              relationship='ortholog_one2many')
+        clec2d = self.comp.Mouse.get_gene_by_stableid(stableid="ENSMUSG00000030157")
+        orthologs = self.comp.get_related_genes(
+            gene_region=clec2d, relationship="ortholog_one2many"
+        )
         self.assertTrue(len(list(orthologs)[0].members) < 4)
 
     def test_get_related_genes3(self):
         """should get all relationships if relationship is not specified"""
         stableid = "ENSG00000244734"
-        expect = set(["within_species_paralog", "ortholog_many2many",
-                      "ortholog_one2many"])
+        expect = set(
+            ["within_species_paralog", "ortholog_many2many", "ortholog_one2many"]
+        )
         orthologs = self.comp.get_related_genes(stableid=stableid)
         got = set([ortholog.relationship for ortholog in orthologs])
         self.assertEqual(got, expect)
 
     def test_get_collection(self):
         brca2 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000139618")
-        Orthologs = self.comp.get_related_genes(gene_region=brca2,
-                                              relationship="ortholog_one2one")
+        Orthologs = self.comp.get_related_genes(
+            gene_region=brca2, relationship="ortholog_one2one"
+        )
         collection = list(Orthologs)[0].get_seq_collection()
         self.assertTrue(len(collection.seqs[0]) > 1000)
 
@@ -86,25 +90,30 @@ class TestCompara(ComparaTestBase):
         mid = "ENSMUSG00000017119"
         nbr1 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
         # print(nbr1)
-        ## previous test gene mouse brca2 doesn't have alignment to other species using PECAN since release 86. 
-        result = list(self.comp.get_syntenic_regions(region=nbr1,
-                                                   align_method='PECAN',
-                                                   align_clade='vertebrates'))
+        ## previous test gene mouse brca2 doesn't have alignment to other species using PECAN since release 86.
+        result = list(
+            self.comp.get_syntenic_regions(
+                region=nbr1, align_method="PECAN", align_clade="vertebrates"
+            )
+        )
         result = result[-1]
-        aln = result.get_alignment(feature_types='gene')
+        aln = result.get_alignment(feature_types="gene")
         # to improve test robustness across Ensembl releases, where alignment
         # coordinates change due to inclusion of new species, we search for
         # the mouse subseq and use the resulting coords to ensure we get the
         # same match as that from the Ensembl website
         mouse_name = [n for n in aln.names if "Mus musculus" in n][0]
-        start = aln.todict()[mouse_name].find('GCTTGTCCTCCAGAAGCCAC')
-        sub_aln = aln[start: start + 20]
+        start = aln.todict()[mouse_name].find("GCTTGTCCTCCAGAAGCCAC")
+        sub_aln = aln[start : start + 20]
         seqs = list(sub_aln.todict().values())
-        expect = set(['GCTTGTCCTCCAGAACCCAT',  # human
-                      'GCTTGTCCTCCAGAAGCCAC',  # mouse
-                      'GCTTGTCCTCCAGAAGCCAC',  # rat
-                      'GCTGAGCCTGCAGAGCCTGC'  # platypus
-                      ])
+        expect = set(
+            [
+                "GCTTGTCCTCCAGAACCCAT",  # human
+                "GCTTGTCCTCCAGAAGCCAC",  # mouse
+                "GCTTGTCCTCCAGAAGCCAC",  # rat
+                "GCTGAGCCTGCAGAGCCTGC",  # platypus
+            ]
+        )
         self.assertEqual(set(seqs), expect)
         self.assertTrue(len(aln) > 1000)
 
@@ -117,8 +126,7 @@ class TestCompara(ComparaTestBase):
 
     def test_no_method_clade_data(self):
         """generate a Table with no rows if no alignment data"""
-        compara = Compara(['S.cerevisiae'], release=ENSEMBL_RELEASE,
-                          account=account)
+        compara = Compara(["S.cerevisiae"], release=ENSEMBL_RELEASE, account=account)
         self.assertEqual(compara.method_species_links.shape[0], 0)
 
     def test_get_syntenic_returns_nothing(self):
@@ -126,25 +134,42 @@ class TestCompara(ComparaTestBase):
         assembly gap"""
         start = 100000
         end = start + 100000
-        related = list(self.comp.get_syntenic_regions(species='mouse',
-                                                    coord_name='1', start=start, end=end,
-                                                    align_method='PECAN', align_clade='vertebrates'))
+        related = list(
+            self.comp.get_syntenic_regions(
+                species="mouse",
+                coord_name="1",
+                start=start,
+                end=end,
+                align_method="PECAN",
+                align_clade="vertebrates",
+            )
+        )
         self.assertEqual(related, [])
 
     def test_get_species_set(self):
         """should return the correct set of species"""
-        expect = set(['Homo sapiens', 'Ornithorhynchus anatinus',
-                      'Mus musculus', 'Rattus norvegicus'])
+        expect = set(
+            [
+                "Homo sapiens",
+                "Ornithorhynchus anatinus",
+                "Mus musculus",
+                "Rattus norvegicus",
+            ]
+        )
         brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
-        Orthologs = self.comp.get_related_genes(gene_region=brca1,
-                                              relationship="ortholog_one2one")
+        Orthologs = self.comp.get_related_genes(
+            gene_region=brca1, relationship="ortholog_one2one"
+        )
         self.assertEqual(list(Orthologs)[0].get_species_set(), expect)
-    
+
     def test_gene_tree(self):
         """gene tree should match one downloaded from ensembl web"""
         hbb = self.comp.Human.get_gene_by_stableid("ENSG00000244734")
-        paras = list(self.comp.get_related_genes(gene_region=hbb,
-                                        relationship="within_species_paralog"))
+        paras = list(
+            self.comp.get_related_genes(
+                gene_region=hbb, relationship="within_species_paralog"
+            )
+        )
         t = paras[0].get_tree()
         expect = LoadTree("data/HBB_gene_tree.nh")
         expect = expect.get_sub_tree(t.get_tip_names(), ignore_missing=True)
@@ -152,118 +177,175 @@ class TestCompara(ComparaTestBase):
 
     def test_species_tree(self):
         """should match the one used by ensembl"""
-        comp = Compara(["human", "rat", "dog", "platypus"],
-                       release=ENSEMBL_RELEASE,
-                       account=account)
-        
+        comp = Compara(
+            ["human", "rat", "dog", "platypus"],
+            release=ENSEMBL_RELEASE,
+            account=account,
+        )
+
         # sub-tree should have correct species
         sub_species = comp.get_species_tree(just_members=True)
-        self.assertEqual(set(sub_species.get_tip_names()),
-                         set(["Homo sapiens", "Rattus norvegicus",
-                              "Canis familiaris", "Ornithorhynchus anatinus"]))
+        self.assertEqual(
+            set(sub_species.get_tip_names()),
+            set(
+                [
+                    "Homo sapiens",
+                    "Rattus norvegicus",
+                    "Canis familiaris",
+                    "Ornithorhynchus anatinus",
+                ]
+            ),
+        )
         # topology should match current topology belief
         expect = LoadTree(
-            treestring="(((Homo_sapiens,Rattus_norvegicus),"\
+            treestring="(((Homo_sapiens,Rattus_norvegicus),"
             "Canis_familiaris),Ornithorhynchus_anatinus)",
-            underscore_unmunge=True)
+            underscore_unmunge=True,
+        )
         self.assertTrue(sub_species.same_topology(expect))
-        
+
         # returned full tree should match download from ensembl
         # but taxon names are customised in what they put up on
         # the web-site, so need a better test.
         sptree = comp.get_species_tree(just_members=False)
-        expect = LoadTree("data/ensembl_all_species.nh",
-                          underscore_unmunge=True)
+        expect = LoadTree("data/ensembl_all_species.nh", underscore_unmunge=True)
         self.assertTrue(len(sptree.get_tip_names()) > len(expect.get_tip_names()))
-    
+
     def test_pool_connection(self):
         """excercising ability to specify pool connection"""
-        dog = Compara(['chimp', 'dog'], release=ENSEMBL_RELEASE,
-                      account=account,
-                      pool_recycle=1000)
+        dog = Compara(
+            ["chimp", "dog"],
+            release=ENSEMBL_RELEASE,
+            account=account,
+            pool_recycle=1000,
+        )
 
 
 class TestSyntenicRegions(TestCase):
-    comp = Compara(['human', 'chimp', 'macaque'], account=account,
-                   release=ENSEMBL_RELEASE)
+    comp = Compara(
+        ["human", "chimp", "macaque"], account=account, release=ENSEMBL_RELEASE
+    )
 
     def test_correct_alignments(self):
         """should return the correct alignments"""
         # following cases have a mixture of strand between ref seq and others
         coords_expected = [
-            [{'coord_name': 18, 'end': 213739, 'species': 'human', 'start': 213639, 'strand': -1},
-                {'Homo sapiens:chromosome:18:213639-213739:-1':
-                 'ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGAGTGAGTGCAGATTATTCGGTAAACACT----CTTA',
-                 'Macaca mulatta:chromosome:18:13858303-13858397:1':
-                 '------GTTTCCCTTTAGGGCTCTAAGATGAGGTCATCATTGTTTTTAATCCTGAAGAAGGGCTACTGA----GTGCAGATTATTCTGTAAATGTGCTTACTTG',
-                 'Pan troglodytes:chromosome:18:16601082-16601182:1':
-                 'ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGA----GTGCAGATTATTCTGTAAACACTCACTCTTA'}],
-            [{'coord_name': 5, 'end': 204859, 'species': 'human', 'start': 204759, 'strand': 1},
-                {'Homo sapiens:chromosome:5:204874-204974:1':
-                 'AACACTTGGTATTT----CCCCTTTATGGAGTGAGAGAGATCTTTAAAATATAAACCCTTGATAATATAATATTACTACTTCCTATTA---CCTGTTATGCAGTTCT',
-                 'Macaca mulatta:chromosome:6:1297736-1297840:-1':
-                 'AACTCTTGGTGTTTCCTTCCCCTTTATGG---GAGAGAGATCTTTAAAATAAAAAACCTTGATAATATAATATTACTACTTTCTATTATCATCTGTTATGCAGTTCT',
-                 'Pan troglodytes:chromosome:5:335911-336011:1':
-                 'AACACTTGGTAGTT----CCCCTTTATGGAGTGAGAGAGATCTTTAAAATATAAACCCTTGATAATATAATATTACTACTTTCTATTA---CCTGTTATGCAGTTCT'}],
-            [{'coord_name': 18, 'end': 203270, 'species': 'human', 'start': 203170, 'strand': -1},
-                {'Homo sapiens:chromosome:18:203170-203270:-1':
-                 'GGAATAATGAAAGCAATTGTGAGTTAGCAATTACCTTCAAAGAATTACATTTCTTATACAAAGTAAAGTTCATTACTAACCTTAAGAACTTTGGCATTCA',
-                 'Pan troglodytes:chromosome:18:16611584-16611684:1':
-                 'GGAATAATGAAAGCAATTGTAAGTTAGCAATTACCTTCAAAGAATTACATTTCTTATACAAAGTAAAGTTCATTACTAACCTTAAGAACTTTGGCATTCA'}],
-            [{'coord_name': 2, 'end': 46445, 'species': 'human', 'start': 46345, 'strand': -1},
-                {'Homo sapiens:chromosome:2:46345-46445:-1':
-                 'CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCGGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAGCGCGCCCCCGAACGAGC',
-                 'Macaca mulatta:chromosome:13:43921-44021:-1':
-                 'CTGCCACTCCAGCGCGTCTCCGCTGCACCCGGAGCGCCGGCCGGTCCATTCCCCGCGAGGATGCGCGCCCTGGCGGCCCTGAACACGTCGGCGAGAGAGC',
-                 'Pan troglodytes:chromosome:2a:36792-36892:-1':
-                 'CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCAGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAACGCGCCCCCGAACGAGC'}],
-            [{'coord_name': 18, 'end': 268049, 'species': 'human', 'start': 267949, 'strand': -1},
-                {'Homo sapiens:chromosome:18:267949-268049:-1':
-                 'GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGAGGGG',
-                 'Macaca mulatta:chromosome:18:13805604-13805703:1':
-                 'GCGCAG-GGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGGCGGG',
-                 'Pan troglodytes:chromosome:18:16546800-16546900:1':
-                 'GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGCGGGG'}]
+            [
+                {
+                    "coord_name": 18,
+                    "end": 213739,
+                    "species": "human",
+                    "start": 213639,
+                    "strand": -1,
+                },
+                {
+                    "Homo sapiens:chromosome:18:213639-213739:-1": "ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGAGTGAGTGCAGATTATTCGGTAAACACT----CTTA",
+                    "Macaca mulatta:chromosome:18:13858303-13858397:1": "------GTTTCCCTTTAGGGCTCTAAGATGAGGTCATCATTGTTTTTAATCCTGAAGAAGGGCTACTGA----GTGCAGATTATTCTGTAAATGTGCTTACTTG",
+                    "Pan troglodytes:chromosome:18:16601082-16601182:1": "ATAAGCATTTCCCTTTAGGGCTCTAAGATGAGGTCATCATCGTTTTTAATCCTGAAGAAGGGCTACTGA----GTGCAGATTATTCTGTAAACACTCACTCTTA",
+                },
+            ],
+            [
+                {
+                    "coord_name": 5,
+                    "end": 204859,
+                    "species": "human",
+                    "start": 204759,
+                    "strand": 1,
+                },
+                {
+                    "Homo sapiens:chromosome:5:204874-204974:1": "AACACTTGGTATTT----CCCCTTTATGGAGTGAGAGAGATCTTTAAAATATAAACCCTTGATAATATAATATTACTACTTCCTATTA---CCTGTTATGCAGTTCT",
+                    "Macaca mulatta:chromosome:6:1297736-1297840:-1": "AACTCTTGGTGTTTCCTTCCCCTTTATGG---GAGAGAGATCTTTAAAATAAAAAACCTTGATAATATAATATTACTACTTTCTATTATCATCTGTTATGCAGTTCT",
+                    "Pan troglodytes:chromosome:5:335911-336011:1": "AACACTTGGTAGTT----CCCCTTTATGGAGTGAGAGAGATCTTTAAAATATAAACCCTTGATAATATAATATTACTACTTTCTATTA---CCTGTTATGCAGTTCT",
+                },
+            ],
+            [
+                {
+                    "coord_name": 18,
+                    "end": 203270,
+                    "species": "human",
+                    "start": 203170,
+                    "strand": -1,
+                },
+                {
+                    "Homo sapiens:chromosome:18:203170-203270:-1": "GGAATAATGAAAGCAATTGTGAGTTAGCAATTACCTTCAAAGAATTACATTTCTTATACAAAGTAAAGTTCATTACTAACCTTAAGAACTTTGGCATTCA",
+                    "Pan troglodytes:chromosome:18:16611584-16611684:1": "GGAATAATGAAAGCAATTGTAAGTTAGCAATTACCTTCAAAGAATTACATTTCTTATACAAAGTAAAGTTCATTACTAACCTTAAGAACTTTGGCATTCA",
+                },
+            ],
+            [
+                {
+                    "coord_name": 2,
+                    "end": 46445,
+                    "species": "human",
+                    "start": 46345,
+                    "strand": -1,
+                },
+                {
+                    "Homo sapiens:chromosome:2:46345-46445:-1": "CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCGGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAGCGCGCCCCCGAACGAGC",
+                    "Macaca mulatta:chromosome:13:43921-44021:-1": "CTGCCACTCCAGCGCGTCTCCGCTGCACCCGGAGCGCCGGCCGGTCCATTCCCCGCGAGGATGCGCGCCCTGGCGGCCCTGAACACGTCGGCGAGAGAGC",
+                    "Pan troglodytes:chromosome:2a:36792-36892:-1": "CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCAGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAACGCGCCCCCGAACGAGC",
+                },
+            ],
+            [
+                {
+                    "coord_name": 18,
+                    "end": 268049,
+                    "species": "human",
+                    "start": 267949,
+                    "strand": -1,
+                },
+                {
+                    "Homo sapiens:chromosome:18:267949-268049:-1": "GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGAGGGG",
+                    "Macaca mulatta:chromosome:18:13805604-13805703:1": "GCGCAG-GGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGGCGGG",
+                    "Pan troglodytes:chromosome:18:16546800-16546900:1": "GCGCAGTGGCGGGCACGCGCAGCCGAGAAGATGTCTCCGACGCCGCCGCTCTTCAGTTTGCCCGAAGCGCGGACGCGGTTTACGGTGAGCTGTAGCGGGG",
+                },
+            ],
         ]
         # print(self.comp.method_species_links)
         for coord, expect in coords_expected:
             syntenic = list(
-                self.comp.get_syntenic_regions(method_clade_id=822, **coord))[0]
+                self.comp.get_syntenic_regions(method_clade_id=822, **coord)
+            )[0]
             # check the slope computed from the expected and returned
             # coordinates is ~ 1
-            got_names = dict([(n.split(':')[0], n.split(':'))
-                             for n in syntenic.get_alignment().names])
-            exp_names = dict([(n.split(':')[0], n.split(':'))
-                             for n in list(expect.keys())])
+            got_names = dict(
+                [
+                    (n.split(":")[0], n.split(":"))
+                    for n in syntenic.get_alignment().names
+                ]
+            )
+            exp_names = dict(
+                [(n.split(":")[0], n.split(":")) for n in list(expect.keys())]
+            )
             for species in exp_names:
                 exp_chrom = exp_names[species][2]
                 got_chrom = got_names[species][2]
                 self.assertEqual(exp_chrom.lower(), got_chrom.lower())
-                exp_start, exp_end = list(
-                    map(int, exp_names[species][3].split('-')))
-                got_start, got_end = list(
-                    map(int, got_names[species][3].split('-')))
+                exp_start, exp_end = list(map(int, exp_names[species][3].split("-")))
+                got_start, got_end = list(map(int, got_names[species][3].split("-")))
                 slope = calc_slope(exp_start, exp_end, got_start, got_end)
                 self.assertFloatEqual(abs(slope), 1.0, eps=1e-3)
 
     def test_failing_region(self):
         """should correctly handle queries where multiple Ensembl have
         genome block associations for multiple coord systems"""
-        gene = self.comp.Human.get_gene_by_stableid(stableid='ENSG00000188554')
+        gene = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000188554")
         # this should simply not raise any exceptions
-        syntenic_regions = list(self.comp.get_syntenic_regions(region=gene,
-                                                             align_method='PECAN',
-                                                             align_clade='vertebrates'))
-    
+        syntenic_regions = list(
+            self.comp.get_syntenic_regions(
+                region=gene, align_method="PECAN", align_clade="vertebrates"
+            )
+        )
+
     def test_syntenic_species_missing(self):
         """should not fail when a compara species has no syntenic region"""
-        gene = self.comp.Human.get_gene_by_stableid(stableid='ENSG00000104827')
+        gene = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000104827")
         syntenic = list(
-            self.comp.get_syntenic_regions(region=gene.canonical_transcript,
-                                         method_clade_id=830))[0]
+            self.comp.get_syntenic_regions(
+                region=gene.canonical_transcript, method_clade_id=830
+            )
+        )[0]
         species = syntenic.get_species_set()
         self.assertEqual(species, set(["Homo sapiens", "Pan troglodytes"]))
-
 
 
 if __name__ == "__main__":

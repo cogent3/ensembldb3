@@ -1,7 +1,9 @@
 from collections import defaultdict
+
 import sqlalchemy as sql
 
 from cogent3.util import table as cogent_table
+
 from .host import DbConnection, get_db_name
 from .util import flatten
 
@@ -18,19 +20,33 @@ __status__ = "alpha"
 class Database(object):
     """holds the data-base connection and table attributes"""
 
-    def __init__(self, account, species=None, db_type=None, release=None,
-                 pool_recycle=None, division=None):
+    def __init__(
+        self,
+        account,
+        species=None,
+        db_type=None,
+        release=None,
+        pool_recycle=None,
+        division=None,
+    ):
         self._tables = {}
-        self.db_name = get_db_name(account=account, species=species,
-                                   release=release, db_type=db_type,
-                                   division=division)
+        self.db_name = get_db_name(
+            account=account,
+            species=species,
+            release=release,
+            db_type=db_type,
+            division=division,
+        )
         if not self.db_name:
-            raise RuntimeError("%s db doesn't exist for '%s' on '%s'" %
-                               (db_type, species, account.host))
+            raise RuntimeError(
+                "%s db doesn't exist for '%s' on '%s'"
+                % (db_type, species, account.host)
+            )
         else:
             self.db_name = self.db_name[0]
-        self._db = DbConnection(account=account, db_name=self.db_name,
-                                pool_recycle=pool_recycle)
+        self._db = DbConnection(
+            account=account, db_name=self.db_name, pool_recycle=pool_recycle
+        )
         self._meta = sql.MetaData(self._db)
         self.type = db_type
 
@@ -55,12 +71,18 @@ class Database(object):
                 if "tinyint" in type_:
                     custom_columns.append(sql.Column(Field, sql.Integer))
             try:
-                table = sql.Table(name, self._meta, autoload=True,
-                                  extend_existing=True, *custom_columns)
+                table = sql.Table(
+                    name,
+                    self._meta,
+                    autoload=True,
+                    extend_existing=True,
+                    *custom_columns
+                )
             except TypeError:
                 # new arg name not supported, try old
-                table = sql.Table(name, self._meta, autoload=True,
-                                  useexisting=True, *custom_columns)
+                table = sql.Table(
+                    name, self._meta, autoload=True, useexisting=True, *custom_columns
+                )
 
             self._tables[name] = table
         return table
@@ -77,8 +99,7 @@ class Database(object):
         records = set()
         string_types = str, str
         for record in query.execute():
-            if type(record) not in string_types and \
-                    type(record[0]) not in string_types:
+            if type(record) not in string_types and type(record[0]) not in string_types:
                 # multi-dimensioned list/tuple
                 record = flatten(record)
             elif type(record) not in string_types:
@@ -112,9 +133,10 @@ class Database(object):
         for name in table_name:
             table = self.get_table(name)
             count = table.count().execute().fetchone()[0]
-            rows.append(['%s.%s' % (self.db_name, name), count])
+            rows.append(["%s.%s" % (self.db_name, name), count])
 
-        return cogent_table.Table(header=['name', 'count'], rows=rows)
+        return cogent_table.Table(header=["name", "count"], rows=rows)
+
 
 # used to store commonly looked up attribs
 # there are restrictions imposed at present but a

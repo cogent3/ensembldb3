@@ -2,33 +2,36 @@ import warnings
 
 import sqlalchemy as sql
 
+from .name import EnsemblDbName
+from .species import Species
+
 _engine_kwargs = {}
 
 try:
     import mysql.connector as mysql_connect
-    connect_template = 'mysql+mysqlconnector://'
-    '%(account)s/%(db_name)s?raise_on_warnings=False'
-    password_arg = 'password'
-    sql_version = tuple([int(v)
-                         for v in sql.__version__.split(".") if v.isdigit()])
+
+    connect_template = "mysql+mysqlconnector://"
+    "%(account)s/%(db_name)s?raise_on_warnings=False"
+    password_arg = "password"
+    sql_version = tuple([int(v) for v in sql.__version__.split(".") if v.isdigit()])
     if sql_version < (0, 9, 7):
-        warnings.warn('mysql.connector requires sqlalchemy >= 0.9.7\n')
+        warnings.warn("mysql.connector requires sqlalchemy >= 0.9.7\n")
         raise ImportError
 except ImportError:
     try:
         import pymysql as mysql_connect
         from pymysql.constants.CLIENT import MULTI_STATEMENTS
-        connect_template = 'mysql+pymysql://%(account)s/%(db_name)s'
-        password_arg = 'passwd'
+
+        connect_template = "mysql+pymysql://%(account)s/%(db_name)s"
+        password_arg = "passwd"
         # handle change in pymysql default value from version 0.8
-        _engine_kwargs['client_flag'] = MULTI_STATEMENTS
+        _engine_kwargs["client_flag"] = MULTI_STATEMENTS
     except ImportError:
         import MySQLdb as mysql_connect
-        connect_template = 'mysql+mysqldb://%(account)s/%(db_name)s'
-        password_arg = 'passwd'
 
-from .species import Species
-from .name import EnsemblDbName
+        connect_template = "mysql+mysqldb://%(account)s/%(db_name)s"
+        password_arg = "passwd"
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -67,7 +70,7 @@ class HostAccount(object):
         return self._hash
 
     def __str__(self):
-        return '%s:%s@%s:%s' % (self.user, self.passwd, self.host, self.port)
+        return "%s:%s@%s:%s" % (self.user, self.passwd, self.host, self.port)
 
 
 def get_ensembl_account(release=None):
@@ -86,6 +89,7 @@ def _get_default_connection():
 
 class EngineCache(object):
     """storage of active connections, indexed by account, database name"""
+
     _db_account = {}
 
     def __call__(self, account, db_name=None, pool_recycle=None):
@@ -96,18 +100,19 @@ class EngineCache(object):
             if db_name == "PARENT":
                 args = {password_arg: account.passwd}
                 args.update(_engine_kwargs)
-                engine = mysql_connect.connect(host=account.host,
-                                               user=account.user,
-                                               port=account.port, **args)
+                engine = mysql_connect.connect(
+                    host=account.host, user=account.user, port=account.port, **args
+                )
             else:
-                engine = sql.create_engine(connect_template %
-                                           dict(account=account,
-                                                db_name=db_name),
-                                           pool_recycle=pool_recycle)
+                engine = sql.create_engine(
+                    connect_template % dict(account=account, db_name=db_name),
+                    pool_recycle=pool_recycle,
+                )
             if db_name not in self._db_account:
                 self._db_account[db_name] = {}
             self._db_account[db_name][account] = engine
         return self._db_account[db_name][account]
+
 
 DbConnection = EngineCache()
 
@@ -128,8 +133,9 @@ def make_db_name_pattern(species=None, db_type=None, release=None):
     return "'%s%s'" % (pattern, sep)
 
 
-def get_db_name(account=None, species=None, db_type=None, release=None,
-                division=None, DEBUG=False):
+def get_db_name(
+    account=None, species=None, db_type=None, release=None, division=None, DEBUG=False
+):
     """returns the listing of valid data-base names as EnsemblDbName objects"""
     if account is None:
         account = get_ensembl_account(release=release)
@@ -138,7 +144,7 @@ def get_db_name(account=None, species=None, db_type=None, release=None,
         print("Connection To:", account)
         print("Selecting For:", species, db_type, release)
 
-    server = DbConnection(account, db_name='PARENT')
+    server = DbConnection(account, db_name="PARENT")
     cursor = server.cursor()
     show = "SHOW DATABASES"
     if species or db_type or release:
@@ -154,8 +160,9 @@ def get_db_name(account=None, species=None, db_type=None, release=None,
             if division is not None and division not in row[0]:
                 continue
             name = EnsemblDbName(row[0])
-            if (release is None or name.release == str(release)) and\
-                    (db_type is None or name.type == db_type):
+            if (release is None or name.release == str(release)) and (
+                db_type is None or name.type == db_type
+            ):
                 dbs.append(name)
         except (IndexError, RuntimeError):
             if DEBUG:

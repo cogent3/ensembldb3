@@ -23,8 +23,8 @@ def get_version_from_name(name):
     # first number run is release, followed by build
     # note, for the ensemblgenomes naming system, the second digit run is the
     # standard Ensembl release and the first is for the specified genome
-    release = name[r.start(): r.end()]
-    b = [s for s in _name_delim.split(name[r.end():]) if s]
+    release = name[r.start() : r.end()]
+    b = [s for s in _name_delim.split(name[r.end() :]) if s]
 
     return release, b
 
@@ -79,7 +79,7 @@ class EnsemblDbName(object):
         self.general_release = self.release
 
         if len(build) == 1:
-            if self.type != 'compara':
+            if self.type != "compara":
                 self.build = build[0]
             else:
                 self.build = None
@@ -94,11 +94,13 @@ class EnsemblDbName(object):
         self.species = Species.get_species_name(self.prefix)
 
     def __repr__(self):
-        build = ['', "; build='%s'" % self.build][self.build is not None]
-        s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (self.prefix,
-                                                            self.type,
-                                                            self.release,
-                                                            build)
+        build = ["", "; build='%s'" % self.build][self.build is not None]
+        s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (
+            self.prefix,
+            self.type,
+            self.release,
+            build,
+        )
         return s
 
     def __str__(self):

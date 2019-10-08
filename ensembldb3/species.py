@@ -1,9 +1,11 @@
 import os
 from collections import defaultdict
+
 from pkg_resources import resource_filename
+
 from cogent3.util.table import Table
 
-from .util import CaseInsensitiveString, ENSEMBLDBRC
+from .util import ENSEMBLDBRC, CaseInsensitiveString
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -25,7 +27,7 @@ def load_species(species_path):
     with open(species_path, "r") as infile:
         data = []
         for line in infile:
-            line = [e.strip() for e in line.split('\t')]
+            line = [e.strip() for e in line.split("\t")]
             num_fields = len(line)
             if 2 <= num_fields <= 3:
                 data.append(line)
@@ -34,9 +36,11 @@ def load_species(species_path):
                 raise ValueError(
                     "species file should be "
                     "<latin name>\t<common name>\t<optional species synonym>"
-                    " per line")
+                    " per line"
+                )
 
     return data
+
 
 _species_common_map = load_species(os.path.join(ENSEMBLDBRC, "species.tsv"))
 
@@ -64,17 +68,22 @@ class SpeciesNameMap(dict):
         for common in self._common_species:
             species = self._common_species[common]
             ensembl = self._species_ensembl[species]
-            syn = syns.get(species, '')
+            syn = syns.get(species, "")
 
             rows += [[common, species, ensembl, syn]]
-        display = str(Table(['Common name', 'Species name',
-                             'Ensembl Db Prefix', 'Synonymns'],
-                            rows=rows, space=2).sorted())
+        display = str(
+            Table(
+                ["Common name", "Species name", "Ensembl Db Prefix", "Synonymns"],
+                rows=rows,
+                space=2,
+            ).sorted()
+        )
         return display
 
     def __repr__(self):
-        return 'Available species: %s' % \
-            ("'" + "'; '".join(list(self._common_species.keys())) + "'")
+        return "Available species: %s" % (
+            "'" + "'; '".join(list(self._common_species.keys())) + "'"
+        )
 
     def add_synonym(self, species, synonym):
         """add a synonym for a species name
@@ -85,7 +94,7 @@ class SpeciesNameMap(dict):
         synonym = CaseInsensitiveString(synonym)
         self._synonyms[synonym] = species
 
-    def get_common_name(self, name, level='raise'):
+    def get_common_name(self, name, level="raise"):
         """returns the common name for the given name (which can be either a
         species name or the ensembl version)"""
         name = CaseInsensitiveString(name)
@@ -104,14 +113,14 @@ class SpeciesNameMap(dict):
 
         if common_name is None:
             msg = "Unknown species name: %s" % name
-            if level == 'raise':
+            if level == "raise":
                 raise ValueError(msg)
-            elif level == 'warn':
+            elif level == "warn":
                 print("WARN: %s" % msg)
 
         return str(common_name)
 
-    def get_species_name(self, name, level='ignore'):
+    def get_species_name(self, name, level="ignore"):
         """returns the species name for the given common name"""
         name = CaseInsensitiveString(name)
         if name in self._species_common:
@@ -129,9 +138,9 @@ class SpeciesNameMap(dict):
                 species_name = data[name]
         if species_name is None:
             msg = "Unknown common name: %s" % name
-            if level == 'raise':
+            if level == "raise":
                 raise ValueError(msg)
-            elif level == 'warn':
+            elif level == "warn":
                 print("WARN: %s" % msg)
         return str(species_name)
 
@@ -148,7 +157,7 @@ class SpeciesNameMap(dict):
         if name in self._common_species:
             name = self._common_species[name]
         try:
-            species_name = self.get_species_name(name, level='raise')
+            species_name = self.get_species_name(name, level="raise")
         except ValueError:
             if name not in self._species_common:
                 raise ValueError("Unknown name %s" % name)
@@ -160,13 +169,13 @@ class SpeciesNameMap(dict):
         """returns string matching a compara instance attribute name for a
         species"""
         name = self.get_common_name(name)
-        if '.' in name:
-            name = name.replace('.', '')
+        if "." in name:
+            name = name.replace(".", "")
         else:
             name = name.title()
 
         name = name.split()
-        return ''.join(name)
+        return "".join(name)
 
     def _purge_species(self, species_name):
         """removes a species record"""
@@ -178,12 +187,11 @@ class SpeciesNameMap(dict):
         self._ensembl_species.pop(ensembl_name)
         self._common_species.pop(common_name)
 
-    def amend_species(self, species_name, common_name, synonym=''):
+    def amend_species(self, species_name, common_name, synonym=""):
         """add a new species, and common name"""
         species_name = CaseInsensitiveString(species_name)
         common_name = CaseInsensitiveString(common_name)
-        assert "_" not in species_name,\
-            "'_' in species_name, not a Latin name?"
+        assert "_" not in species_name, "'_' in species_name, not a Latin name?"
         self._purge_species(species_name)  # remove if existing
         self._species_common[species_name] = common_name
         self._common_species[common_name] = species_name
@@ -194,5 +202,6 @@ class SpeciesNameMap(dict):
             self.add_synonym(species_name, CaseInsensitiveString(synonym))
 
         return
+
 
 Species = SpeciesNameMap()

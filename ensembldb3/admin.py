@@ -1,20 +1,20 @@
+import configparser
 import os
 import shutil
-from glob import glob1
-import configparser
 from collections import defaultdict
+from glob import glob1
 from pprint import pprint
 
 import click
 
-from . import HostAccount
-from .host import DbConnection, get_db_name
-from .util import exec_command, open_, ENSEMBLDBRC
-from .download import (download_dbs, read_config, reduce_dirnames,
-                       is_downloaded, _cfg)
-
 from cogent3 import LoadTable
 from cogent3.util import parallel
+
+from . import HostAccount
+from .download import (_cfg, download_dbs, is_downloaded, read_config,
+                       reduce_dirnames)
+from .host import DbConnection, get_db_name
+from .util import ENSEMBLDBRC, exec_command, open_
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -35,8 +35,9 @@ def listpaths(dirname, glob_pattern):
     return fns
 
 
-def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport",
-                 verbose=False, debug=False):
+def InstallTable(
+    mysqlcfg, account, dbname, mysqlimport="mysqlimport", verbose=False, debug=False
+):
     """returns a function that requires path to the db table
 
     Parameters
@@ -55,13 +56,14 @@ def InstallTable(mysqlcfg, account, dbname, mysqlimport="mysqlimport",
     host = "" if info["host"] is None else r" -h %(host)s "
     port = "" if info["port"] is None else r" --port %(port)s "
 
-    cmnd_template = command + port + host + acct + \
-        " %(dbname)s -L %(tablename)s"
-    kwargs = dict(host=info["host"] or account.host,
-                  user=info["user"] or account.user,
-                  passwd=info["passwd"] or account.passwd,
-                  dbname=dbname,
-                  port=info["port"] or account.port)
+    cmnd_template = command + port + host + acct + " %(dbname)s -L %(tablename)s"
+    kwargs = dict(
+        host=info["host"] or account.host,
+        user=info["user"] or account.user,
+        passwd=info["passwd"] or account.passwd,
+        dbname=dbname,
+        port=info["port"] or account.port,
+    )
 
     def install_table(tablename):
         """installs a single table"""
@@ -100,8 +102,17 @@ def is_installed(local_path, dbname):
     return os.path.exists(chk)
 
 
-def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
-                   force_overwrite=False, verbose=False, debug=False):
+def install_one_db(
+    mysqlcfg,
+    cursor,
+    account,
+    dbname,
+    local_path,
+    numprocs,
+    force_overwrite=False,
+    verbose=False,
+    debug=False,
+):
     """installs a single ensembl database"""
     # first create the database in mysql
     # find the .sql file, load all contents into memory
@@ -118,7 +129,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
         raise RuntimeError("sql file not present in %s" % dbpath)
 
     sqlfile = sqlfile[0]
-    with open_(sqlfile, mode='rt') as infile:
+    with open_(sqlfile, mode="rt") as infile:
         sql = infile.readlines()
     sql = "\n".join(sql)
     # select the database
@@ -148,13 +159,14 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
         got = set(str(g[0]) for g in result)
 
         diff = got ^ expected  # symmetric diff
-        msg = ["ERR: The symmetric difference in tables between "
-               "SQL statement and actually created:",
-               "\t%s" % str(diff)]
+        msg = [
+            "ERR: The symmetric difference in tables between "
+            "SQL statement and actually created:",
+            "\t%s" % str(diff),
+        ]
         click.secho("\n".join(msg), fg="red")
 
-        raise RuntimeError(
-            "number of created tables doesn't match number in sql")
+        raise RuntimeError("number of created tables doesn't match number in sql")
 
     if debug:
         click.echo(r)
@@ -169,8 +181,7 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
             name = name[:-3]
             if name in tablenames:
                 if verbose:
-                    click.echo(
-                        "  WARN: Deleting %s, using compressed version" % name)
+                    click.echo("  WARN: Deleting %s, using compressed version" % name)
                 tablenames.remove(name)
                 os.remove(name)
 
@@ -178,7 +189,8 @@ def install_one_db(mysqlcfg, cursor, account, dbname, local_path, numprocs,
         click.echo(str(tablenames))
 
     install_table = InstallTable(
-        mysqlcfg, account, dbname, verbose=verbose, debug=debug)
+        mysqlcfg, account, dbname, verbose=verbose, debug=debug
+    )
 
     if numprocs > 1:
         procs = parallel.MultiprocessingParallelContext(numprocs)
@@ -276,29 +288,52 @@ def display_dbs_tables(cursor, dbname):
 
 
 # default mysql config
-_mycfg = os.path.join(ENSEMBLDBRC, 'mysql.cfg')
+_mycfg = os.path.join(ENSEMBLDBRC, "mysql.cfg")
 
 # defining some of the options
-_cfgpath = click.option('-c', '--configpath', default=_cfg, type=click.File(),
-                        help="path to config file specifying databases, only "
-                        "species or compara at present")
-_mysqlcfg = click.option('-m', '--mysqlcfg', default=_mycfg, type=click.File(),
-                         help="path to mysql config file specifying host, "
-                         "user, installing data for writing")
-_verbose = click.option('-v', '--verbose', is_flag=True,
-                        help="causes stdout/stderr from rsync download to be "
-                        "written to screen")
-_numprocs = click.option('-n', '--numprocs', type=int, default=1,
-                         help="number of processes to use for download")
-_force = click.option('-f', '--force_overwrite', is_flag=True,
-                      help="drop existing database if it exists prior to "
-                      "installing")
-_debug = click.option('-d', '--debug', is_flag=True,
-                      help="maximum verbosity")
-_dbrc_out = click.option('-o', '--outpath', type=click.Path(),
-                         help="path to directory to export all rc contents")
-_release = click.option("-r", "--release", type=int,
-                        help="Ensembl release number")
+_cfgpath = click.option(
+    "-c",
+    "--configpath",
+    default=_cfg,
+    type=click.File(),
+    help="path to config file specifying databases, only "
+    "species or compara at present",
+)
+_mysqlcfg = click.option(
+    "-m",
+    "--mysqlcfg",
+    default=_mycfg,
+    type=click.File(),
+    help="path to mysql config file specifying host, "
+    "user, installing data for writing",
+)
+_verbose = click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    help="causes stdout/stderr from rsync download to be " "written to screen",
+)
+_numprocs = click.option(
+    "-n",
+    "--numprocs",
+    type=int,
+    default=1,
+    help="number of processes to use for download",
+)
+_force = click.option(
+    "-f",
+    "--force_overwrite",
+    is_flag=True,
+    help="drop existing database if it exists prior to " "installing",
+)
+_debug = click.option("-d", "--debug", is_flag=True, help="maximum verbosity")
+_dbrc_out = click.option(
+    "-o",
+    "--outpath",
+    type=click.Path(),
+    help="path to directory to export all rc contents",
+)
+_release = click.option("-r", "--release", type=int, help="Ensembl release number")
 
 
 @click.group()
@@ -327,10 +362,14 @@ def download(configpath, numprocs, verbose, debug):
 def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
     """install ensembl databases into a MySQL server"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
-    account = HostAccount(mysql_info["host"], mysql_info["user"],
-                          mysql_info["passwd"], port=mysql_info["port"])
+    account = HostAccount(
+        mysql_info["host"],
+        mysql_info["user"],
+        mysql_info["passwd"],
+        port=mysql_info["port"],
+    )
 
-    server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
+    server = DbConnection(account, db_name="PARENT", pool_recycle=36000)
 
     release, remote_path, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
@@ -351,9 +390,17 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
-        install_one_db(mysqlcfg, cursor, account, dbname.name, local_path,
-                       numprocs, force_overwrite=force_overwrite,
-                       verbose=verbose, debug=debug)
+        install_one_db(
+            mysqlcfg,
+            cursor,
+            account,
+            dbname.name,
+            local_path,
+            numprocs,
+            force_overwrite=force_overwrite,
+            verbose=verbose,
+            debug=debug,
+        )
         cursor.close()
 
     if debug:
@@ -371,9 +418,13 @@ def install(configpath, mysqlcfg, numprocs, force_overwrite, verbose, debug):
 def drop(configpath, mysqlcfg, verbose, debug):
     """drop databases from a MySQL server"""
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
-    account = HostAccount(mysql_info["host"], mysql_info["user"],
-                          mysql_info["passwd"], port=mysql_info["port"])
-    server = DbConnection(account, db_name='PARENT', pool_recycle=36000)
+    account = HostAccount(
+        mysql_info["host"],
+        mysql_info["user"],
+        mysql_info["passwd"],
+        port=mysql_info["port"],
+    )
+    server = DbConnection(account, db_name="PARENT", pool_recycle=36000)
     cursor = server.cursor()
     release, remote_path, local_path, species_dbs = read_config(configpath)
     content = get_db_name(account=account, release=str(release))
@@ -417,15 +468,18 @@ def show(release, mysqlcfg):
     if mysqlcfg.name == _mycfg:
         click.secho("%s\n" % show.help)
         click.secho("use --help for more options")
-        
+
         exit()
 
     mysql_info = read_mysql_config(mysqlcfg, "mysql")
-    account = HostAccount(mysql_info["host"], mysql_info["user"],
-                          mysql_info["passwd"], port=mysql_info["port"])
+    account = HostAccount(
+        mysql_info["host"],
+        mysql_info["user"],
+        mysql_info["passwd"],
+        port=mysql_info["port"],
+    )
     names = get_db_name(account=account, release=str(release))
-    click.echo("Databases at host='%s' for release=%s" %
-               (account.host, release))
+    click.echo("Databases at host='%s' for release=%s" % (account.host, release))
     if names:
         click.echo("\n".join(["  %s" % n for n in names]))
     else:
@@ -441,14 +495,19 @@ def status(configpath):
     dbnames = reduce_dirnames(content, species_dbs)
     rows = []
     for db in dbnames:
-        row = [db.name, is_downloaded(local_path, db.name),
-               is_installed(local_path, db.name)]
+        row = [
+            db.name,
+            is_downloaded(local_path, db.name),
+            is_installed(local_path, db.name),
+        ]
         rows.append(row)
 
-    table = LoadTable(header=["dbname", "Downloaded", "Installed"], rows=rows,
-                      title="Status of download and install",
-                      legend="config=%s; local_path=%s" % (configpath.name,
-                                                           local_path))
+    table = LoadTable(
+        header=["dbname", "Downloaded", "Installed"],
+        rows=rows,
+        title="Status of download and install",
+        legend="config=%s; local_path=%s" % (configpath.name, local_path),
+    )
     print(table)
 
 

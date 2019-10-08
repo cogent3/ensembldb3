@@ -1,10 +1,10 @@
-import os
-import gzip
 import bz2
+import gzip
+import os
 import subprocess
 import sys
-import numpy
 
+import numpy
 from pkg_resources import resource_filename
 
 __author__ = "Gavin Huttley"
@@ -37,8 +37,7 @@ ENSEMBLDBRC = get_resource_dir()
 
 
 def open_(filename, mode="r"):
-    func = {'gz': gzip.open, 'bz2': bz2.open}.get(
-        filename.split('.')[-1], open)
+    func = {"gz": gzip.open, "bz2": bz2.open}.get(filename.split(".")[-1], open)
     return func(filename, mode=mode)
 
 
@@ -60,7 +59,7 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         sys.stderr.writelines("FAILED: %s\n%s" % (cmnd, msg))
         sys.exit(proc.returncode)
     if out is not None:
-        r = out.decode('utf8')
+        r = out.decode("utf8")
     else:
         r = None
     return r
@@ -81,6 +80,7 @@ def abspath(path):
 
 class DisplayString(str):
     """provides a mechanism for customising the str() and repr() of objects"""
+
     def __new__(cls, arg, num_words=None, repr_length=None, with_quotes=False):
         new = str.__new__(cls, str(arg))
         new.num_words = num_words
@@ -90,39 +90,41 @@ class DisplayString(str):
 
     def __repr__(self):
         if self.num_words is not None:
-            new = " ".join(self.split()[:self.num_words])
+            new = " ".join(self.split()[: self.num_words])
         elif self.repr_length != len(self):
-            new = self[:self.repr_length]
+            new = self[: self.repr_length]
         else:
             new = self
         if len(self) > len(new):
-            new += '...'
+            new += "..."
         new = [new, "'%s'" % new][self.with_quotes]
         return new
 
 
 class CaseInsensitiveString(str):
     """A case insensitive string class. Comparisons are case insensitive."""
+
     def __new__(cls, arg, h=None):
         n = str.__new__(cls, str(arg))
-        n._lower = ''.join(list(n)).lower()
+        n._lower = "".join(list(n)).lower()
         n._hash = hash(n._lower)
         return n
 
     def __eq__(self, other):
-        return self._lower == ''.join(list(other)).lower()
+        return self._lower == "".join(list(other)).lower()
 
     def __hash__(self):
         # dict hashing done via lower case
         return self._hash
 
     def __str__(self):
-        return ''.join(list(self))
+        return "".join(list(self))
 
 
 class LazyRecord(object):
     """a convenience class for conducting lazy evaluations of class
     properties"""
+
     NULL_VALUE = None
 
     def __init__(self):
@@ -153,7 +155,6 @@ class LazyRecord(object):
 
 
 class NoItemError(Exception):
-
     def __init__(self, value):
         self.value = value
 
@@ -164,8 +165,8 @@ class NoItemError(Exception):
 def convert_strand(val):
     """ensures a consistent internal representation of strand"""
     if isinstance(val, str):
-        assert val in '-+', 'unknown strand "%s"' % val
-        val = [-1, 1][val == '+']
+        assert val in "-+", 'unknown strand "%s"' % val
+        val = [-1, 1][val == "+"]
     elif val is not None:
         val = [-1, 1][val > 0]
     else:
@@ -178,12 +179,12 @@ def asserted_one(items):
     one = False
     for item in items:
         if one:
-            raise ValueError('More than one: [%s]' % list(item.items()))
+            raise ValueError("More than one: [%s]" % list(item.items()))
         one = True
     if one:
         return item
     else:
-        raise NoItemError('No items')
+        raise NoItemError("No items")
 
 
 def what_columns(table):
@@ -205,6 +206,7 @@ def yield_selected(sqlalchemy_select, limit=100):
         offset += limit
         if count == 0 or count < limit:
             break
+
 
 def flatten(data):
     """returns 1D list

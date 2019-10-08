@@ -5,8 +5,8 @@ from configparser import ConfigParser
 from click.testing import CliRunner
 
 from cogent3.util.unit_test import TestCase, main
-from ensembldb3.admin import (download, install, exportrc, drop, show,
-                              get_installed_checkpoint_path, ENSEMBLDBRC)
+from ensembldb3.admin import (ENSEMBLDBRC, download, drop, exportrc,
+                              get_installed_checkpoint_path, install, show)
 from ensembldb3.download import get_download_checkpoint_path
 
 
@@ -14,7 +14,7 @@ class TestAdminCli(TestCase):
     dirname = "_delme"
 
     def test_all(self):
-        '''runs download, install, drop according to a special test cfg'''
+        """runs download, install, drop according to a special test cfg"""
 
         def exec_show(mysql_cfg, release):
             runner = CliRunner()
@@ -24,8 +24,9 @@ class TestAdminCli(TestCase):
 
         test_mysql_cfg = os.environ.get("ENSEMBLDB_TEST_CFG", None)
         if test_mysql_cfg is None:
-            self.skipTest("ENSEMBLDB_TEST_CFG variable not defined, "
-                          "skipping some cli tests")
+            self.skipTest(
+                "ENSEMBLDB_TEST_CFG variable not defined, " "skipping some cli tests"
+            )
 
         if os.path.exists(self.dirname):
             shutil.rmtree(self.dirname)
@@ -35,11 +36,10 @@ class TestAdminCli(TestCase):
         # create a simpler download config
         # we want a very small test set
         parser = ConfigParser()
-        parser.read(os.path.join(ENSEMBLDBRC, 'ensembldb_download.cfg'))
-        parser.remove_section('C.elegans')
-        parser.set('local path', 'path', value=self.dirname)
-        download_cfg = os.path.abspath(
-            os.path.join(self.dirname, "download.cfg"))
+        parser.read(os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg"))
+        parser.remove_section("C.elegans")
+        parser.set("local path", "path", value=self.dirname)
+        download_cfg = os.path.abspath(os.path.join(self.dirname, "download.cfg"))
         with open(download_cfg, "wt") as out:
             parser.write(out)
 
@@ -47,8 +47,11 @@ class TestAdminCli(TestCase):
         runner = CliRunner()
         r = runner.invoke(download, ["-c%s" % download_cfg])
         # make sure the download checkpoint file exists
-        dirnames = [dn for dn in os.listdir(self.dirname)
-                    if os.path.isdir(os.path.join(self.dirname, dn))]
+        dirnames = [
+            dn
+            for dn in os.listdir(self.dirname)
+            if os.path.isdir(os.path.join(self.dirname, dn))
+        ]
         self.assertEqual(len(dirnames), 1)
         chkpt = get_download_checkpoint_path(self.dirname, dirnames[0])
         self.assertTrue(os.path.exists(chkpt))
@@ -68,8 +71,11 @@ class TestAdminCli(TestCase):
 
         # now install
         runner = CliRunner()
-        r = runner.invoke(install, ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
-                          catch_exceptions=False)
+        r = runner.invoke(
+            install,
+            ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+            catch_exceptions=False,
+        )
         if r.exit_code != 0:
             print(r.output)
 
@@ -85,8 +91,12 @@ class TestAdminCli(TestCase):
 
         # then drop, but don't execute
         runner = CliRunner()
-        r = runner.invoke(drop, ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
-                          catch_exceptions=False, input="n")
+        r = runner.invoke(
+            drop,
+            ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+            catch_exceptions=False,
+            input="n",
+        )
 
         # then show still present
         r = exec_show(test_mysql_cfg, release)
@@ -94,9 +104,12 @@ class TestAdminCli(TestCase):
 
         # then drop
         runner = CliRunner()
-        r = runner.invoke(drop,
-                          ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
-                          catch_exceptions=False, input="y")
+        r = runner.invoke(
+            drop,
+            ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+            catch_exceptions=False,
+            input="y",
+        )
         # then show now gone
         r = exec_show(test_mysql_cfg, release)
         self.assertTrue("saccharomyces" not in r.output)

@@ -1,9 +1,10 @@
 from collections import defaultdict
 
 import sqlalchemy as sql
+
 from cogent3 import DNA
+from cogent3.core.alignment import Aligned, Alignment, SequenceCollection
 from cogent3.core.tree import PhyloNode
-from cogent3.core.alignment import SequenceCollection, Alignment, Aligned
 from cogent3.parse import cigar
 
 from .util import LazyRecord, asserted_one
@@ -33,8 +34,8 @@ class _RelatedRegions(LazyRecord):
         my_type = self.__class__.__name__
 
         data = list(map(repr, self.members))
-        data.insert(0, '%s(' % my_type)
-        data.append(')')
+        data.insert(0, "%s(" % my_type)
+        data.append(")")
         return "\n\t".join(data)
 
     def get_seq_collection(self, feature_types=None, where_feature=None):
@@ -56,12 +57,11 @@ class _RelatedRegions(LazyRecord):
 
     def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.location.species for m in self.members
-                    if m.location is not None])
+        return set([m.location.species for m in self.members if m.location is not None])
 
 
 class RelatedGenes(_RelatedRegions):
-    type = 'related_genes'
+    type = "related_genes"
 
     def __init__(self, compara, members, relationship, gene_tree_root=None):
         super(RelatedGenes, self).__init__()
@@ -74,10 +74,9 @@ class RelatedGenes(_RelatedRegions):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        display = ['%s:' % my_type,
-                   ' relationship=%s' % str(self.relationship)]
-        display += ['  %s' % m for m in self.members]
-        return '\n'.join(display)
+        display = ["%s:" % my_type, " relationship=%s" % str(self.relationship)]
+        display += ["  %s" % m for m in self.members]
+        return "\n".join(display)
 
     def __repr__(self):
         return self.__str__()
@@ -95,33 +94,40 @@ class RelatedGenes(_RelatedRegions):
         """
         gtrn = self.compara.ComparaDb.get_table("gene_tree_node")
         condition = gtrn.c.root_id == list(self._gene_tree_root)[0]
-        query = sql.select([gtrn.c.node_id, gtrn.c.parent_id,
-                            gtrn.c.distance_to_parent, gtrn.c.seq_member_id],
-                           whereclause=condition)
+        query = sql.select(
+            [
+                gtrn.c.node_id,
+                gtrn.c.parent_id,
+                gtrn.c.distance_to_parent,
+                gtrn.c.seq_member_id,
+            ],
+            whereclause=condition,
+        )
         records = query.execute().fetchall()
 
         # get the gene stable IDs, via join of seq_member with gene_member
         # on seq_member_id
-        seqmem_ids = [r['seq_member_id'] for r in records]
+        seqmem_ids = [r["seq_member_id"] for r in records]
         seqmem = self.compara.ComparaDb.get_table("seq_member")
         genmem = self.compara.ComparaDb.get_table("gene_member")
         condition = genmem.c.gene_member_id == seqmem.c.gene_member_id
-        joined = seqmem.join(genmem,
-                             genmem.c.gene_member_id ==
-                             seqmem.c.gene_member_id)
-        query = sql.select([joined.c.seq_member_seq_member_id,
-                            joined.c.gene_member_stable_id]).\
-            where(joined.c.seq_member_seq_member_id.in_(
-                seqmem_ids)).select_from(joined)
+        joined = seqmem.join(genmem, genmem.c.gene_member_id == seqmem.c.gene_member_id)
+        query = (
+            sql.select(
+                [joined.c.seq_member_seq_member_id, joined.c.gene_member_stable_id]
+            )
+            .where(joined.c.seq_member_seq_member_id.in_(seqmem_ids))
+            .select_from(joined)
+        )
 
         gene_ids = dict(query.execute().fetchall())
         nodes = {}
         parents = defaultdict(list)
         for record in records:
-            parent_id = record['parent_id']
-            node_id = record['node_id']
-            length = record['distance_to_parent']
-            name = gene_ids.get(record['seq_member_id'], None)
+            parent_id = record["parent_id"]
+            node_id = record["node_id"]
+            length = record["distance_to_parent"]
+            name = gene_ids.get(record["seq_member_id"], None)
             node = PhyloNode(length=length, name=name)
             nodes[node_id] = node
             parents[parent_id].append(node)
@@ -129,7 +135,7 @@ class RelatedGenes(_RelatedRegions):
         root = None
         for parent in parents:
             if parent not in nodes:
-                node = PhyloNode(name='root')
+                node = PhyloNode(name="root")
                 nodes[parent] = node
 
             node = nodes[parent]
@@ -149,8 +155,9 @@ class SyntenicRegion(LazyRecord):
     """a class that takes the genome, compara instances and is used to build
     Aligned sequences for Ensembl multiple alignments"""
 
-    def __init__(self, parent, genome, identifiers_values, am_ref_member,
-                 location=None):
+    def __init__(
+        self, parent, genome, identifiers_values, am_ref_member, location=None
+    ):
         # create with method_link_species_set_id, at least, in
         # identifiers_values
         super(SyntenicRegion, self).__init__()
@@ -160,47 +167,48 @@ class SyntenicRegion(LazyRecord):
         self.am_ref_member = am_ref_member
         self.aln_map = None
         self.aln_loc = None
-        self._make_map_func = [self._make_map_from_ref,
-                               self._make_ref_map][am_ref_member]
+        self._make_map_func = [self._make_map_from_ref, self._make_ref_map][
+            am_ref_member
+        ]
 
         if location is not None:
-            if hasattr(location, 'location'):  # likely to be a feature region
+            if hasattr(location, "location"):  # likely to be a feature region
                 region = location
             else:
                 region = genome.get_region(region=location)
-            self._cached['region'] = region
+            self._cached["region"] = region
 
         for identifier, value in list(dict(identifiers_values).items()):
             self._cached[identifier] = value
 
     def __len__(self):
-        return len(self._get_cached_value('region', self._make_map_func))
+        return len(self._get_cached_value("region", self._make_map_func))
 
     def _get_location(self):
-        region = self._get_cached_value('region', self._make_map_func)
+        region = self._get_cached_value("region", self._make_map_func)
         location = None if region is None else region.location
         return location
 
     location = property(_get_location)
 
     def _get_region(self):
-        region = self._get_cached_value('region', self._make_map_func)
+        region = self._get_cached_value("region", self._make_map_func)
         return region
 
     region = property(_get_region)
 
     def _get_cigar_record(self):
-        genomic_align_table = \
-            self.parent.compara.ComparaDb.get_table('genomic_align')
-        query = sql.select([genomic_align_table.c.cigar_line],
-                           genomic_align_table.c.genomic_align_id ==
-                           self._cached['genomic_align_id'])
+        genomic_align_table = self.parent.compara.ComparaDb.get_table("genomic_align")
+        query = sql.select(
+            [genomic_align_table.c.cigar_line],
+            genomic_align_table.c.genomic_align_id == self._cached["genomic_align_id"],
+        )
         record = asserted_one(query.execute())
-        self._cached['cigar_line'] = record['cigar_line']
+        self._cached["cigar_line"] = record["cigar_line"]
         return record
 
     def _get_cigar_line(self):
-        return self._get_cached_value('cigar_line', self._get_cigar_record)
+        return self._get_cached_value("cigar_line", self._get_cigar_record)
 
     cigar_line = property(_get_cigar_line)
 
@@ -209,15 +217,17 @@ class SyntenicRegion(LazyRecord):
             return
 
         ref_record = self._cached
-        record_start = ref_record['dnafrag_start']
-        record_end = ref_record['dnafrag_end']
-        record_strand = ref_record['dnafrag_strand']
+        record_start = ref_record["dnafrag_start"]
+        record_end = ref_record["dnafrag_end"]
+        record_strand = ref_record["dnafrag_strand"]
 
-        block_loc = self.genome.make_location(coord_name=ref_record['name'],
-                                              start=record_start,
-                                              end=record_end,
-                                              strand=record_strand,
-                                              ensembl_coord=True)
+        block_loc = self.genome.make_location(
+            coord_name=ref_record["name"],
+            start=record_start,
+            end=record_end,
+            strand=record_strand,
+            ensembl_coord=True,
+        )
 
         ref_location = self.parent.ref_location
         relative_start = ref_location.start - block_loc.start
@@ -226,15 +236,16 @@ class SyntenicRegion(LazyRecord):
             relative_start = len(block_loc) - relative_end
             relative_end = relative_start + len(ref_location)
 
-        aln_map, aln_loc = cigar.slice_cigar(self.cigar_line, relative_start,
-                                             relative_end, by_align=False)
+        aln_map, aln_loc = cigar.slice_cigar(
+            self.cigar_line, relative_start, relative_end, by_align=False
+        )
 
         self.aln_map = aln_map
         self.aln_loc = aln_loc
         region_loc = ref_location.copy()
         region_loc.strand = block_loc.strand
         region = self.genome.get_region(region=region_loc)
-        self._cached['region'] = region
+        self._cached["region"] = region
 
     def _make_map_from_ref(self):
         # this is the 'other' species
@@ -242,24 +253,27 @@ class SyntenicRegion(LazyRecord):
             return
 
         record = self._cached
-        aln_map, aln_loc = cigar.slice_cigar(self.cigar_line,
-                                             self.parent.cigar_start,
-                                             self.parent.cigar_end,
-                                             by_align=True)
+        aln_map, aln_loc = cigar.slice_cigar(
+            self.cigar_line,
+            self.parent.cigar_start,
+            self.parent.cigar_end,
+            by_align=True,
+        )
         if not aln_loc:
-            self._cached['region'] = self.NULL_VALUE
+            self._cached["region"] = self.NULL_VALUE
             return
 
         self.aln_map = aln_map
         self.aln_loc = aln_loc  # probably unnecesary to store??
 
         # we make a loc for the aligned region
-        block_loc = self.genome.make_location(coord_name=record['name'],
-                                              start=record['dnafrag_start'],
-                                              end=record['dnafrag_end'],
-                                              strand=record[
-            'dnafrag_strand'],
-            ensembl_coord=True)
+        block_loc = self.genome.make_location(
+            coord_name=record["name"],
+            start=record["dnafrag_start"],
+            end=record["dnafrag_end"],
+            strand=record["dnafrag_strand"],
+            ensembl_coord=True,
+        )
         relative_start = aln_loc[0]
         relative_end = aln_loc[1]
         # new location with correct length ensembl_start
@@ -272,14 +286,14 @@ class SyntenicRegion(LazyRecord):
             shift = relative_start
         loc = loc.shifted(shift)
         region = self.genome.get_region(region=loc)
-        self._cached['region'] = region
+        self._cached["region"] = region
 
     def _make_aligned(self, feature_types=None, where_feature=None):
         if self.aln_loc is None or self.aln_map is None:  # is this required?
             self._make_map_func()
-        region = self._cached['region']
+        region = self._cached["region"]
         if region is None:
-            self._cached['aligned_seq'] = None
+            self._cached["aligned_seq"] = None
             return
         if feature_types:
             seq = region.get_annotated_seq(feature_types, where_feature)
@@ -289,26 +303,25 @@ class SyntenicRegion(LazyRecord):
         # we get the seq objects to allow for copying of their annotations
         gapped_seq = Aligned(self.aln_map, seq)
 
-        self._cached['aligned_seq'] = gapped_seq
+        self._cached["aligned_seq"] = gapped_seq
 
     def _get_aligned_seq(self):
-        aligned = self._get_cached_value('aligned_seq', self._make_aligned)
+        aligned = self._get_cached_value("aligned_seq", self._make_aligned)
         return aligned
 
     aligned_seq = property(_get_aligned_seq)
 
     def get_annotated_aligned(self, feature_types, where_feature=None):
         """returns aligned seq annotated for the specified feature types"""
-        region = self._get_cached_value('region', self._make_map_func)
+        region = self._get_cached_value("region", self._make_map_func)
         if region is None:
             return None
-        self._make_aligned(feature_types=feature_types,
-                           where_feature=where_feature)
+        self._make_aligned(feature_types=feature_types, where_feature=where_feature)
         return self.aligned_seq
 
 
 class SyntenicRegions(_RelatedRegions):
-    type = 'syntenic_regions'
+    type = "syntenic_regions"
 
     def __init__(self, compara, members, ref_location, method_clade_id=None):
         super(SyntenicRegions, self).__init__()
@@ -319,12 +332,11 @@ class SyntenicRegions(_RelatedRegions):
         self.ref_location = ref_location
         for genome, data in members:
             if genome is ref_location.genome:
-                ref_member = SyntenicRegion(self, genome, dict(data),
-                                            am_ref_member=True,
-                                            location=ref_location)
+                ref_member = SyntenicRegion(
+                    self, genome, dict(data), am_ref_member=True, location=ref_location
+                )
             else:
-                mem = SyntenicRegion(self, genome, dict(data),
-                                     am_ref_member=False)
+                mem = SyntenicRegion(self, genome, dict(data), am_ref_member=False)
                 mems.append(mem)
 
         assert ref_member is not None, "Can't match a member to ref_location"
@@ -338,10 +350,9 @@ class SyntenicRegions(_RelatedRegions):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        display = ['%s:' % my_type]
-        display += ['  %r' % m.location for m in self.members
-                    if m.region is not None]
-        return '\n'.join(display)
+        display = ["%s:" % my_type]
+        display += ["  %r" % m.location for m in self.members if m.region is not None]
+        return "\n".join(display)
 
     def __repr__(self):
         return self.__str__()
@@ -350,8 +361,8 @@ class SyntenicRegions(_RelatedRegions):
         """near (don't actually get the sequence) completes construction of
         ref sequence"""
         self.ref_member._make_map_func()
-        self._cached['cigar_start'] = self.ref_member.aln_loc[0]
-        self._cached['cigar_end'] = self.ref_member.aln_loc[1]
+        self._cached["cigar_start"] = self.ref_member.aln_loc[0]
+        self._cached["cigar_end"] = self.ref_member.aln_loc[1]
 
     def _get_rc_state(self):
         """determines whether the ref_member strand is the same as that from
@@ -360,7 +371,7 @@ class SyntenicRegions(_RelatedRegions):
         if self._do_rc is not None:
             return self._do_rc
         self._populate_ref()
-        inferred = self.ref_member._cached['region'].location.strand
+        inferred = self.ref_member._cached["region"].location.strand
         self._do_rc = self.ref_location.strand != inferred
         return self._do_rc
 
@@ -370,17 +381,18 @@ class SyntenicRegions(_RelatedRegions):
         return self.cigar_end - self.cigar_start
 
     def _get_ref_start(self):
-        return self._get_cached_value('cigar_start', self._populate_ref)
+        return self._get_cached_value("cigar_start", self._populate_ref)
 
     cigar_start = property(_get_ref_start)
 
     def _get_ref_end(self):
-        return self._get_cached_value('cigar_end', self._populate_ref)
+        return self._get_cached_value("cigar_end", self._populate_ref)
 
     cigar_end = property(_get_ref_end)
 
-    def get_alignment(self, feature_types=None, where_feature=None,
-                      omit_redundant=True):
+    def get_alignment(
+        self, feature_types=None, where_feature=None, omit_redundant=True
+    ):
         """Arguments:
             - feature_types: annotations to be applied to the returned
               sequences
@@ -390,8 +402,7 @@ class SyntenicRegions(_RelatedRegions):
 
         for member in self.members:
             if feature_types:
-                seq = member.get_annotated_aligned(
-                    feature_types, where_feature)
+                seq = member.get_annotated_aligned(feature_types, where_feature)
             else:
                 seq = member.aligned_seq
             if seq is None:

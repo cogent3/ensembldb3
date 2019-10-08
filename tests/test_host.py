@@ -1,11 +1,11 @@
 import os
 
 from cogent3.util.unit_test import TestCase, main
-
+from ensembldb3.host import (DbConnection, HostAccount, get_db_name,
+                             get_ensembl_account, get_latest_release)
 from ensembldb3.name import EnsemblDbName
-from ensembldb3.host import get_db_name, get_latest_release,\
-    DbConnection, HostAccount, get_ensembl_account
 from ensembldb3.species import Species
+
 from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
@@ -17,23 +17,22 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
-if 'ENSEMBL_ACCOUNT' in os.environ:
-    args = os.environ['ENSEMBL_ACCOUNT'].split()
+if "ENSEMBL_ACCOUNT" in os.environ:
+    args = os.environ["ENSEMBL_ACCOUNT"].split()
     host, username, password = args[0:3]
     kwargs = {}
     if len(args) > 3:
-        kwargs['port'] = int(args[3])
+        kwargs["port"] = int(args[3])
     account = HostAccount(host, username, password, **kwargs)
 else:
     account = get_ensembl_account(release=ENSEMBL_RELEASE)
 
 
 class TestEnsemblDbName(TestCase):
-
     def test_cmp_name(self):
         """should validly compare names by attributes"""
-        n1 = EnsemblDbName('homo_sapiens_core_46_36h')
-        n2 = EnsemblDbName('homo_sapiens_core_46_36h')
+        n1 = EnsemblDbName("homo_sapiens_core_46_36h")
+        n2 = EnsemblDbName("homo_sapiens_core_46_36h")
         self.assertEqual(n1, n2)
 
     def test_name_without_build(self):
@@ -41,31 +40,30 @@ class TestEnsemblDbName(TestCase):
         n = EnsemblDbName("pongo_pygmaeus_core_49_1")
         self.assertEqual(n.prefix, "pongo_pygmaeus")
         self.assertEqual(n.type, "core")
-        self.assertEqual(n.build, '1')
+        self.assertEqual(n.build, "1")
 
     def test_species_with_three_words_name(self):
         """should correctly parse a db name that contains a three words species name"""
         n = EnsemblDbName("mustela_putorius_furo_core_70_1")
         self.assertEqual(n.prefix, "mustela_putorius_furo")
         self.assertEqual(n.type, "core")
-        self.assertEqual(n.build, '1')
+        self.assertEqual(n.build, "1")
 
     def test_ensemblgenomes_names(self):
         """correctly handle the ensemblgenomes naming system"""
-        n = EnsemblDbName('aedes_aegypti_core_5_58_1e')
-        self.assertEqual(n.prefix, 'aedes_aegypti')
-        self.assertEqual(n.type, 'core')
-        self.assertEqual(n.release, '5')
-        self.assertEqual(n.general_release, '58')
-        self.assertEqual(n.build, '1e')
-        n = EnsemblDbName('ensembl_compara_metazoa_6_59')
-        self.assertEqual(n.release, '6')
-        self.assertEqual(n.general_release, '59')
-        self.assertEqual(n.type, 'compara')
+        n = EnsemblDbName("aedes_aegypti_core_5_58_1e")
+        self.assertEqual(n.prefix, "aedes_aegypti")
+        self.assertEqual(n.type, "core")
+        self.assertEqual(n.release, "5")
+        self.assertEqual(n.general_release, "58")
+        self.assertEqual(n.build, "1e")
+        n = EnsemblDbName("ensembl_compara_metazoa_6_59")
+        self.assertEqual(n.release, "6")
+        self.assertEqual(n.general_release, "59")
+        self.assertEqual(n.type, "compara")
 
 
 class TestHostAccount(TestCase):
-
     def test_host_comparison(self):
         """instances with same host, account, database, port are equal"""
         h1 = HostAccount("ensembldb.ensembl.org", "anonymous", "", port=5306)
@@ -80,28 +78,29 @@ class TestHostAccount(TestCase):
 
 
 class TestDBconnects(TestCase):
-
     def test_get_ensembl_account(self):
         """return an HostAccount with correct port"""
-        for release in [48, '48', None]:
+        for release in [48, "48", None]:
             act_new = get_ensembl_account(release=ENSEMBL_RELEASE)
             self.assertEqual(act_new.port, 5306)
 
-        for release in [45, '45']:
+        for release in [45, "45"]:
             act_old = get_ensembl_account(release=45)
             self.assertEqual(act_old.port, 3306)
 
     def test_getdb(self):
         """should discover human entries correctly"""
-        for name, db_name in [("human", "homo_sapiens_core_49_36k"),
-                              ("mouse", "mus_musculus_core_49_37b"),
-                              ("rat", "rattus_norvegicus_core_49_34s"),
-                              ("platypus", "ornithorhynchus_anatinus_core_49_1f")]:
-            result = get_db_name(species=name, db_type="core", release='49')
+        for name, db_name in [
+            ("human", "homo_sapiens_core_49_36k"),
+            ("mouse", "mus_musculus_core_49_37b"),
+            ("rat", "rattus_norvegicus_core_49_34s"),
+            ("platypus", "ornithorhynchus_anatinus_core_49_1f"),
+        ]:
+            result = get_db_name(species=name, db_type="core", release="49")
             self.assertEqual(len(result), 1)
             result = result[0]
             self.assertEqual(result.name, db_name)
-            self.assertEqual(result.release, '49')
+            self.assertEqual(result.release, "49")
 
     def test_latest_release_number(self):
         """should correctly the latest release number"""
@@ -123,23 +122,22 @@ class TestDBconnects(TestCase):
         # that we only receive valid ones back
         available = get_db_name(release="46")
         for db in available:
-            self.assertEqual(db.release, '46')
+            self.assertEqual(db.release, "46")
 
     def test_active_connections(self):
         """connecting to a database on a specified server should be done once
         only, but same database on a different server should be done"""
-        ensembl_acct = get_ensembl_account(release='46')
-        engine1 = DbConnection(account=ensembl_acct,
-                               db_name="homo_sapiens_core_46_36h")
-        engine2 = DbConnection(account=ensembl_acct,
-                               db_name="homo_sapiens_core_46_36h")
+        ensembl_acct = get_ensembl_account(release="46")
+        engine1 = DbConnection(account=ensembl_acct, db_name="homo_sapiens_core_46_36h")
+        engine2 = DbConnection(account=ensembl_acct, db_name="homo_sapiens_core_46_36h")
         self.assertEqual(engine1, engine2)
 
     def test_pool_recycle_option(self):
         """excercising ability to specify a pool recycle option"""
-        ensembl_acct = get_ensembl_account(release='56')
-        engine1 = DbConnection(account=ensembl_acct,
-                               db_name="homo_sapiens_core_46_36h", pool_recycle=1000)
+        ensembl_acct = get_ensembl_account(release="56")
+        engine1 = DbConnection(
+            account=ensembl_acct, db_name="homo_sapiens_core_46_36h", pool_recycle=1000
+        )
 
 
 if __name__ == "__main__":
