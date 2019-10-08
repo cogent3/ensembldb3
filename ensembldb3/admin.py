@@ -130,6 +130,8 @@ def install_one_db(
     sqlfile = sqlfile[0]
     with open_(sqlfile, mode="rt") as infile:
         sql = infile.readlines()
+        sql = [l.rstrip("\n") for l in sql]
+
     sql = "\n".join(sql)
     # select the database
     if verbose or debug:
