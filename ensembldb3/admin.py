@@ -34,59 +34,31 @@ def listpaths(dirname, glob_pattern):
     return fns
 
 
-def InstallTable(
-    mysqlcfg, account, dbname, mysqlimport="mysqlimport", verbose=False, debug=False
-):
-    """returns a function that requires path to the db table
+def decompress_files(local_path):
+    """gunzip all the files in local_path"""
+    paths = pathlib.Path(local_path).glob("*.gz")
+    for path in paths:
+        r = exec_command(f"gunzip {path}")
+        if r != 0:
+            raise RuntimeError(f"failed to gunzip {path}")
 
-    Parameters
-    ----------
-    mysqlcfg : path
-      path to the mysql cfg file containing a mysqlimport section
-    account : HostAccount
-    dbname : str
-      name of the database
-    mysqlimport : str
-      path to mysqlimport
-    """
+
+def get_import_command(mysqlcfg, account, dbname, local_path, verbose=False):
     info = read_mysql_config(mysqlcfg, "mysqlimport", verbose=verbose)
-    command = info["command"] or r"mysqlimport --fields_escaped_by=\\"
+    command = info.get("command", r"mysqlimport --fields_escaped_by=\\")
     acct = r" -u %(user)s -p%(passwd)s "
     host = "" if info["host"] is None else r" -h %(host)s "
     port = "" if info["port"] is None else r" --port %(port)s "
-
-    cmnd_template = command + port + host + acct + " %(dbname)s -L %(tablename)s"
-    kwargs = dict(
+    opts = dict(
         host=info["host"] or account.host,
         user=info["user"] or account.user,
         passwd=info["passwd"] or account.passwd,
-        dbname=dbname,
         port=info["port"] or account.port,
     )
 
-    def install_table(tablename):
-        """installs a single table"""
-        if tablename.endswith(".gz"):
-            # gunzip
-            r = exec_command("gunzip %s" % tablename)
-        tablename = tablename.replace(".gz", "")
-        # then install
-        kwargs["tablename"] = tablename
-        if debug:
-            click.echo(str(kwargs))
-
-        cmnd = cmnd_template % kwargs
-        if debug:
-            click.echo(cmnd)
-
-        if verbose:
-            click.echo("  installing %s" % tablename)
-
-        exec_args = {} if not debug else dict(stderr=None, stdout=None)
-        r = exec_command(cmnd, **exec_args)
-        return r
-
-    return install_table
+    cmnd = command + port + host + acct + f" {dbname} {local_path}/{dbname}/*.txt"
+    cmnd = cmnd % opts
+    return cmnd
 
 
 def get_installed_checkpoint_path(local_path, dbname):
@@ -173,30 +145,16 @@ def install_one_db(
         click.echo()
         display_dbs_tables(cursor, dbname)
 
-    tablenames = listpaths(dbpath, "*.txt*")
-    tablenames_gzipped = listpaths(dbpath, "*.txt.gz")
-    # if uncompressed table exists, we'll remove it
-    if tablenames and tablenames_gzipped:
-        for name in tablenames_gzipped:
-            name = name[:-3]
-            if name in tablenames:
-                if verbose:
-                    click.echo("  WARN: Deleting %s, using compressed version" % name)
-                tablenames.remove(name)
-                os.remove(name)
-
+    decompress_files(dbpath)
+    tablenames = listpaths(dbpath, "*.txt")
     if debug:
         click.echo(str(tablenames))
 
-    install_table = InstallTable(
-        mysqlcfg, account, dbname, verbose=verbose, debug=debug
+    mysqlimport_command = get_import_command(
+        mysqlcfg, account, dbname, local_path, verbose=verbose
     )
-
-    # we do the table install in parallel
-    for r in map(install_table, tablenames):
-        pass
-
-    # existence of this file signals completion of the install without failure
+    r = exec_command(mysqlimport_command)
+    # existence of this checkpoint file signals completion of the install without failure
     checkpoint_file = get_installed_checkpoint_path(local_path, dbname)
     with open(checkpoint_file, "w") as checked:
         pass
