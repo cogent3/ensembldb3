@@ -1,8 +1,8 @@
 import configparser
 import os
+import pathlib
 import shutil
 from collections import defaultdict
-from glob import glob1
 from pprint import pprint
 
 import click
@@ -28,10 +28,9 @@ __status__ = "alpha"
 
 def listpaths(dirname, glob_pattern):
     """return path to all files matching glob_pattern"""
-    fns = glob1(dirname, glob_pattern)
+    fns = [str(p) for p in pathlib.Path(dirname).glob(glob_pattern)]
     if not fns:
         return None
-    fns = [os.path.join(dirname, fn) for fn in fns]
     return fns
 
 
