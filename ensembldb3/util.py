@@ -43,7 +43,7 @@ def open_(filename, mode="r"):
 
 def lftp_installed():
     """returns True if lftp installed"""
-    if sys.platform().lower() == "windows":
+    if sys.platform.lower() == "windows":
         raise RuntimeError("not supported on windows")
 
     r = subprocess.call(["which", "lftp"])
