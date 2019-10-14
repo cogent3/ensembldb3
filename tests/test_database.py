@@ -92,15 +92,15 @@ class TestDatabase(TestCase):
 
     def test_table_has_column(self):
         """return correct values for whether a Table has a column"""
-        vardb = Database(
+        coredb = Database(
             account=account,
             release=ENSEMBL_RELEASE,
             species="human",
-            db_type="variation",
+            db_type="core",
         )
 
-        self.assertTrue(vardb.table_has_column("variation", "evidence_attribs"))
-        self.assertFalse(vardb.table_has_column("variation", "validation_status"))
+        self.assertTrue(coredb.table_has_column("seq_region", "name"))
+        self.assertFalse(coredb.table_has_column("seq_region", "length"))
 
 
 if __name__ == "__main__":
