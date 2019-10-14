@@ -28,6 +28,7 @@ else:
 
 class TestDatabase(TestCase):
     def test_connect(self):
+        """connection should not fail"""
         human = Database(
             account=account, release=ENSEMBL_RELEASE, species="human", db_type="core"
         )
@@ -39,40 +40,36 @@ class TestDatabase(TestCase):
             account=account, release=ENSEMBL_RELEASE, species="human", db_type="core"
         )
         tn, tc = "gene", "biotype"
-        expected = set(
-            [
-                "protein_coding",
-                "pseudogene",
-                "processed_transcript",
-                "Mt_tRNA",
-                "Mt_rRNA",
-                "IG_V_gene",
-                "IG_J_gene",
-                "IG_C_gene",
-                "IG_D_gene",
-                "miRNA",
-                "misc_RNA",
-                "snoRNA",
-                "snRNA",
-                "rRNA",
-            ]
-        )
+        expected = {
+            "protein_coding",
+            "pseudogene",
+            "processed_transcript",
+            "Mt_tRNA",
+            "Mt_rRNA",
+            "IG_V_gene",
+            "IG_J_gene",
+            "IG_C_gene",
+            "IG_D_gene",
+            "miRNA",
+            "misc_RNA",
+            "snoRNA",
+            "snRNA",
+            "rRNA",
+        }
         got = set(db.get_distinct(tn, tc))
         self.assertNotEqual(set(got) & expected, set())
 
         db = Database(account=account, release=ENSEMBL_RELEASE, db_type="compara")
         got = set(db.get_distinct("homology", "description"))
-        expected = set(
-            [
-                "gene_split",
-                "alt_allele",
-                "other_paralog",
-                "ortholog_one2many",
-                "ortholog_one2one",
-                "within_species_paralog",
-                "ortholog_many2many",
-            ]
-        )
+        expected = {
+            "gene_split",
+            "alt_allele",
+            "other_paralog",
+            "ortholog_one2many",
+            "ortholog_one2one",
+            "within_species_paralog",
+            "ortholog_many2many",
+        }
         self.assertEqual(len(got & expected), len(expected))
 
     def test_get_table_row_counts(self):
@@ -93,10 +90,7 @@ class TestDatabase(TestCase):
     def test_table_has_column(self):
         """return correct values for whether a Table has a column"""
         coredb = Database(
-            account=account,
-            release=ENSEMBL_RELEASE,
-            species="human",
-            db_type="core",
+            account=account, release=ENSEMBL_RELEASE, species="human", db_type="core"
         )
 
         self.assertTrue(coredb.table_has_column("seq_region", "name"))
