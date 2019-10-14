@@ -36,19 +36,6 @@ class TestDatabase(TestCase):
     def test_get_distinct(self):
         """should return list of strings"""
         db = Database(
-            account=account,
-            release=ENSEMBL_RELEASE,
-            species="human",
-            db_type="variation",
-        )
-        tn, tc = "variation_feature", "consequence_types"
-        expected = set(
-            ("3_prime_UTR_variant", "splice_acceptor_variant", "5_prime_UTR_variant")
-        )
-        got = db.get_distinct(tn, tc)
-        self.assertNotEqual(set(got) & expected, set())
-
-        db = Database(
             account=account, release=ENSEMBL_RELEASE, species="human", db_type="core"
         )
         tn, tc = "gene", "biotype"

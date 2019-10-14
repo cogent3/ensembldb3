@@ -2,6 +2,7 @@ import os
 
 from cogent3 import DNA
 from cogent3.util.unit_test import TestCase, main
+from ensembldb3.database import Database
 from ensembldb3.genome import Genome
 from ensembldb3.host import HostAccount, get_ensembl_account
 from ensembldb3.sequence import _assemble_seq
@@ -87,6 +88,33 @@ class TestVariation(GenomeTestBase):
         )[0]
         self.cached_snps[name] = snp
         return snp
+
+    def test_get_distinct(self):
+        """should return list of strings"""
+        db = Database(
+            account=account,
+            release=ENSEMBL_RELEASE,
+            species="human",
+            db_type="variation",
+        )
+        tn, tc = "variation_feature", "consequence_types"
+        expected = set(
+            ("3_prime_UTR_variant", "splice_acceptor_variant", "5_prime_UTR_variant")
+        )
+        got = db.get_distinct(tn, tc)
+        self.assertNotEqual(set(got) & expected, set())
+
+    def test_table_has_column(self):
+        """return correct values for whether a Table has a column"""
+        vardb = Database(
+            account=account,
+            release=ENSEMBL_RELEASE,
+            species="human",
+            db_type="variation",
+        )
+
+        self.assertTrue(vardb.table_has_column("variation", "evidence_attribs"))
+        self.assertFalse(vardb.table_has_column("variation", "validation_status"))
 
     def test_variant(self):
         """variant attribute correctly constructed"""
