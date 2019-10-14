@@ -22,3 +22,4 @@ draw_results
 *taskpaper
 *.ipynb_checkpoints*
 *.sublime*
+*.pytest_cache*
