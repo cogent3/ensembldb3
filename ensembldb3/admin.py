@@ -39,8 +39,6 @@ def decompress_files(local_path):
     paths = pathlib.Path(local_path).glob("*.gz")
     for path in paths:
         r = exec_command(f"gunzip {path}")
-        if r != 0:
-            raise RuntimeError(f"failed to gunzip {path}")
 
 
 def get_import_command(mysqlcfg, account, dbname, local_path, verbose=False):
