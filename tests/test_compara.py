@@ -216,6 +216,7 @@ class TestSyntenicRegions(TestCase):
     comp = Compara(
         ["human", "chimp", "macaque"], account=account, release=ENSEMBL_RELEASE
     )
+    syntenic_args = dict(align_method="EPO", align_clade="primates")
 
     def test_correct_alignments(self):
         """should return the correct alignments"""
@@ -272,7 +273,6 @@ class TestSyntenicRegions(TestCase):
                 },
                 {
                     "Homo sapiens:chromosome:2:46345-46445:-1": "CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCGGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAGCGCGCCCCCGAACGAGC",
-                    "Macaca mulatta:chromosome:13:43921-44021:-1": "CTGCCACTCCAGCGCGTCTCCGCTGCACCCGGAGCGCCGGCCGGTCCATTCCCCGCGAGGATGCGCGCCCTGGCGGCCCTGAACACGTCGGCGAGAGAGC",
                     "Pan troglodytes:chromosome:2a:36792-36892:-1": "CTACCACTCGAGCGCGTCTCCGCTGGACCCGGAACCCCAGTCGGTCCATTCCCCGCGAAGATGCGCGCCCTGGCGGCCCTGAACGCGCCCCCGAACGAGC",
                 },
             ],
@@ -291,11 +291,9 @@ class TestSyntenicRegions(TestCase):
                 },
             ],
         ]
-        # print(self.comp.method_species_links)
         for coord, expect in coords_expected:
-            syntenic = list(
-                self.comp.get_syntenic_regions(method_clade_id=822, **coord)
-            )[0]
+            coord.update(self.syntenic_args)
+            syntenic = list(self.comp.get_syntenic_regions(**coord))[0]
             # check the slope computed from the expected and returned
             # coordinates is ~ 1
             got_names = dict(
