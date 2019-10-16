@@ -131,7 +131,7 @@ class TestGenome(GenomeTestBase):
             species="gorilla", release=ENSEMBL_RELEASE, account=account
         )
         gene = self.gorilla.get_gene_by_stableid("ENSGGOG00000005730")
-        self.assertEqual(str(gene.seq[:10]), "TGGGAGTCCA")
+        self.assertEqual(str(gene.seq[:10]), "TCCATGCGTG")
 
     def test_diff_strand_contig_chrom(self):
         """get correct sequence when contig and chromosome strands differ"""
@@ -139,10 +139,11 @@ class TestGenome(GenomeTestBase):
         cds = gene.canonical_transcript.cds
         self.assertEqual(
             str(cds),
-            "ATGGCCCAGGATCTCAGCGAGAAGGACCTGTTGAAGATG"
-            "GAGGTGGAGCAGCTGAAGAAAGAAGTGAAAAACACAAGAATTCCGATTTCCAAAGCGGGAAAGGAAAT"
-            "CAAAGAGTACGTGGAGGCCCAAGCAGGAAACGATCCTTTTCTCAAAGGCATCCCTGAGGACAAGAATC"
-            "CCTTCAAGGAGAAAGGTGGCTGTCTGATAAGCTGA",
+            "ATGGCCCAGGATCTCAGCGAGAAGGACCTGTTGAAGATGGAGGTGGAGCAGCTGAAGAAA"
+            "GAAGTGAAAAACACAAGAATTCCGATTTCCAAAGCGGGAAAGGAAATCAAAGAGTACGTG"
+            "GAGGCCCAAGCAGGAAACGATCCTTTTCTCAAAGGCATCCCTGAGGACAAGAATCCCTTC"
+            "AAGGAGAAAGGACCCACATTTAACGCCTTACTTCTTTTGCTGGGAAGAGCTTCTTGGTTG"
+            "GAGCTAACCCGGTCTAGGACACCATAG",
         )
 
     def test_get_distinct_biotype(self):
