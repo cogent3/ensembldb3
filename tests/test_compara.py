@@ -42,6 +42,9 @@ class ComparaTestBase(TestCase):
     comp = Compara(
         ["human", "mouse", "rat", "platypus"], release=ENSEMBL_RELEASE, account=account
     )
+    eutheria = Compara(
+        ["human", "mouse", "rat"], release=ENSEMBL_RELEASE, account=account
+    )
 
 
 class TestCompara(ComparaTestBase):
@@ -88,32 +91,28 @@ class TestCompara(ComparaTestBase):
 
     def test_getting_alignment(self):
         mid = "ENSMUSG00000017119"
-        nbr1 = self.comp.Mouse.get_gene_by_stableid(stableid=mid)
-        # print(nbr1)
+        nbr1 = self.eutheria.Mouse.get_gene_by_stableid(stableid=mid)
         ## previous test gene mouse brca2 doesn't have alignment to other species using PECAN since release 86.
         result = list(
-            self.comp.get_syntenic_regions(
+            self.eutheria.get_syntenic_regions(
                 region=nbr1, align_method="PECAN", align_clade="vertebrates"
             )
         )
         result = result[-1]
-        aln = result.get_alignment(feature_types="gene")
+        aln = result.get_alignment()
         # to improve test robustness across Ensembl releases, where alignment
         # coordinates change due to inclusion of new species, we search for
         # the mouse subseq and use the resulting coords to ensure we get the
         # same match as that from the Ensembl website
         mouse_name = [n for n in aln.names if "Mus musculus" in n][0]
-        start = aln.todict()[mouse_name].find("GCTTGTCCTCCAGAAGCCAC")
+        start = aln.to_dict()[mouse_name].find("ACAGGATCAGCTCAAGCAAA")
         sub_aln = aln[start : start + 20]
-        seqs = list(sub_aln.todict().values())
-        expect = set(
-            [
-                "GCTTGTCCTCCAGAACCCAT",  # human
-                "GCTTGTCCTCCAGAAGCCAC",  # mouse
-                "GCTTGTCCTCCAGAAGCCAC",  # rat
-                "GCTGAGCCTGCAGAGCCTGC",  # platypus
-            ]
-        )
+        seqs = list(sub_aln.to_dict().values())
+        expect = {
+            "GCATGATCAGCTCAAGCAAA",  # human
+            "ACAGGATCAGCTCAAGCAAA",  # mouse
+            "ATGGGATTAGCTCAAGCAAA",  # rat
+        }
         self.assertEqual(set(seqs), expect)
         self.assertTrue(len(aln) > 1000)
 
