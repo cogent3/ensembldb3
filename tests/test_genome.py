@@ -341,7 +341,7 @@ class TestGene(GenomeTestBase):
                 biotype="protein_coding", description="cancer"
             )
         )
-        self.assertTrue(len(results) > 50)
+        self.assertTrue(len(results) > 40)
 
     def test_get_gene_by_stable_id(self):
         """should correctly handle getting gene by stable_id"""
