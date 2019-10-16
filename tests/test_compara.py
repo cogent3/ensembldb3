@@ -145,14 +145,8 @@ class TestCompara(ComparaTestBase):
 
     def test_get_species_set(self):
         """should return the correct set of species"""
-        expect = set(
-            [
-                "Homo sapiens",
-                "Ornithorhynchus anatinus",
-                "Mus musculus",
-                "Rattus norvegicus",
-            ]
-        )
+        # from release 98, platypus has a one2many ortholog
+        expect = set(["Homo sapiens", "Mus musculus", "Rattus norvegicus"])
         brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
         Orthologs = self.comp.get_related_genes(
             gene_region=brca1, relationship="ortholog_one2one"
