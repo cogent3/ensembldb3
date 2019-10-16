@@ -73,7 +73,7 @@ def is_installed(local_path, dbname):
 
 def install_one_db(
     mysqlcfg,
-    cursor,
+    server,
     account,
     dbname,
     local_path,
@@ -105,6 +105,7 @@ def install_one_db(
     # select the database
     if verbose or debug:
         click.echo("  Creating table definitions for %s" % dbname)
+    cursor = server.cursor()
     r = cursor.execute("USE %s" % dbname)
     # make sure tables don't exist
     r = cursor.execute("SHOW TABLES")
@@ -143,6 +144,7 @@ def install_one_db(
         click.echo()
         display_dbs_tables(cursor, dbname)
 
+    cursor.close()
     decompress_files(dbpath)
     tablenames = listpaths(dbpath, "*.txt")
     if debug:
@@ -324,11 +326,7 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
     release, remote_path, local_path, species_dbs = read_config(configpath)
     content = os.listdir(local_path)
     cursor = server.cursor()
-    sql_for_speed = [
-        "SET FOREIGN_KEY_CHECKS=0;",
-        "SET AUTOCOMMIT=0;",
-        "SET UNIQUE_CHECKS=0;",
-    ]
+    sql_for_speed = ["SET FOREIGN_KEY_CHECKS=0;", "SET UNIQUE_CHECKS=0;"]
     cursor.execute("\n".join(sql_for_speed))
     cursor.close()
     dbnames = reduce_dirnames(content, species_dbs)
@@ -348,9 +346,10 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
         # now create dbname
         sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
         r = cursor.execute(sql)
+        cursor.close()
         install_one_db(
             mysqlcfg,
-            cursor,
+            server,
             account,
             dbname.name,
             local_path,
@@ -358,18 +357,13 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
             verbose=verbose,
             debug=debug,
         )
-        cursor.close()
 
     if debug:
         display_dbs(cursor, release)
         click.echo(server)
 
+    undo_sql_for_speed = ["SET FOREIGN_KEY_CHECKS=1;", "SET UNIQUE_CHECKS=1;"]
     cursor = server.cursor()
-    undo_sql_for_speed = [
-        "SET FOREIGN_KEY_CHECKS=1;",
-        "SET UNIQUE_CHECKS=1;",
-        "COMMIT;",
-    ]
     cursor.execute("\n".join(undo_sql_for_speed))
     cursor.close()
 
