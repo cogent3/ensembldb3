@@ -74,9 +74,7 @@ class TestCompara(ComparaTestBase):
     def test_get_related_genes3(self):
         """should get all relationships if relationship is not specified"""
         stableid = "ENSG00000244734"
-        expect = set(
-            ["within_species_paralog", "ortholog_many2many", "ortholog_one2many"]
-        )
+        expect = set(["within_species_paralog", "other_paralog"])
         orthologs = self.comp.get_related_genes(stableid=stableid)
         got = set([ortholog.relationship for ortholog in orthologs])
         self.assertEqual(got, expect)
