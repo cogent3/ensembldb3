@@ -74,7 +74,7 @@ class TestCompara(ComparaTestBase):
     def test_get_related_genes3(self):
         """should get all relationships if relationship is not specified"""
         stableid = "ENSG00000244734"
-        expect = set(["within_species_paralog", "other_paralog"])
+        expect = {"within_species_paralog", "other_paralog"}
         orthologs = self.comp.get_related_genes(stableid=stableid)
         got = set([ortholog.relationship for ortholog in orthologs])
         self.assertEqual(got, expect)
@@ -146,7 +146,7 @@ class TestCompara(ComparaTestBase):
     def test_get_species_set(self):
         """should return the correct set of species"""
         # from release 98, platypus has a one2many ortholog
-        expect = set(["Homo sapiens", "Mus musculus", "Rattus norvegicus"])
+        expect = {"Homo sapiens", "Mus musculus", "Rattus norvegicus"}
         brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
         Orthologs = self.comp.get_related_genes(
             gene_region=brca1, relationship="ortholog_one2one"
@@ -178,14 +178,12 @@ class TestCompara(ComparaTestBase):
         sub_species = comp.get_species_tree(just_members=True)
         self.assertEqual(
             set(sub_species.get_tip_names()),
-            set(
-                [
-                    "Homo sapiens",
-                    "Rattus norvegicus",
-                    "Canis familiaris",
-                    "Ornithorhynchus anatinus",
-                ]
-            ),
+            {
+                "Homo sapiens",
+                "Rattus norvegicus",
+                "Canis familiaris",
+                "Ornithorhynchus anatinus",
+            },
         )
         # topology should match current topology belief
         expect = LoadTree(
@@ -332,7 +330,7 @@ class TestSyntenicRegions(TestCase):
             self.comp.get_syntenic_regions(region=region, **self.syntenic_args)
         )[0]
         species = syntenic.get_species_set()
-        self.assertEqual(species, set(["Homo sapiens", "Pan troglodytes"]))
+        self.assertEqual(species, {"Homo sapiens", "Pan troglodytes"})
 
 
 if __name__ == "__main__":
