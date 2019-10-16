@@ -78,7 +78,7 @@ class EnsemblDbName(object):
         self.release = release
         self.general_release = self.release
 
-        if len(build) == 1:
+        if build and len(build) == 1:
             if self.type != "compara":
                 self.build = build[0]
             else:
