@@ -327,11 +327,9 @@ class TestSyntenicRegions(TestCase):
 
     def test_syntenic_species_missing(self):
         """should not fail when a compara species has no syntenic region"""
-        gene = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000104827")
+        region = self.comp.Human.get_region(coord_name=2, start=46345, end=46445)
         syntenic = list(
-            self.comp.get_syntenic_regions(
-                region=gene.canonical_transcript, method_clade_id=830
-            )
+            self.comp.get_syntenic_regions(region=region, **self.syntenic_args)
         )[0]
         species = syntenic.get_species_set()
         self.assertEqual(species, set(["Homo sapiens", "Pan troglodytes"]))
