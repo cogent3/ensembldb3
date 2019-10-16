@@ -57,9 +57,9 @@ class MZ_Genome(TestCase):
         rel_gt_65 = Genome(
             "D.melanogaster", release=ENSEMBL_GENOMES_RELEASE, account=account
         )
-        self.assertEqual(rel_gt_65.general_release, 89)
+        self.assertEqual(rel_gt_65.general_release, 98)
         self.assertEqual(
-            rel_gt_65.CoreDb.db_name.name, "drosophila_melanogaster_core_36_89_6"
+            rel_gt_65.CoreDb.db_name.name, "drosophila_melanogaster_core_45_98_7"
         )
 
 
