@@ -80,7 +80,7 @@ Get genomic alignment for the *BRCA2* gene region. We can specify the alignment 
     >>> aln
     3 x 99492 dna alignment: Homo sapiens:chromosome:13:32315473-32400266:1[GGGCTTGTGGC...], Pan troglodytes:chromosome:13:31957346-32041418:1[GGGCTTGTGGC...], Macaca mulatta:chromosome:17:11686607-11779396:1[GGGCTTGTGGC...]
 
-A PyCogent3 annotated alignment object is returned. This can be queried to get annotations corresponding to specific features, or for masking those features, etc.. See the PyCogent3 documentation for more information on `using annotations <http://cogent3.readthedocs.io/en/latest/examples/complete_seq_features.html>`_.
+A Cogent3 annotated alignment object is returned. This can be queried to get annotations corresponding to specific features, or for masking those features, etc.. See the Cogent3 documentation for more information on `using annotations <http://cogent3.readthedocs.io/en/latest/examples/complete_seq_features.html>`_.
 
 .. doctest::
     

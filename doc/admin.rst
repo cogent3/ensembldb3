@@ -75,6 +75,8 @@ If you wish to use the contents of this directory you can create an environment 
 ``ensembldb3 download``
 =======================
 
+This capability relies on the `lftp <http://lftp.yar.ru/>`_ client. This can be installed on linux using conventional package managers, and on MacOS using `conda`.
+
 The command::
     
     $ ensembldb3 download -c /path/to/edited/ensembldb_download.cfg -n 3
@@ -96,9 +98,9 @@ For the very large databases (e.g. compara or human variation) the download time
 
 The command::
     
-    $ ensembldb3 install -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg -n 3
+    $ ensembldb3 install -c /path/to/edited/ensembldb_download.cfg -m /path/to/mysql.cfg
     
-installs databases specified in the ``ensembldb_download.cfg`` config, into the mysql server specified by ``mysql.cfg``. In this instance, 3 processors are used for separate gzipping and ``mysqlimport`` of tables in parallel.
+installs databases specified in the ``ensembldb_download.cfg`` config, into the mysql server specified by ``mysql.cfg``. If you wish to use multiple threads for importing the data, this is done via editing the ``--use-threads=4`` in the ``mysql.cfg`` file (see the example provided).
 
 For the very large databases (e.g. compara or human variation) the install times can be very long. In which case we recommend, if running on a server, using the ``nohup`` command.
 
@@ -131,7 +133,7 @@ The command::
 
     $ ensembldb3 status -c /path/to/edited/ensembldb_download.cfg
 
-will display the download/install status of the databases specified by ``ensembldb_download.cfg``.
+will display the download/install status of the databases specified by ``ensembldb_download.cfg``. This command just checks whether ``ENSEMBLDB_DOWNLOADED`` and ``ENSEMBLDB_INSTALLED`` files exist.
 
 Trouble shooting
 ================
