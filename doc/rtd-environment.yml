@@ -1,0 +1,14 @@
+name: edb3
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.7
+  - pandoc
+  - pip:
+    - numpy
+    - numpydoc
+    - tqdm
+    - scitrack
+    - sphinx>=1.6
+    - sphinxcontrib-bibtex
+    - sphinx_rtd_theme
