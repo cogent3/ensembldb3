@@ -4,7 +4,7 @@ ensembldb3
 
 This library provides capabilities for querying Ensembl MySQL databases and for "administering" them. ``ensembldb3`` is compatible with a range of Ensembl releases.
 
-``ensembldb3`` began it's existence in 2009 as ``cogent.db.ensembl``, a part of PyCogent. With the port of PyCogent to Python 3 (resulting in `PyCogent3 <https://bitbucket.org/pycogent3/cogent3>`_), it was decided to split the Ensembl querying code out into it's own project. This makes it easier to add new features and makes the project more visible to users.
+``ensembldb3`` began it's existence in 2009 as ``cogent.db.ensembl``, a part of PyCogent. With the port of PyCogent to Python 3 (resulting in `cogent3 <https://github.com/cogent3/cogent3>`_), it was decided to split the Ensembl querying code out into it's own project. This makes it easier to add new features and makes the project more visible to users.
 
 ************
 Installation
@@ -12,12 +12,9 @@ Installation
 
 ``ensembldb3`` requires python 3.5+. Installation via pip into virtualenv's or conda environments (via pip) has been tested and is described below.
 
-Because the PyCogent3 dependency requires numpy be installed prior to installation, the following steps are recommended.
-
 ::
 
-    $ pip install numpy
-    $ pip install hg+ssh://hg@bitbucket.org/pycogent3/ensembldb3
+    $ pip install git+http://github.com/cogent3/ensembldb3.git
 
 *************
 Documentation

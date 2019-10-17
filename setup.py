@@ -29,7 +29,7 @@ Version %s.
 setup(
     name="ensembldb3",
     version=__version__,
-    url="http://github.com/pycogent/pycogent",
+    url="https://github.com/cogent3/ensembldb3",
     author="Gavin Huttley, Hua Ying",
     author_email="gavin.huttley@anu.edu.au",
     description=short_description,
@@ -46,7 +46,7 @@ setup(
             "Operating System :: OS Independent",
             ],
     packages=['ensembldb3'],
-    dependency_links=['ssh://hg@bitbucket.org/pycogent3/pycogent3'],
+    dependency_links=['ssh://git@github.com:cogent3/cogent3.git'],
     install_requires=[
               'numpy',
               'cogent3',
