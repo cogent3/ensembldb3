@@ -132,7 +132,7 @@ class TestCompara(ComparaTestBase):
         start = 100000
         end = start + 100000
         related = list(
-            self.comp.get_syntenic_regions(
+            self.eutheria.get_syntenic_regions(
                 species="mouse",
                 coord_name="1",
                 start=start,
