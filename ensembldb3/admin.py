@@ -6,7 +6,6 @@ from collections import defaultdict
 from pprint import pprint
 
 import click
-
 from cogent3 import LoadTable
 from cogent3.util import parallel
 
