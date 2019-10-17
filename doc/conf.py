@@ -11,7 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -22,28 +23,28 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.todo', 'sphinx.ext.doctest', 'sphinx.ext.pngmath']
+extensions = ["sphinx.ext.todo", "sphinx.ext.doctest", "sphinx.ext.mathjax"]
 
 # todo_include_todos = True # to expose the TODOs
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['templates']
+templates_path = ["templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # ignore the cookbook/ensembl.rst file as it's specifically imported
-exclude_patterns = ['cookbook/ensembl.rst']
+exclude_patterns = ["cookbook/ensembl.rst"]
 
 # The encoding of source files.
 # source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = u'EnsemblDb3'
-copyright = u'2016, EnsemblDb3 Team'
+project = u"EnsemblDb3"
+copyright = u"2016, EnsemblDb3 Team"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -69,7 +70,7 @@ release = "3.0.a1"
 
 # List of directories, relative to source directory, that shouldn't be searched
 # for source files.
-exclude_trees = ['_build']
+exclude_trees = ["_build"]
 # exclude_trees = ['_build', 'cookbook'] # comment out after release
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -87,7 +88,7 @@ exclude_trees = ['_build']
 show_authors = True
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -95,11 +96,12 @@ pygments_style = 'sphinx'
 
 # -- Options for HTML output ---------------------------------------------------
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
+
+    html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 
@@ -168,7 +170,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'EnsemblDbDoc'
+htmlhelp_basename = "EnsemblDbDoc"
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -182,8 +184,7 @@ htmlhelp_basename = 'EnsemblDbDoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ensembldb3.tex', u'PyCogent Documentation',
-   u'EnsemblDb Team', 'manual'),
+    ("index", "ensembldb3.tex", u"PyCogent Documentation", u"EnsemblDb Team", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
