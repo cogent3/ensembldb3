@@ -1,4 +1,5 @@
 from cogent3.util.unit_test import TestCase, main
+
 from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"

@@ -1,5 +1,4 @@
 import sqlalchemy as sql
-
 from cogent3 import DNA
 from cogent3.core.location import Map
 

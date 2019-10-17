@@ -1,6 +1,7 @@
 import os
 
 from cogent3.util.unit_test import TestCase, main
+
 from ensembldb3.database import Database
 from ensembldb3.host import HostAccount, get_ensembl_account
 
