@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import sqlalchemy as sql
+
 from cogent3 import DNA
 from cogent3.core.alignment import Aligned, Alignment, SequenceCollection
 from cogent3.core.tree import PhyloNode

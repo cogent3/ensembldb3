@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sqlalchemy as sql
+
 from cogent3.util.table import Table
 
 from .assembly import CoordSystem

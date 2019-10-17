@@ -1,9 +1,10 @@
 from collections import defaultdict
 
 import sqlalchemy as sql
+from numpy import empty
+
 from cogent3.core.tree import PhyloNode
 from cogent3.util.table import Table
-from numpy import empty
 
 from .assembly import location_query
 from .database import Database
