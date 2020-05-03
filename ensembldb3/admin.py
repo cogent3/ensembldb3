@@ -7,7 +7,7 @@ from pprint import pprint
 
 import click
 
-from cogent3 import LoadTable
+from cogent3 import make_table
 from cogent3.util import parallel
 
 from . import HostAccount
@@ -460,7 +460,7 @@ def status(configpath):
         ]
         rows.append(row)
 
-    table = LoadTable(
+    table = make_table(
         header=["dbname", "Downloaded", "Installed"],
         rows=rows,
         title="Status of download and install",
