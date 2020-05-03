@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 import sqlalchemy as sql
-
 from cogent3.util import table as cogent_table
 
 from .host import DbConnection, get_db_name
@@ -135,7 +134,7 @@ class Database(object):
             count = table.count().execute().fetchone()[0]
             rows.append(["%s.%s" % (self.db_name, name), count])
 
-        return cogent_table.Table(header=["name", "count"], rows=rows)
+        return cogent_table.Table(header=["name", "count"], data=rows)
 
 
 # used to store commonly looked up attribs

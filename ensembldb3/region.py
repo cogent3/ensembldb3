@@ -1,7 +1,6 @@
 import sys
 
 import sqlalchemy as sql
-
 from cogent3 import DNA
 from cogent3.core.annotation import Feature
 from cogent3.core.location import Map
@@ -1308,7 +1307,7 @@ class Variation(_Region):
             self._cached[("allele_freqs")] = self.NULL_VALUE
             return
 
-        table = Table(header=["allele", "freq", sample_id], rows=data)
+        table = Table(header=["allele", "freq", sample_id], data=data)
         self._cached[("allele_freqs")] = table.sorted([sample_id, "allele"])
 
     def _get_allele_freqs(self):
