@@ -1,6 +1,6 @@
 import os
 
-from cogent3 import LoadTree
+from cogent3 import load_tree, make_tree
 from cogent3.util.unit_test import TestCase, main
 from ensembldb3.compara import Compara
 from ensembldb3.host import HostAccount, get_ensembl_account
@@ -162,7 +162,7 @@ class TestCompara(ComparaTestBase):
             )
         )
         t = paras[0].get_tree()
-        expect = LoadTree("data/HBB_gene_tree.nh")
+        expect = load_tree("data/HBB_gene_tree.nh")
         expect = expect.get_sub_tree(t.get_tip_names(), ignore_missing=True)
         self.assertTrue(expect.same_topology(t))
 
@@ -186,7 +186,7 @@ class TestCompara(ComparaTestBase):
             },
         )
         # topology should match current topology belief
-        expect = LoadTree(
+        expect = make_tree(
             treestring="(((Homo_sapiens,Rattus_norvegicus),"
             "Canis_familiaris),Ornithorhynchus_anatinus)",
             underscore_unmunge=True,
@@ -197,7 +197,7 @@ class TestCompara(ComparaTestBase):
         # but taxon names are customised in what they put up on
         # the web-site, so need a better test.
         sptree = comp.get_species_tree(just_members=False)
-        expect = LoadTree("data/ensembl_all_species.nh", underscore_unmunge=True)
+        expect = load_tree("data/ensembl_all_species.nh", underscore_unmunge=True)
         self.assertTrue(len(sptree.get_tip_names()) > len(expect.get_tip_names()))
 
     def test_pool_connection(self):
