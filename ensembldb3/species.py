@@ -74,7 +74,7 @@ class SpeciesNameMap(dict):
         display = str(
             Table(
                 ["Common name", "Species name", "Ensembl Db Prefix", "Synonymns"],
-                rows=rows,
+                data=rows,
                 space=2,
             ).sorted()
         )

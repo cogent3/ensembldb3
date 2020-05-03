@@ -1,8 +1,8 @@
 from collections import defaultdict
 
-import sqlalchemy as sql
 from numpy import empty
 
+import sqlalchemy as sql
 from cogent3.core.tree import PhyloNode
 from cogent3.util.table import Table
 
@@ -248,9 +248,9 @@ class Compara(object):
 
         t = Table(
             header=header,
-            rows=rows,
+            data=rows,
             space=2,
-            row_ids=True,
+            index="method_link_species_set_id",
             title="Align Methods/Clades",
         )
         self._method_species_link = t
