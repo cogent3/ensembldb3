@@ -368,7 +368,7 @@ class Compara(object):
             return None
 
         gene_set = sql.select(
-            [member_table, homology_member_table.c.homology_id],
+            [member_table.c.gene_member_id, member_table.c.stable_id, member_table.c.dnafrag_strand, member_table.c.genome_db_id, homology_member_table.c.homology_id],
             sql.and_(
                 member_table.c[mem_id].in_(list(ortholog_ids.keys())),
                 member_table.c.genome_db_id.in_(list(self._dbid_genome_map.keys())),
