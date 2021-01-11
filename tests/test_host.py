@@ -102,8 +102,8 @@ class TestDBconnects(TestCase):
             self.assertEqual(result.release, "49")
 
     def test_latest_release_number(self):
-        """should correctly the latest release number"""
-        self.assertGreater(get_latest_release(), "53")
+        """should correctly identify the latest release number"""
+        self.assertGreater(int(get_latest_release()), 53)
 
     def test_get_all_available(self):
         """should return a listing of all the available databases on the
