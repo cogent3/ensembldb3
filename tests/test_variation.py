@@ -217,7 +217,7 @@ class TestVariation(GenomeTestBase):
     def test_variation_seq(self):
         """should return the sequence for a Variation snp if asked"""
         snp = self._get_snp(self.snp_names[0])
-        self.assertContains(snp.alleles, str(snp.seq))
+        self.assertIn(str(snp.seq), snp.alleles)
 
     def test_get_validation_condition(self):
         """simple test of SNP validation status"""
