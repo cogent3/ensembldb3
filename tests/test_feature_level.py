@@ -1,8 +1,6 @@
 import os
+from unittest import TestCase, main
 
-from cogent3 import DNA
-from cogent3.util.unit_test import TestCase, main
-from ensembldb3.assembly import Coordinate, CoordSystem, get_coord_conversion
 from ensembldb3.feature_level import FeatureCoordLevels
 from ensembldb3.genome import Genome
 from ensembldb3.host import HostAccount, get_ensembl_account

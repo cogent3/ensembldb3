@@ -1,10 +1,10 @@
 import os
 import shutil
 from configparser import ConfigParser
+from unittest import TestCase, main
 
 from click.testing import CliRunner
 
-from cogent3.util.unit_test import TestCase, main
 from ensembldb3.admin import (ENSEMBLDBRC, download, drop, exportrc,
                               get_installed_checkpoint_path, install, show)
 from ensembldb3.download import get_download_checkpoint_path

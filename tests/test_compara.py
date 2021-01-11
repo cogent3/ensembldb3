@@ -1,7 +1,9 @@
 import os
+from unittest import TestCase, main
 
 from cogent3 import load_tree, make_tree
-from cogent3.util.unit_test import TestCase, main
+from numpy.testing import assert_allclose
+
 from ensembldb3.compara import Compara
 from ensembldb3.host import HostAccount, get_ensembl_account
 
@@ -310,7 +312,7 @@ class TestSyntenicRegions(TestCase):
                 exp_start, exp_end = list(map(int, exp_names[species][3].split("-")))
                 got_start, got_end = list(map(int, got_names[species][3].split("-")))
                 slope = calc_slope(exp_start, exp_end, got_start, got_end)
-                self.assertFloatEqual(abs(slope), 1.0, eps=1e-3)
+                assert_allclose(abs(slope), 1.0, atol=1e-3)
 
     def test_failing_region(self):
         """should correctly handle queries where multiple Ensembl have

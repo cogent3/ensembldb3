@@ -1,9 +1,8 @@
 import os
 from collections import defaultdict
 
-from pkg_resources import resource_filename
-
 from cogent3.util.table import Table
+from pkg_resources import resource_filename
 
 from .util import ENSEMBLDBRC, CaseInsensitiveString
 

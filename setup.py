@@ -19,16 +19,21 @@ __status__ = "Production"
 # Check Python version, no point installing if unsupported version inplace
 if sys.version_info < (3, 6):
     py_version = ".".join([str(n) for n in sys.version_info])
-    raise RuntimeError("Python-3.5 or greater is required, Python-%s used." % py_version)
+    raise RuntimeError(
+        "Python-3.6 or greater is required, Python-%s used." % py_version
+    )
 
 
 short_description = "Ensembl DB"
 
 # This ends up displayed by the installer
-long_description = """ensembldb3
+long_description = (
+    """ensembldb3
 A toolkit for querying the Ensembl MySQL databases.
 Version %s.
-""" % __version__
+"""
+    % __version__
+)
 
 setup(
     name="ensembldb3",
@@ -42,27 +47,27 @@ setup(
     license=["BSD"],
     keywords=["biology", "genomics", "bioinformatics"],
     classifiers=[
-            "Development status :: 5 - Production/Stable",
-            "Intended Audience :: Science/Research",
-            "License :: OSI Approved :: BSD",
-            "Topic :: Scientific/Engineering :: Bio-Informatics",
-            "Topic :: Software Development :: Libraries :: Python Modules",
-            "Operating System :: OS Independent",
-            ],
-    packages=['ensembldb3'],
-    dependency_links=['ssh://git@github.com:cogent3/cogent3.git'],
-    install_requires=[
-              'numpy',
-              'cogent3',
-              'click',
-              'PyMySQL',
-              'sqlalchemy'],
+        "Development status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Operating System :: OS Independent",
+    ],
+    packages=["ensembldb3"],
+    dependency_links=["ssh://git@github.com:cogent3/cogent3.git"],
+    install_requires=["numpy", "cogent3", "click", "PyMySQL", "sqlalchemy"],
     entry_points={
-        'console_scripts': ['ensembldb3=ensembldb3.admin:main',
-                            ],
+        "console_scripts": [
+            "ensembldb3=ensembldb3.admin:main",
+        ],
     },
-    package_dir={'ensembldb3': 'ensembldb3'},
-    package_data={'ensembldb3' : ['data/ensembldb_download.cfg',
-                                  'data/mysql.cfg',
-                                  'data/species.tsv']}
+    package_dir={"ensembldb3": "ensembldb3"},
+    package_data={
+        "ensembldb3": [
+            "data/ensembldb_download.cfg",
+            "data/mysql.cfg",
+            "data/species.tsv",
+        ]
+    },
 )

@@ -1,10 +1,9 @@
 from collections import defaultdict
 
-from numpy import empty
-
 import sqlalchemy as sql
 from cogent3.core.tree import PhyloNode
 from cogent3.util.table import Table
+from numpy import empty
 
 from .assembly import location_query
 from .database import Database
@@ -368,7 +367,13 @@ class Compara(object):
             return None
 
         gene_set = sql.select(
-            [member_table.c.gene_member_id, member_table.c.stable_id, member_table.c.dnafrag_strand, member_table.c.genome_db_id, homology_member_table.c.homology_id],
+            [
+                member_table.c.gene_member_id,
+                member_table.c.stable_id,
+                member_table.c.dnafrag_strand,
+                member_table.c.genome_db_id,
+                homology_member_table.c.homology_id,
+            ],
             sql.and_(
                 member_table.c[mem_id].in_(list(ortholog_ids.keys())),
                 member_table.c.genome_db_id.in_(list(self._dbid_genome_map.keys())),
@@ -496,7 +501,7 @@ class Compara(object):
               the method_species_links attribute of this object.
             - method_clade_id: over-rides align_method/align_clade. The entry
               in method_species_links under method_link_species_set_id
-              """
+        """
         assert (
             align_method and align_clade
         ) or method_clade_id, (

@@ -393,9 +393,9 @@ class SyntenicRegions(_RelatedRegions):
         self, feature_types=None, where_feature=None, omit_redundant=True
     ):
         """Arguments:
-            - feature_types: annotations to be applied to the returned
-              sequences
-            - omit_redundant: exclude redundant gap positions"""
+        - feature_types: annotations to be applied to the returned
+          sequences
+        - omit_redundant: exclude redundant gap positions"""
         seqs = []
         annotations = {}
 
