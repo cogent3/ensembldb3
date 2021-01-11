@@ -54,7 +54,7 @@ class TestGenome(GenomeTestBase):
             feature_types="est", coord_name=6, start=99994000, end=100076519
         )
         stable_ids = [est.stableid for est in ests]
-        self.assertContains(stable_ids, direct.stableid)
+        self.assertIn(direct.stableid, stable_ids)
 
     def test_genome_comparison(self):
         """different genome instances with same CoreDb connection are equal"""
@@ -159,12 +159,12 @@ class TestGene(GenomeTestBase):
         self.assertEqual(brca2.symbol.lower(), "brca2")
         self.assertEqual(brca2.stableid, "ENSG00000139618")
         self.assertEqual(brca2.biotype.lower(), "protein_coding")
-        self.assertContains(brca2.description.lower(), "dna repair associated")
+        self.assertIn("dna repair associated", brca2.description.lower())
         if ENSEMBL_RELEASE < 90:
             self.assertEqual(brca2.status, "KNOWN")
         self.assertEqual(brca2.canonical_transcript.stableid, "ENST00000380152")
         # note length can change between genome builds
-        self.assertGreaterThan(len(brca2), 83700)
+        self.assertGreater(len(brca2), 83700)
         transcript = brca2.get_member("ENST00000544455")
         self.assertEqual(transcript.get_cds_length(), len(transcript.cds))
 
@@ -321,7 +321,7 @@ class TestGene(GenomeTestBase):
         # we check we got Exon in the first call and TranslatedExon in the
         # second using the fact that the exons entry is longer than the
         # translated_exons one
-        self.assertGreaterThan(len(exon), len(trans_exon))
+        self.assertGreater(len(exon), len(trans_exon))
 
     def test_get_by_biotype(self):
         results = list(self.human.get_genes_matching(biotype="Mt_tRNA", like=False))
@@ -486,7 +486,7 @@ class TestFeatures(GenomeTestBase):
             end=901867,
             limit=5,
         )
-        for region in regions:
+        for _ in regions:
             pass
 
     def test_repeats(self):
@@ -500,7 +500,7 @@ class TestFeatures(GenomeTestBase):
         loc = self.igf2.location.resized(-1000, 1000)
         genes = self.human.get_features(region=loc, feature_types="gene")
         symbols = [g.symbol.lower() for g in genes]
-        self.assertContains(symbols, self.igf2.symbol.lower())
+        self.assertIn(self.igf2.symbol.lower(), symbols)
 
     def test_other_genes(self):
         """docstring for est_other_genes"""
