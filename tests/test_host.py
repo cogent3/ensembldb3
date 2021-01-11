@@ -1,6 +1,6 @@
 import os
+from unittest import TestCase, main
 
-from cogent3.util.unit_test import TestCase, main
 from ensembldb3.host import (DbConnection, HostAccount, get_db_name,
                              get_ensembl_account, get_latest_release)
 from ensembldb3.name import EnsemblDbName
