@@ -1,13 +1,9 @@
 import os
 from unittest import TestCase, main
 
-from cogent3 import DNA
-
 from ensembldb3.database import Database
 from ensembldb3.genome import Genome
 from ensembldb3.host import HostAccount, get_ensembl_account
-from ensembldb3.sequence import _assemble_seq
-from ensembldb3.util import asserted_one, convert_strand
 
 from . import ENSEMBL_RELEASE
 

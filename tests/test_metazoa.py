@@ -1,7 +1,7 @@
 from unittest import TestCase, main
 
 from ensembldb3.compara import Compara, Genome
-from ensembldb3.host import HostAccount, get_ensembl_account
+from ensembldb3.host import HostAccount
 
 from . import ENSEMBL_GENOMES_RELEASE
 
