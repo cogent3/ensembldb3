@@ -18,7 +18,7 @@ class TestAdminCli(TestCase):
 
         def exec_show(mysql_cfg, release):
             runner = CliRunner()
-            r = runner.invoke(show, ["-r%s" % release, "-m%s" % mysql_cfg])
+            r = runner.invoke(show, [f"-r{release}", f"-m{mysql_cfg}"])
             self.assertEqual(r.exit_code, 0)
             return r
 
@@ -45,7 +45,7 @@ class TestAdminCli(TestCase):
 
         # now download
         runner = CliRunner()
-        r = runner.invoke(download, ["-c%s" % download_cfg])
+        r = runner.invoke(download, [f"-c{download_cfg}"])
         # make sure the download checkpoint file exists
         dirnames = [
             dn
@@ -73,7 +73,7 @@ class TestAdminCli(TestCase):
         runner = CliRunner()
         r = runner.invoke(
             install,
-            ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+            [f"-c{download_cfg}", f"-m{test_mysql_cfg}"],
             catch_exceptions=False,
         )
         if r.exit_code != 0:
@@ -93,7 +93,7 @@ class TestAdminCli(TestCase):
         runner = CliRunner()
         r = runner.invoke(
             drop,
-            ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+            [f"-c{download_cfg}", f"-m{test_mysql_cfg}"],
             catch_exceptions=False,
             input="n",
         )
@@ -106,7 +106,7 @@ class TestAdminCli(TestCase):
         runner = CliRunner()
         r = runner.invoke(
             drop,
-            ["-c%s" % download_cfg, "-m%s" % test_mysql_cfg],
+            [f"-c{download_cfg}", f"-m{test_mysql_cfg}"],
             catch_exceptions=False,
             input="y",
         )
@@ -123,7 +123,7 @@ class TestAdminCli(TestCase):
         if os.path.exists(self.dirname):
             shutil.rmtree(self.dirname)
 
-        r = runner.invoke(exportrc, ["-o%s" % self.dirname])
+        r = runner.invoke(exportrc, [f"-o{self.dirname}"])
         self.assertEqual(r.exit_code, 0)
         fnames = os.listdir(self.dirname)
         self.assertTrue("species.tsv" in fnames)

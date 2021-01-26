@@ -19,21 +19,16 @@ __status__ = "Production"
 # Check Python version, no point installing if unsupported version inplace
 if sys.version_info < (3, 6):
     py_version = ".".join([str(n) for n in sys.version_info])
-    raise RuntimeError(
-        "Python-3.6 or greater is required, Python-%s used." % py_version
-    )
+    raise RuntimeError(f"Python-3.6 or greater is required, Python-{py_version} used.")
 
 
 short_description = "Ensembl DB"
 
 # This ends up displayed by the installer
-long_description = (
-    """ensembldb3
+long_description = f"""ensembldb3
 A toolkit for querying the Ensembl MySQL databases.
-Version %s.
+Version {__version__}.
 """
-    % __version__
-)
 
 setup(
     name="ensembldb3",

@@ -111,11 +111,11 @@ class SpeciesNameMap(dict):
             common_name = None
 
         if common_name is None:
-            msg = "Unknown species name: %s" % name
+            msg = f"Unknown species name: {name}"
             if level == "raise":
                 raise ValueError(msg)
             elif level == "warn":
-                print("WARN: %s" % msg)
+                print(f"WARN: {msg}")
 
         return str(common_name)
 
@@ -136,11 +136,11 @@ class SpeciesNameMap(dict):
             if name in data:
                 species_name = data[name]
         if species_name is None:
-            msg = "Unknown common name: %s" % name
+            msg = f"Unknown common name: {name}"
             if level == "raise":
                 raise ValueError(msg)
             elif level == "warn":
-                print("WARN: %s" % msg)
+                print(f"WARN: {msg}")
         return str(species_name)
 
     def get_species_names(self):
@@ -159,7 +159,7 @@ class SpeciesNameMap(dict):
             species_name = self.get_species_name(name, level="raise")
         except ValueError:
             if name not in self._species_common:
-                raise ValueError("Unknown name %s" % name)
+                raise ValueError(f"Unknown name {name}")
             species_name = name
 
         return str(species_name.lower().replace(" ", "_"))

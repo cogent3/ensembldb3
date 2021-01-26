@@ -77,7 +77,7 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
                 selected_row = row
                 break
         if selected_row is None:
-            raise ValueError("Ambigous coordinate name: %s" % coord_name)
+            raise ValueError(f"Ambigous coordinate name: {coord_name}")
     coord_type = species_coord_sys[selected_row["coord_system_id"]].name
     return selected_row, coord_type
 
@@ -112,10 +112,7 @@ class Coordinate(object):
             end += 1
 
         if start > end:
-            assert strand == -1, "strand incorrect for start[%s] > end[%s]" % (
-                start,
-                end,
-            )
+            assert strand == -1, f"strand incorrect for start[{start}] > end[{end}]"
             start, end = end, start
 
         self.start = start
@@ -216,7 +213,7 @@ class Coordinate(object):
         new.start += from_start
         new.end += from_end
         try:
-            assert len(new) >= 0, "resized generated a negative length: %s" % new
+            assert len(new) >= 0, f"resized generated a negative length: {new}"
         except (ValueError, AssertionError):
             raise ValueError
         return new
@@ -344,7 +341,7 @@ class CoordSystemCache(object):
             if "sequence_level" in val.attr:
                 return val.name
 
-        raise RuntimeError("no coord system for %s" % species)
+        raise RuntimeError(f"no coord system for {species}")
 
     def __call__(self, coord_type=None, core_db=None, species=None, seq_level=False):
         """coord_type can be coord_type or coord_system_id"""
@@ -410,24 +407,24 @@ def _get_equivalent_coords(
     ori = assembly_row["ori"]
     q_strand, t_strand = strand, strand * ori
     if "seq_region" not in query_prefix:
-        q_seq_region_id = assembly_row["%s_seq_region_id" % query_prefix]
-        t_seq_region_id = assembly_row["%s_seq_region_id" % target_prefix]
+        q_seq_region_id = assembly_row[f"{query_prefix}_seq_region_id"]
+        t_seq_region_id = assembly_row[f"{target_prefix}_seq_region_id"]
     else:
         q_seq_region_id = assembly_row["_".join([query_prefix, "id"])]
         t_seq_region_id = assembly_row["_".join([target_prefix, "id"])]
 
     # d -- distance
-    d_start = max(0, start - int(assembly_row["%s_start" % query_prefix]))
-    d_end = max(0, int(assembly_row["%s_end" % query_prefix]) - end)
+    d_start = max(0, start - int(assembly_row[f"{query_prefix}_start"]))
+    d_end = max(0, int(assembly_row[f"{query_prefix}_end"]) - end)
     # q -- query (to differ from the origin query block)
-    q_start = int(assembly_row["%s_start" % query_prefix]) + d_start
-    q_end = int(assembly_row["%s_end" % query_prefix]) - d_end
+    q_start = int(assembly_row[f"{query_prefix}_start"]) + d_start
+    q_end = int(assembly_row[f"{query_prefix}_end"]) - d_end
 
     if int(assembly_row["ori"]) == -1:
         d_start, d_end = d_end, d_start
     # t -- target
-    t_start = int(assembly_row["%s_start" % target_prefix]) + d_start
-    t_end = int(assembly_row["%s_end" % target_prefix]) - d_end
+    t_start = int(assembly_row[f"{target_prefix}_start"]) + d_start
+    t_end = int(assembly_row[f"{target_prefix}_end"]) - d_end
 
     q_location = Coordinate(
         coord_name=query_coord.coord_name,
@@ -495,19 +492,17 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
     query = sql.select(
         [assembly, seq_region.c.name],
         sql.and_(
-            assembly.c["%s_seq_region_id" % target_prefix]
-            == seq_region.c.seq_region_id,
+            assembly.c[f"{target_prefix}_seq_region_id"] == seq_region.c.seq_region_id,
             seq_region.c.coord_system_id == target_coord_system_id,
-            assembly.c["%s_seq_region_id" % query_prefix]
-            == query_location.seq_region_id,
+            assembly.c[f"{query_prefix}_seq_region_id"] == query_location.seq_region_id,
         ),
     )
     query = location_query(
         assembly,
         query_location.ensembl_start,
         query_location.ensembl_end,
-        start_col="%s_start" % query_prefix,
-        end_col="%s_end" % query_prefix,
+        start_col=f"{query_prefix}_start",
+        end_col=f"{query_prefix}_end",
         query=query,
         where=where,
     )

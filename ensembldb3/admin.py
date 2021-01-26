@@ -88,12 +88,12 @@ def install_one_db(
     # $ mysql -u uname dname < dbname.sql
     dbpath = os.path.join(local_path, dbname)
     if is_installed(local_path, dbname) and not force_overwrite:
-        click.echo("ALREADY INSTALLED: %s, skipping" % dbname)
+        click.echo(f"ALREADY INSTALLED: {dbname}, skipping")
         return True
 
     sqlfile = listpaths(dbpath, "*.sql*")
     if not sqlfile:
-        raise RuntimeError("sql file not present in %s" % dbpath)
+        raise RuntimeError(f"sql file not present in {dbpath}")
 
     sqlfile = sqlfile[0]
     with open_(sqlfile, mode="rt") as infile:
@@ -103,15 +103,15 @@ def install_one_db(
     sql = "\n".join(sql)
     # select the database
     if verbose or debug:
-        click.echo("  Creating table definitions for %s" % dbname)
+        click.echo(f"  Creating table definitions for {dbname}")
     cursor = server.cursor()
-    r = cursor.execute("USE %s" % dbname)
+    r = cursor.execute(f"USE {dbname}")
     # make sure tables don't exist
     r = cursor.execute("SHOW TABLES")
     result = cursor.fetchall()
     for table in result:
         click.echo(table)
-        r = cursor.execute("DROP TABLE IF EXISTS %s" % table)
+        r = cursor.execute(f"DROP TABLE IF EXISTS {table}")
 
     # create the table definitions
     num_tables = sql.count("CREATE TABLE")
@@ -132,7 +132,7 @@ def install_one_db(
         msg = [
             "ERR: The symmetric difference in tables between "
             "SQL statement and actually created:",
-            "\t%s" % str(diff),
+            f"\t{str(diff)}",
         ]
         click.secho("\n".join(msg), fg="red")
 
@@ -210,7 +210,7 @@ def read_mysql_config(config_path, section, verbose=False):
 
 def _drop_db(cursor, dbname):
     """drops the database"""
-    sql = "DROP DATABASE IF EXISTS %s" % dbname
+    sql = f"DROP DATABASE IF EXISTS {dbname}"
     cursor.execute(sql)
 
 
@@ -340,10 +340,10 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
                 os.remove(chk)
 
         if verbose:
-            click.echo("Creating database %s" % dbname.name)
+            click.echo(f"Creating database {dbname.name}")
 
         # now create dbname
-        sql = "CREATE DATABASE IF NOT EXISTS %s" % dbname
+        sql = f"CREATE DATABASE IF NOT EXISTS {dbname}"
         r = cursor.execute(sql)
         cursor.close()
         install_one_db(
@@ -397,7 +397,7 @@ def drop(configpath, mysqlcfg, verbose, debug):
         exit(0)
 
     for dbname in dbnames:
-        click.echo("Dropping %s" % dbname)
+        click.echo(f"Dropping {dbname}")
         _drop_db(cursor, dbname)
 
     if verbose:
@@ -414,7 +414,7 @@ def exportrc(outpath):
     setting an environment variable ENSEMBLDBRC with this path
     will force it's contents to override the default ensembldb3 settings"""
     shutil.copytree(ENSEMBLDBRC, outpath)
-    click.echo("Contents written to %s" % outpath)
+    click.echo(f"Contents written to {outpath}")
 
 
 @main.command()
@@ -423,7 +423,7 @@ def exportrc(outpath):
 def show(release, mysqlcfg):
     """shows databases corresponding to release"""
     if mysqlcfg.name == _mycfg:
-        click.secho("%s\n" % show.help)
+        click.secho(f"{show.help}\n")
         click.secho("use --help for more options")
 
         exit()
@@ -436,7 +436,7 @@ def show(release, mysqlcfg):
         port=mysql_info["port"],
     )
     names = get_db_name(account=account, release=str(release))
-    click.echo("Databases at host='%s' for release=%s" % (account.host, release))
+    click.echo(f"Databases at host='{account.host}' for release={release}")
     if names:
         click.echo("\n".join(["  %s" % n for n in names]))
     else:
@@ -463,7 +463,7 @@ def status(configpath):
         header=["dbname", "Downloaded", "Installed"],
         rows=rows,
         title="Status of download and install",
-        legend="config=%s; local_path=%s" % (configpath.name, local_path),
+        legend=f"config={configpath.name}; local_path={local_path}",
     )
     print(table)
 

@@ -21,7 +21,7 @@ class _FeatureLevelRecord(object):
         self.levels = coord_system_names
 
     def __str__(self):
-        return "feature = %s; levels = %s" % (self.feature_type, ", ".join(self.levels))
+        return f"feature = {self.feature_type}; levels = {', '.join(self.levels)}"
 
 
 class FeatureCoordLevelsCache(object):

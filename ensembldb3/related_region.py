@@ -33,7 +33,7 @@ class _RelatedRegions(LazyRecord):
         my_type = self.__class__.__name__
 
         data = list(map(repr, self.members))
-        data.insert(0, "%s(" % my_type)
+        data.insert(0, f"{my_type}(")
         data.append(")")
         return "\n\t".join(data)
 
@@ -73,8 +73,8 @@ class RelatedGenes(_RelatedRegions):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        display = ["%s:" % my_type, " relationship=%s" % str(self.relationship)]
-        display += ["  %s" % m for m in self.members]
+        display = [f"{my_type}:", f" relationship={str(self.relationship)}"]
+        display += [f"  {m}" for m in self.members]
         return "\n".join(display)
 
     def __repr__(self):
@@ -349,8 +349,8 @@ class SyntenicRegions(_RelatedRegions):
     def __str__(self):
         my_type = self.__class__.__name__
 
-        display = ["%s:" % my_type]
-        display += ["  %r" % m.location for m in self.members if m.region is not None]
+        display = [f"{my_type}:"]
+        display += [f"  {m.location!r}" for m in self.members if m.region is not None]
         return "\n".join(display)
 
     def __repr__(self):

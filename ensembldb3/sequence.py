@@ -35,7 +35,7 @@ def _assemble_seq(frags, start, end, frag_positions):
         assembled += ["N" * diff, frags[index]]
         prev_end = frag_end
     diff = end - frag_end
-    assert diff >= 0, "end[%s] < previous frag_end[%s]" % (end, frag_end)
+    assert diff >= 0, f"end[{end}] < previous frag_end[{frag_end}]"
     assembled += ["N" * diff]
     return DNA.make_seq("".join(assembled))
 
@@ -86,7 +86,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
     assemblies = get_coord_conversion(coord, coord_type, genome.CoreDb)
 
     if not assemblies:
-        raise NoItemError("no assembly for %s" % coord)
+        raise NoItemError(f"no assembly for {coord}")
 
     dna = genome.CoreDb.get_table("dna")
     seqs, positions = [], []
@@ -114,7 +114,7 @@ def _get_sequence_from_lower_assembly(coord, DEBUG):
         coord, coord.genome.species, coord.genome.CoreDb
     )
     if not assemblies:
-        raise NoItemError("no assembly for %s" % coord)
+        raise NoItemError(f"no assembly for {coord}")
 
     if DEBUG:
         print("\nMedium_level_assemblies = ", assemblies)

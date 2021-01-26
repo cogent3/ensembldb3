@@ -69,7 +69,7 @@ class FeatureTypeCache(LazyRecord):
         try:
             func = self._type_func_map[feature_type]
         except KeyError:
-            raise RuntimeError("Unknown feature type: %s" % feature_type)
+            raise RuntimeError(f"Unknown feature type: {feature_type}")
         return self._get_cached_value(feature_type, func)
 
 
@@ -106,7 +106,7 @@ class Genome(object):
 
     def __str__(self):
         my_type = self.__class__.__name__
-        return "%s(species='%s'; release='%s')" % (my_type, self.species, self.release)
+        return f"{my_type}(species='{self.species}'; release='{self.release}')"
 
     def __repr__(self):
         return self.__str__()
@@ -183,7 +183,7 @@ class Genome(object):
                 descr = gene_table.c.description.like("%" + description + "%")
             else:
                 descr = gene_table.c.description.op("regexp")(
-                    "[[:<:]]%s[[:>:]]" % description
+                    f"[[:<:]]{description}[[:>:]]"
                 )
 
         if btype is not None and descr is not None:
@@ -832,7 +832,7 @@ class Genome(object):
             property_map["status"] = ("gene", "status")
 
         if property_type not in property_map:
-            raise RuntimeError("ERROR: Unknown property type: %s" % property_type)
+            raise RuntimeError(f"ERROR: Unknown property type: {property_type}")
 
         table_name, column = property_map[property_type]
         return list(db.get_distinct(table_name, column))

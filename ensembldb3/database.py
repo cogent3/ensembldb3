@@ -38,8 +38,7 @@ class Database(object):
         )
         if not self.db_name:
             raise RuntimeError(
-                "%s db doesn't exist for '%s' on '%s'"
-                % (db_type, species, account.host)
+                f"{db_type} db doesn't exist for '{species}' on '{account.host}'"
             )
         else:
             self.db_name = self.db_name[0]
@@ -62,7 +61,7 @@ class Database(object):
         """returns the SQLalchemy table instance"""
         table = self._tables.get(name, None)
         if table is None:
-            c = self._db.execute("DESCRIBE %s" % name)
+            c = self._db.execute(f"DESCRIBE {name}")
             custom_columns = []
             for r in c.fetchall():
                 Field = r["Field"]
@@ -75,7 +74,7 @@ class Database(object):
                     self._meta,
                     autoload=True,
                     extend_existing=True,
-                    *custom_columns
+                    *custom_columns,
                 )
             except TypeError:
                 # new arg name not supported, try old
@@ -132,7 +131,7 @@ class Database(object):
         for name in table_name:
             table = self.get_table(name)
             count = table.count().execute().fetchone()[0]
-            rows.append(["%s.%s" % (self.db_name, name), count])
+            rows.append([f"{self.db_name}.{name}", count])
 
         return cogent_table.Table(header=["name", "count"], data=rows)
 

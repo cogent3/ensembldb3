@@ -49,9 +49,7 @@ class _Region(LazyRecord):
         try:
             return self.location < other.location
         except AttributeError:
-            raise TypeError(
-                "cannot compare %s to %s" % (self.__class__, other.__class__)
-            )
+            raise TypeError(f"cannot compare {self.__class__} to {other.__class__}")
 
     def __eq__(self, other):
         try:
@@ -71,10 +69,10 @@ class _Region(LazyRecord):
         row = self._table_rows[self._attr_ensembl_table_map["location"]]
         if row is None:
             return
-        seq_region_id = row["%sid" % self._location_column_prefix]
-        start = row["%sstart" % self._location_column_prefix]
-        end = row["%send" % self._location_column_prefix]
-        strand = row["%sstrand" % self._location_column_prefix]
+        seq_region_id = row[f"{self._location_column_prefix}id"]
+        start = row[f"{self._location_column_prefix}start"]
+        end = row[f"{self._location_column_prefix}end"]
+        strand = row[f"{self._location_column_prefix}strand"]
         seq_region_table = self.db.get_table("seq_region")
         query = sql.select(
             [seq_region_table.c.name], seq_region_table.c.seq_region_id == seq_region_id
@@ -100,7 +98,7 @@ class _Region(LazyRecord):
             # this magic assumes the method for obtaining a record from a table
             # are named _get_tablename_record
             dep_record_func = getattr(
-                self, "_get_%s_record" % self._attr_ensembl_table_map["location"]
+                self, f"_get_{self._attr_ensembl_table_map['location']}_record"
             )
             dep_record_func()
         self._make_location()
@@ -225,9 +223,9 @@ class GenericRegion(_Region):
         if location is None and coord_name:
             self._get_seq_region_record(str(coord_name))
             if end is not None:
-                assert self._table_rows["seq_region"]["length"] > end, (
-                    "Requested end[%s] too large" % end
-                )
+                assert (
+                    self._table_rows["seq_region"]["length"] > end
+                ), f"Requested end[{end}] too large"
             seq_region_id = self._table_rows["seq_region"]["seq_region_id"]
             location = Coordinate(
                 genome=genome,
@@ -292,7 +290,7 @@ class _StableRegion(GenericRegion):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return "%s(%s; %s)" % (my_type, self.genome.species, self.stableid)
+        return f"{my_type}({self.genome.species}; {self.stableid})"
 
     def _get_record_for_stable_id(self):
         # subclasses need to provide a function for loading the correct
@@ -300,9 +298,9 @@ class _StableRegion(GenericRegion):
         table_name = self._attr_ensembl_table_map["stableid"]
 
         if self.genome.general_release >= 65:
-            func_name = "_get_%s_record" % (table_name + "_stable_id")
+            func_name = f"_get_{table_name + '_stable_id'}_record"
         else:
-            func_name = "_get_%s_record" % table_name
+            func_name = f"_get_{table_name}_record"
 
         func = getattr(self, func_name)
         func()
@@ -330,9 +328,7 @@ class _StableRegion(GenericRegion):
         for member_type in member_types:
             member = getattr(self, member_type, None)
             if member is None:
-                raise AttributeError(
-                    "%s doesn't have property %s" % (self.type, member_type)
-                )
+                raise AttributeError(f"{self.type} doesn't have property {member_type}")
             for element in member:
                 if element.stableid == stableid:
                     return element
@@ -383,24 +379,24 @@ class Gene(_StableRegion):
     def __str__(self):
         my_type = self.__class__.__name__
         vals = [
-            "%s=%r" % (key, val)
+            f"{key}={val!r}"
             for key, val in list(self._cached.items())
             if val is not None
         ]
         vals.sort()
-        vals.insert(0, "species='%s'" % self.genome.species)
-        return "%s(%s)" % (my_type, "; ".join(vals))
+        vals.insert(0, f"species='{self.genome.species}'")
+        return f"{my_type}({'; '.join(vals)})"
 
     def __repr__(self):
         my_type = self.__class__.__name__
         vals = [
-            "%s=%r" % (key, val)
+            f"{key}={val!r}"
             for key, val in list(self._cached.items())
             if val is not None
         ]
         vals.sort()
-        vals.insert(0, "species=%r" % self.genome.species)
-        return "%s(%s)" % (my_type, "; ".join(vals))
+        vals.insert(0, f"species={self.genome.species!r}")
+        return f"{my_type}({'; '.join(vals)})"
 
     def _get_gene_record(self):
         """adds the gene data to self._table_rows"""
@@ -716,7 +712,7 @@ class Transcript(_StableRegion):
             out = [
                 "\nseq_start=%d; seq_end=%d" % (seq_start, seq_end),
                 "shift_start=%d; shift_end=%d" % (shift_start, shift_end),
-                "len=%s" % len(coord),
+                f"len={len(coord)}",
             ]
             sys.stderr.write("\n".join(map(str, out)) + "\n")
 
@@ -859,13 +855,13 @@ class Transcript(_StableRegion):
         except AssertionError:
             if not DEBUG:
                 raise
-            out = ["\n****\nFAILED=%s" % self.stableid]
+            out = [f"\n****\nFAILED={self.stableid}"]
             for exon in self.translated_exons:
                 out += [
                     "TranslatedExon[rank=%d]\n" % exon.rank,
                     exon,
                     exon.location,
-                    "%s ... %s" % (exon.seq[:20], exon.seq[-20:]),
+                    f"{exon.seq[:20]} ... {exon.seq[-20:]}",
                 ]
                 sys.stderr.write("\n".join(map(str, out)) + "\n")
             raise
@@ -970,7 +966,7 @@ class Exon(_StableRegion):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return "%s(stableid=%s, rank=%s)" % (my_type, self.stableid, self.rank)
+        return f"{my_type}(stableid={self.stableid}, rank={self.rank})"
 
     def __lt__(self, other):
         return self.rank < other.rank
@@ -1006,7 +1002,7 @@ class Exon(_StableRegion):
         self._table_rows["exon"] = record
 
     def _make_symbol(self):
-        self._cached["symbol"] = "%s-%s" % (self.stableid, self.rank)
+        self._cached["symbol"] = f"{self.stableid}-{self.rank}"
 
     def _get_symbol(self):
         return self._get_cached_value("symbol", self._make_symbol)
@@ -1046,14 +1042,10 @@ class Intron(GenericRegion):
 
     def __repr__(self):
         my_type = self.__class__.__name__
-        return "%s(TranscriptId=%s, rank=%s)" % (
-            my_type,
-            self.TranscriptStableId,
-            self.rank,
-        )
+        return f"{my_type}(TranscriptId={self.TranscriptStableId}, rank={self.rank})"
 
     def _make_symbol(self):
-        self._cached["symbol"] = "%s-%s" % (self.TranscriptStableId, self.rank)
+        self._cached["symbol"] = f"{self.TranscriptStableId}-{self.rank}"
 
     def _get_symbol(self):
         return self._get_cached_value("symbol", self._make_symbol)
