@@ -59,7 +59,7 @@ def lftp_listdir(host, dirname="", debug=True):
 
 def rsync_listdir(remote_path, dirname="", debug=True):
     if dirname:
-        cmnd = "%s%s" % (remote_path, dirname)
+        cmnd = f"{remote_path}{dirname}"
     else:
         cmnd = remote_path
 
@@ -140,9 +140,9 @@ def read_config(config_path, verbose=False):
         species_dbs[species] = dbs
 
     if verbose:
-        click.secho("DOWNLOADING\n  ensembl release=%s" % release, fg="green")
+        click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
         click.secho("\n".join(["  %s" % d for d in species_dbs]), fg="green")
-        click.secho("\nWRITING to output path=%s\n" % local_path, fg="green")
+        click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
     return release, remote_path, local_path, species_dbs
 
 
@@ -166,7 +166,7 @@ class Download:
     def __call__(self, dbname):
         if is_downloaded(self._local_base, dbname):
             if self._verbose or self._debug:
-                click.secho("Already downloaded: %s, skipping" % dbname, fg="green")
+                click.secho(f"Already downloaded: {dbname}, skipping", fg="green")
             return
 
         commands = do_lftp_command(
@@ -179,7 +179,7 @@ class Download:
         checkpoint_file = get_download_checkpoint_path(self._local_base, dbname)
         with open(checkpoint_file, "w") as checked:
             pass
-        click.secho("Completed download: %s" % dbname, fg="green")
+        click.secho(f"Completed download: {dbname}", fg="green")
 
 
 def download_dbs(configpath, numprocs, verbose, debug):
@@ -205,4 +205,4 @@ def download_dbs(configpath, numprocs, verbose, debug):
     for db in db_names:
         lftp(db.name)
 
-    click.secho("\nWROTE to output path=%s\n" % local_path, fg="green")
+    click.secho(f"\nWROTE to output path={local_path}\n", fg="green")

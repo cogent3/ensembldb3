@@ -598,6 +598,6 @@ class Compara(object):
             "clade": ("method_link_species_set", "name"),
         }
         if property_type not in property_map:
-            raise RuntimeError("ERROR: Unknown property type: %s" % property_type)
+            raise RuntimeError(f"ERROR: Unknown property type: {property_type}")
         table_name, column = property_map[property_type]
         return list(db.get_distinct(table_name, column))

@@ -58,7 +58,7 @@ def get_db_prefix(name):
     elif len(name) > 2:
         prefix = "_".join(name[:-1])
     else:
-        raise RuntimeError("Unknown name structure: %s" % "_".join(name))
+        raise RuntimeError(f"Unknown name structure: {'_'.join(name)}")
     return prefix
 
 
@@ -94,7 +94,7 @@ class EnsemblDbName(object):
         self.species = Species.get_species_name(self.prefix)
 
     def __repr__(self):
-        build = ["", "; build='%s'" % self.build][self.build is not None]
+        build = ["", f"; build='{self.build}'"][self.build is not None]
         s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (
             self.prefix,
             self.type,

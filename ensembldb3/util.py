@@ -65,7 +65,7 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     out, err = proc.communicate()
     if proc.returncode != 0:
         msg = err
-        sys.stderr.writelines("FAILED: %s\n%s" % (cmnd, msg))
+        sys.stderr.writelines(f"FAILED: {cmnd}\n{msg}")
         sys.exit(proc.returncode)
     if out is not None:
         r = out.decode("utf8")
@@ -106,7 +106,7 @@ class DisplayString(str):
             new = self
         if len(self) > len(new):
             new += "..."
-        new = [new, "'%s'" % new][self.with_quotes]
+        new = [new, f"'{new}'"][self.with_quotes]
         return new
 
 
@@ -174,7 +174,7 @@ class NoItemError(Exception):
 def convert_strand(val):
     """ensures a consistent internal representation of strand"""
     if isinstance(val, str):
-        assert val in "-+", 'unknown strand "%s"' % val
+        assert val in "-+", f'unknown strand "{val}"'
         val = [-1, 1][val == "+"]
     elif val is not None:
         val = [-1, 1][val > 0]
@@ -188,7 +188,7 @@ def asserted_one(items):
     one = False
     for item in items:
         if one:
-            raise ValueError("More than one: [%s]" % list(item.items()))
+            raise ValueError(f"More than one: [{list(item.items())}]")
         one = True
     if one:
         return item

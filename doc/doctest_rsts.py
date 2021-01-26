@@ -58,7 +58,7 @@ def main(file_paths, just, exclude, verbose):
         file_paths = new
 
     if verbose:
-        print("File paths, after filtering: %s" % str(file_paths))
+        print(f"File paths, after filtering: {str(file_paths)}")
 
     for test in file_paths:
         print()

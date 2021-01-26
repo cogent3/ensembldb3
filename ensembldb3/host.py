@@ -70,7 +70,7 @@ class HostAccount(object):
         return self._hash
 
     def __str__(self):
-        return "%s:%s@%s:%s" % (self.user, self.passwd, self.host, self.port)
+        return f"{self.user}:{self.passwd}@{self.host}:{self.port}"
 
 
 def get_ensembl_account(release=None):
@@ -123,14 +123,14 @@ def make_db_name_pattern(species=None, db_type=None, release=None):
     pattern = ""
     if species:
         species = Species.get_ensembl_db_prefix(species)
-        pattern = "%s%s" % (sep, species)
+        pattern = f"{sep}{species}"
     if db_type:
-        pattern = "%s%s%s" % (pattern, sep, db_type)
+        pattern = f"{pattern}{sep}{db_type}"
     if release:
-        pattern = "%s%s%s" % (pattern, sep, release)
+        pattern = f"{pattern}{sep}{release}"
     assert pattern
 
-    return "'%s%s'" % (pattern, sep)
+    return f"'{pattern}{sep}'"
 
 
 def get_db_name(
@@ -149,7 +149,7 @@ def get_db_name(
     show = "SHOW DATABASES"
     if species or db_type or release:
         pattern = make_db_name_pattern(species, db_type, release)
-        show = "%s LIKE %s" % (show, pattern)
+        show = f"{show} LIKE {pattern}"
     if DEBUG:
         print(show)
     cursor.execute(show)
