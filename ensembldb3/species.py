@@ -167,11 +167,7 @@ class SpeciesNameMap(dict):
         """returns string matching a compara instance attribute name for a
         species"""
         name = self.get_common_name(name)
-        if "." in name:
-            name = name.replace(".", "")
-        else:
-            name = name.title()
-
+        name = name.replace(".", "") if "." in name else name.title()
         name = name.split()
         return "".join(name)
 

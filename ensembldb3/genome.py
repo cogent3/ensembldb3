@@ -251,11 +251,7 @@ class Genome(object):
         # after release 65, the gene_id_table is removed. The following is to
         # maintain support for earlier releases
         release_ge_65 = self.general_release >= 65
-        if release_ge_65:
-            gene_id_table = None
-        else:
-            gene_id_table = db.get_table("gene_stable_id")
-
+        gene_id_table = None if release_ge_65 else db.get_table("gene_stable_id")
         assert (
             symbol or description or stableid or biotype
         ), "no valid argument provided"
@@ -270,11 +266,9 @@ class Genome(object):
                 gene_table, description, biotype, like
             )
 
-        query = self._build_gene_query(
+        return self._build_gene_query(
             db, condition, gene_table, gene_id_table, xref_table
         )
-
-        return query
 
     def make_location(
         self, coord_name, start=None, end=None, strand=1, ensembl_coord=False
@@ -809,11 +803,7 @@ class Genome(object):
             - property_type: valid values are biotype, status (pre release 90)
               effect"""
         property_type = property_type.lower()
-        if property_type == "effect":
-            db = self.VarDb
-        else:
-            db = self.CoreDb
-
+        db = self.VarDb if property_type == "effect" else self.CoreDb
         consequence_type = "consequence_type"
         if self.general_release > 67:
             consequence_type += "s"  # change to plural column name

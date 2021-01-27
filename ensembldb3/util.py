@@ -67,11 +67,7 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         msg = err
         sys.stderr.writelines(f"FAILED: {cmnd}\n{msg}")
         sys.exit(proc.returncode)
-    if out is not None:
-        r = out.decode("utf8")
-    else:
-        r = None
-    return r
+    return out.decode("utf8") if out is not None else None
 
 
 def makedirs(path):

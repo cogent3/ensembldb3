@@ -38,11 +38,7 @@ def do_lftp_command(host, remote_dir, db_name, local_dir, numprocs):
         f'--use-pget-n={numprocs} --parallel={numprocs} {db_name} {local_dir}; bye" {host}'
     )
     result = exec_command(command)
-    if result != "":
-        result = result.split("\n")
-    else:
-        result = []
-
+    result = result.split("\n") if result != "" else []
     return result
 
 
@@ -56,17 +52,12 @@ def lftp_listdir(host, dirname="", debug=True):
 
 
 def rsync_listdir(remote_path, dirname="", debug=True):
-    if dirname:
-        cmnd = f"{remote_path}{dirname}"
-    else:
-        cmnd = remote_path
-
+    cmnd = f"{remote_path}{dirname}" if dirname else remote_path
     cmnd = r"rsync --list-only rsync://%s" % cmnd
     if debug:
         print(cmnd)
     result = exec_command(cmnd)
-    r = result.splitlines()
-    return r
+    return result.splitlines()
 
 
 def _sort_dbs(dbnames):

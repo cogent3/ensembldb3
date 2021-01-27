@@ -42,10 +42,7 @@ def get_dbtype_from_name(name):
         print(name, type(name), msg)
         raise
     dbtype = None
-    if name[0] == "ensembl":
-        dbtype = name[1]
-    else:
-        dbtype = name[-1]
+    dbtype = name[1] if name[0] == "ensembl" else name[-1]
     return dbtype
 
 
