@@ -605,9 +605,11 @@ class Transcript(_StableRegion):
             exon_transcript_table.c.transcript_id == transcript_id,
         )
         records = query.execute()
-        exons = []
-        for record in records:
-            exons.append(Exon(self.genome, self.db, record["exon_id"], record["rank"]))
+        exons = [
+            Exon(self.genome, self.db, record["exon_id"], record["rank"])
+            for record in records
+        ]
+
         exons.sort()
         self._cached["exons"] = tuple(exons)
 
@@ -1330,7 +1332,7 @@ class Variation(_Region):
                     attr_ty.c.name == "Variant evidence status",
                 ),
             )
-            mapping = dict((str(i), v) for i, v in query.execute().fetchall())
+            mapping = {str(i): v for i, v in query.execute().fetchall()}
             cached_attribs.add_to_cache(self.genome, "validation", mapping)
 
         out = [mapping[k] for k in sorted(result)]

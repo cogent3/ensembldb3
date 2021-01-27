@@ -37,9 +37,11 @@ class FeatureCoordLevelsCache(object):
         result = []
         for species in list(self._species_feature_levels.keys()):
             feature_levels = self._species_feature_levels[species]
-            collate = []
-            for feature in list(feature_levels.keys()):
-                collate.append([feature, feature_levels[feature].levels])
+            collate = [
+                [feature, feature_levels[feature].levels]
+                for feature in list(feature_levels.keys())
+            ]
+
             t = Table(header, collate, title=species)
             result.append(str(t))
         result = "\n".join(result)

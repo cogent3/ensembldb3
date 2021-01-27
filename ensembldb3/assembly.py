@@ -506,15 +506,10 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
         where=where,
     )
     assembly_rows = query.execute().fetchall()
-    results = []
-    for assembly_row in assembly_rows:
-        results.append(
-            _get_equivalent_coords(
+    return [_get_equivalent_coords(
                 query_location,
                 assembly_row,
                 query_prefix,
                 target_prefix,
                 target_coord_type,
-            )
-        )
-    return results
+            ) for assembly_row in assembly_rows]

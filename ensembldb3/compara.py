@@ -104,7 +104,7 @@ class Compara(object):
             genome_db_table.c.name.in_(db_prefixes),
         )
         records = query.execute().fetchall()
-        data = dict((r[0], self._genomes[db_species[r[1]]]) for r in records)
+        data = {r[0]: self._genomes[db_species[r[1]]] for r in records}
         self._dbid_species_map = data
         return self._dbid_species_map
 
@@ -193,10 +193,12 @@ class Compara(object):
                 species_sets[sp_set_id] = set([gen_id])
 
         expected = set(self._dbid_genome_map.keys())
-        species_set_ids = []
-        for sp_set, gen_id in list(species_sets.items()):
-            if expected <= gen_id:
-                species_set_ids.append(sp_set)
+        species_set_ids = [
+            sp_set
+            for sp_set, gen_id in list(species_sets.items())
+            if expected <= gen_id
+        ]
+
         self._species_set = species_set_ids
         return self._species_set
 
