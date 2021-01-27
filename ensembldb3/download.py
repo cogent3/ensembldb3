@@ -138,7 +138,7 @@ def read_config(config_path, verbose=False):
 
     if verbose:
         click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
-        click.secho("\n".join(["  %s" % d for d in species_dbs]), fg="green")
+        click.secho("\n".join("  %s" % d for d in species_dbs), fg="green")
         click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
     return release, remote_path, local_path, species_dbs
 

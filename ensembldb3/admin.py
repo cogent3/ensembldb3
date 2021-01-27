@@ -388,7 +388,7 @@ def drop(configpath, mysqlcfg, verbose, debug):
     dbnames = reduce_dirnames(content, species_dbs)
 
     click.echo("The following databases will be deleted:")
-    click.echo("\n".join(["  %s" % d for d in dbnames]))
+    click.echo("\n".join("  %s" % d for d in dbnames))
     try:
         click.confirm("Confirm you want to delete the databases", abort=True)
     except click.exceptions.Abort:
@@ -437,7 +437,7 @@ def show(release, mysqlcfg):
     names = get_db_name(account=account, release=str(release))
     click.echo(f"Databases at host='{account.host}' for release={release}")
     if names:
-        click.echo("\n".join(["  %s" % n for n in names]))
+        click.echo("\n".join("  %s" % n for n in names))
     else:
         click.echo("  None")
 

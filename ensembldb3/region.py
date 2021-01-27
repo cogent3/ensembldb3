@@ -514,9 +514,7 @@ class Gene(_StableRegion):
         if self.transcripts is self.NULL_VALUE:
             return None
         return [
-            ts.get_cds_length()
-            for ts in self.transcripts
-            if ts.biotype == self.biotype
+            ts.get_cds_length() for ts in self.transcripts if ts.biotype == self.biotype
         ]
 
     def get_longest_cds_transcript(self):

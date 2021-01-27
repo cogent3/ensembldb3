@@ -56,7 +56,7 @@ class _RelatedRegions(LazyRecord):
 
     def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.location.species for m in self.members if m.location is not None])
+        return {m.location.species for m in self.members if m.location is not None}
 
 
 class RelatedGenes(_RelatedRegions):
