@@ -105,8 +105,7 @@ def _get_sequence_from_direct_assembly(coord=None, DEBUG=False):
             seq = seq.rc()
         seqs.append(str(seq))
         positions.append((q_loc.start, q_loc.end))
-    sequence = _assemble_seq(seqs, coord.start, coord.end, positions)
-    return sequence
+    return _assemble_seq(seqs, coord.start, coord.end, positions)
 
 
 def _get_sequence_from_lower_assembly(coord, DEBUG):
@@ -134,8 +133,7 @@ def _get_sequence_from_lower_assembly(coord, DEBUG):
         seqs.append(str(temp_seq))
         positions.append((q_loc.start, q_loc.end))
 
-    sequence = _assemble_seq(seqs, coord.start, coord.end, positions)
-    return sequence
+    return _assemble_seq(seqs, coord.start, coord.end, positions)
 
 
 def get_sequence(

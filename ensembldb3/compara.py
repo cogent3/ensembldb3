@@ -73,11 +73,13 @@ class Compara(object):
         )
 
     def _connect_db(self):
-        # TODO can the connection be all done in init?
-        connection = dict(
-            account=self._account, release=self.release, pool_recycle=self._pool_recycle
-        )
         if self._compara_db is None:
+            # TODO can the connection be all done in init?
+            connection = dict(
+                account=self._account,
+                release=self.release,
+                pool_recycle=self._pool_recycle,
+            )
             self._compara_db = Database(
                 db_type="compara", division=self.division, **connection
             )
@@ -104,7 +106,7 @@ class Compara(object):
             genome_db_table.c.name.in_(db_prefixes),
         )
         records = query.execute().fetchall()
-        data = dict((r[0], self._genomes[db_species[r[1]]]) for r in records)
+        data = {r[0]: self._genomes[db_species[r[1]]] for r in records}
         self._dbid_species_map = data
         return self._dbid_species_map
 
@@ -156,7 +158,7 @@ class Compara(object):
             parents[parent_id].append(node)
 
         root = None
-        for parent in parents:
+        for parent, value in parents.items():
             if parent not in nodes:
                 node = PhyloNode(name="root")
                 nodes[parent] = node
@@ -165,7 +167,7 @@ class Compara(object):
             for child in parents[parent]:
                 child.parent = node
 
-            if len(parents[parent]) == 1:
+            if len(value) == 1:
                 root = node
 
         # convert tip-names to match genome db names
@@ -193,10 +195,12 @@ class Compara(object):
                 species_sets[sp_set_id] = set([gen_id])
 
         expected = set(self._dbid_genome_map.keys())
-        species_set_ids = []
-        for sp_set, gen_id in list(species_sets.items()):
-            if expected <= gen_id:
-                species_set_ids.append(sp_set)
+        species_set_ids = [
+            sp_set
+            for sp_set, gen_id in list(species_sets.items())
+            if expected <= gen_id
+        ]
+
         self._species_set = species_set_ids
         return self._species_set
 
@@ -303,9 +307,8 @@ class Compara(object):
 
         if not member_records:
             return None
-        else:
-            member_record = asserted_one(member_records)
-            member_id = member_record[mem_id]
+        member_record = asserted_one(member_records)
+        member_id = member_record[mem_id]
 
         # in case query gene_region is not provided
         if gene_region is None:

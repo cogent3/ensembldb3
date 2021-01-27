@@ -174,7 +174,5 @@ def get_db_name(
 def get_latest_release(account=None):
     """returns the number of the latest release based on the compara db"""
     names = get_db_name(account=account, db_type="compara")
-    compara = []
-    for name in names:
-        compara += [int(name.release)]
+    compara = [int(name.release) for name in names]
     return str(max(compara))

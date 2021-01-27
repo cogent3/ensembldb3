@@ -70,14 +70,13 @@ class SpeciesNameMap(dict):
             syn = syns.get(species, "")
 
             rows += [[common, species, ensembl, syn]]
-        display = str(
+        return str(
             Table(
                 ["Common name", "Species name", "Ensembl Db Prefix", "Synonymns"],
                 data=rows,
                 space=2,
             ).sorted()
         )
-        return display
 
     def __repr__(self):
         return "Available species: %s" % (
@@ -168,11 +167,7 @@ class SpeciesNameMap(dict):
         """returns string matching a compara instance attribute name for a
         species"""
         name = self.get_common_name(name)
-        if "." in name:
-            name = name.replace(".", "")
-        else:
-            name = name.title()
-
+        name = name.replace(".", "") if "." in name else name.title()
         name = name.split()
         return "".join(name)
 

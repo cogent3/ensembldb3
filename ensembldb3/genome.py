@@ -212,8 +212,7 @@ class Genome(object):
                 xref_table, gene_table.c.display_xref_id == xref_table.c.xref_id
             )
             select_obj.append(xref_table.c.display_label)
-        query = sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
-        return query
+        return sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
 
     def _get_symbol_from_synonym(self, db, synonym):
         """returns the gene symbol for a synonym"""
@@ -252,11 +251,7 @@ class Genome(object):
         # after release 65, the gene_id_table is removed. The following is to
         # maintain support for earlier releases
         release_ge_65 = self.general_release >= 65
-        if release_ge_65:
-            gene_id_table = None
-        else:
-            gene_id_table = db.get_table("gene_stable_id")
-
+        gene_id_table = None if release_ge_65 else db.get_table("gene_stable_id")
         assert (
             symbol or description or stableid or biotype
         ), "no valid argument provided"
@@ -271,11 +266,9 @@ class Genome(object):
                 gene_table, description, biotype, like
             )
 
-        query = self._build_gene_query(
+        return self._build_gene_query(
             db, condition, gene_table, gene_id_table, xref_table
         )
-
-        return query
 
     def make_location(
         self, coord_name, start=None, end=None, strand=1, ensembl_coord=False
@@ -405,11 +398,9 @@ class Genome(object):
                 transcript_table, description, biotype, like
             )
 
-        query = self._build_transcript_query(
+        return self._build_transcript_query(
             db, condition, transcript_table, transcript_id_table, xref_table
         )
-
-        return query
 
     def _build_transcript_query(
         self, db, condition, transcript_table, transcript_id_table, xref_table=None
@@ -429,8 +420,7 @@ class Genome(object):
                 xref_table, transcript_table.c.display_xref_id == xref_table.c.xref_id
             )
             select_obj.append(xref_table.c.display_label)
-        query = sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
-        return query
+        return sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
 
     def get_est_matching(self, stableid):
         """returns an Est object from the otherfeatures db with the stableid"""
@@ -610,10 +600,9 @@ class Genome(object):
             dbs["var_db"] = self.VarDb
         if "est" in feature_types:
             dbs["otherfeature_db"] = self.OtherFeaturesDb
-        feature_coord_levels = self._feature_coord_levels(
+        return self._feature_coord_levels(
             self.species, feature_types=feature_types, **dbs
         )
-        return feature_coord_levels
 
     def _feature_coord_levels(self):
         if str(self._feature_coord_levels):
@@ -687,15 +676,14 @@ class Genome(object):
                     coord, feature_coord, db, where=where_feature
                 )
                 for chrom_coord, other_coord in chrom_other_coords:
-                    for region in target_func(
+                    yield from target_func(
                         db,
                         target_class,
                         chrom_coord,
                         other_coord,
                         where_feature,
                         limit=limit,
-                    ):
-                        yield region
+                    )
 
     def get_variation(
         self,
@@ -814,11 +802,7 @@ class Genome(object):
             - property_type: valid values are biotype, status (pre release 90)
               effect"""
         property_type = property_type.lower()
-        if property_type == "effect":
-            db = self.VarDb
-        else:
-            db = self.CoreDb
-
+        db = self.VarDb if property_type == "effect" else self.CoreDb
         consequence_type = "consequence_type"
         if self.general_release > 67:
             consequence_type += "s"  # change to plural column name

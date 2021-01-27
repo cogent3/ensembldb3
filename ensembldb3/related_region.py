@@ -56,7 +56,7 @@ class _RelatedRegions(LazyRecord):
 
     def get_species_set(self):
         """returns the latin names of self.Member species as a set"""
-        return set([m.location.species for m in self.members if m.location is not None])
+        return {m.location.species for m in self.members if m.location is not None}
 
 
 class RelatedGenes(_RelatedRegions):
@@ -132,7 +132,7 @@ class RelatedGenes(_RelatedRegions):
             parents[parent_id].append(node)
 
         root = None
-        for parent in parents:
+        for parent, value in parents.items():
             if parent not in nodes:
                 node = PhyloNode(name="root")
                 nodes[parent] = node
@@ -140,7 +140,7 @@ class RelatedGenes(_RelatedRegions):
             node = nodes[parent]
             for child in parents[parent]:
                 child.parent = node
-            if len(parents[parent]) == 1:
+            if len(value) == 1:
                 root = node
 
         if just_members:
@@ -185,14 +185,12 @@ class SyntenicRegion(LazyRecord):
 
     def _get_location(self):
         region = self._get_cached_value("region", self._make_map_func)
-        location = None if region is None else region.location
-        return location
+        return None if region is None else region.location
 
     location = property(_get_location)
 
     def _get_region(self):
-        region = self._get_cached_value("region", self._make_map_func)
-        return region
+        return self._get_cached_value("region", self._make_map_func)
 
     region = property(_get_region)
 
@@ -305,8 +303,7 @@ class SyntenicRegion(LazyRecord):
         self._cached["aligned_seq"] = gapped_seq
 
     def _get_aligned_seq(self):
-        aligned = self._get_cached_value("aligned_seq", self._make_aligned)
-        return aligned
+        return self._get_cached_value("aligned_seq", self._make_aligned)
 
     aligned_seq = property(_get_aligned_seq)
 

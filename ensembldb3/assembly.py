@@ -71,7 +71,7 @@ def _get_coord_type_and_seq_region_id(coord_name, core_db):
         selected_row = None
         for row in rows:
             # not a default_version
-            if not row["coord_system_id"] in species_coord_sys:
+            if row["coord_system_id"] not in species_coord_sys:
                 continue
             elif not selected_row:
                 selected_row = row
@@ -256,14 +256,13 @@ class Coordinate(object):
         start = min(self.start, other.start)
         end = max(self.end, other.end)
 
-        new = self.__class__(
+        return self.__class__(
             self.genome,
             coord_name=self.coord_name,
             start=start,
             end=end,
             strand=self.strand,
         )
-        return new
 
 
 class _CoordRecord(object):
@@ -356,12 +355,11 @@ class CoordSystemCache(object):
         species = _Species.get_species_name(species or core_db.db_name.species)
         self._set_species_system(core_db, species)
         if seq_level:
-            result = self._get_seq_level_system(species)
+            return self._get_seq_level_system(species)
         elif coord_type:
-            result = self._species_coord_systems[species][coord_type]
+            return self._species_coord_systems[species][coord_type]
         else:
-            result = self._species_coord_systems[species]
-        return result
+            return self._species_coord_systems[species]
 
 
 CoordSystem = CoordSystemCache()
@@ -420,7 +418,7 @@ def _get_equivalent_coords(
     q_start = int(assembly_row[f"{query_prefix}_start"]) + d_start
     q_end = int(assembly_row[f"{query_prefix}_end"]) - d_end
 
-    if int(assembly_row["ori"]) == -1:
+    if int(ori) == -1:
         d_start, d_end = d_end, d_start
     # t -- target
     t_start = int(assembly_row[f"{target_prefix}_start"]) + d_start
@@ -507,15 +505,13 @@ def get_coord_conversion(query_location, target_coord_type, core_db, where=None)
         where=where,
     )
     assembly_rows = query.execute().fetchall()
-    results = []
-    for assembly_row in assembly_rows:
-        results.append(
-            _get_equivalent_coords(
-                query_location,
-                assembly_row,
-                query_prefix,
-                target_prefix,
-                target_coord_type,
-            )
+    return [
+        _get_equivalent_coords(
+            query_location,
+            assembly_row,
+            query_prefix,
+            target_prefix,
+            target_coord_type,
         )
-    return results
+        for assembly_row in assembly_rows
+    ]

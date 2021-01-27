@@ -93,7 +93,7 @@ class _Region(LazyRecord):
 
     def _get_location_record(self):
         """makes the location data"""
-        if not self._attr_ensembl_table_map["location"] in self._table_rows:
+        if self._attr_ensembl_table_map["location"] not in self._table_rows:
             # we use a bit of magic to figure out what method will be required
             # this magic assumes the method for obtaining a record from a table
             # are named _get_tablename_record
@@ -160,10 +160,9 @@ class _Region(LazyRecord):
             if self.location.strand == -1:
                 # this map is relative to + strand
                 feat_map = feat_map.reversed()
-            data = (self.type, str(symbol), feat_map)
+            return self.type, str(symbol), feat_map
         else:
-            data = None
-        return data
+            return None
 
     def get_annotated_seq(self, feature_types=None, where_feature=None):
         regions = list(
@@ -513,10 +512,9 @@ class Gene(_StableRegion):
         returns None if no transcripts."""
         if self.transcripts is self.NULL_VALUE:
             return None
-        lengths = [
+        return [
             ts.get_cds_length() for ts in self.transcripts if ts.biotype == self.biotype
         ]
-        return lengths
 
     def get_longest_cds_transcript(self):
         """returns the Transcript with the longest cds and the same biotype"""
@@ -584,8 +582,7 @@ class Transcript(_StableRegion):
         gene_table = self.db.get_table("gene")
         query = sql.select([gene_table.c.stable_id], gene_table.c.gene_id == gene_id)
         record = asserted_one(query.execute())
-        gene = self.genome.get_gene_by_stableid(record[0])
-        return gene
+        return self.genome.get_gene_by_stableid(record[0])
 
     gene = property(_get_gene)
 
@@ -607,9 +604,11 @@ class Transcript(_StableRegion):
             exon_transcript_table.c.transcript_id == transcript_id,
         )
         records = query.execute()
-        exons = []
-        for record in records:
-            exons.append(Exon(self.genome, self.db, record["exon_id"], record["rank"]))
+        exons = [
+            Exon(self.genome, self.db, record["exon_id"], record["rank"])
+            for record in records
+        ]
+
         exons.sort()
         self._cached["exons"] = tuple(exons)
 
@@ -638,16 +637,13 @@ class Transcript(_StableRegion):
         chrom = self.location.coord_name
         strand = self.location.strand
         introns = []
-        rank = 1
         if strand == -1:
             intron_positions.reverse()
-        for s, e in intron_positions:
+        for rank, (s, e) in enumerate(intron_positions, start=1):
             coord = self.genome.make_location(
                 coord_name=chrom, start=s, end=e, strand=strand, ensembl_coord=False
             )
             introns.append(Intron(self.genome, self.db, rank, self.stableid, coord))
-            rank += 1
-
         self._cached["introns"] = tuple(introns)
 
     def _get_introns(self):
@@ -1178,8 +1174,7 @@ class Variation(_Region):
         query = sql.select(
             [seq_region_table], seq_region_table.c.seq_region_id == seq_region_id
         )
-        record = asserted_one(query.execute())
-        return record
+        return asserted_one(query.execute())
 
     def _get_flanking_seq_data_ge_70(self):
         """return the flanking sequence data if release >= 70"""
@@ -1264,7 +1259,7 @@ class Variation(_Region):
         query = sql.select([allele_table], allele_table.c.variation_id == variation_id)
         records = [r for r in query.execute()]
 
-        if len(records) == 0:
+        if not records:
             self._cached[("allele_freqs")] = self.NULL_VALUE
             return
 
@@ -1333,7 +1328,7 @@ class Variation(_Region):
                     attr_ty.c.name == "Variant evidence status",
                 ),
             )
-            mapping = dict((str(i), v) for i, v in query.execute().fetchall())
+            mapping = {str(i): v for i, v in query.execute().fetchall()}
             cached_attribs.add_to_cache(self.genome, "validation", mapping)
 
         out = [mapping[k] for k in sorted(result)]
