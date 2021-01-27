@@ -93,7 +93,7 @@ class _Region(LazyRecord):
 
     def _get_location_record(self):
         """makes the location data"""
-        if not self._attr_ensembl_table_map["location"] in self._table_rows:
+        if self._attr_ensembl_table_map["location"] not in self._table_rows:
             # we use a bit of magic to figure out what method will be required
             # this magic assumes the method for obtaining a record from a table
             # are named _get_tablename_record
@@ -160,10 +160,9 @@ class _Region(LazyRecord):
             if self.location.strand == -1:
                 # this map is relative to + strand
                 feat_map = feat_map.reversed()
-            data = (self.type, str(symbol), feat_map)
+            return self.type, str(symbol), feat_map
         else:
-            data = None
-        return data
+            return None
 
     def get_annotated_seq(self, feature_types=None, where_feature=None):
         regions = list(
@@ -638,16 +637,13 @@ class Transcript(_StableRegion):
         chrom = self.location.coord_name
         strand = self.location.strand
         introns = []
-        rank = 1
         if strand == -1:
             intron_positions.reverse()
-        for s, e in intron_positions:
+        for rank, (s, e) in enumerate(intron_positions, start=1):
             coord = self.genome.make_location(
                 coord_name=chrom, start=s, end=e, strand=strand, ensembl_coord=False
             )
             introns.append(Intron(self.genome, self.db, rank, self.stableid, coord))
-            rank += 1
-
         self._cached["introns"] = tuple(introns)
 
     def _get_introns(self):
@@ -1263,7 +1259,7 @@ class Variation(_Region):
         query = sql.select([allele_table], allele_table.c.variation_id == variation_id)
         records = [r for r in query.execute()]
 
-        if len(records) == 0:
+        if not records:
             self._cached[("allele_freqs")] = self.NULL_VALUE
             return
 

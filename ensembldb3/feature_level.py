@@ -93,26 +93,36 @@ class FeatureCoordLevelsCache(object):
         if species not in self._species_feature_levels:
             self._species_feature_levels[species] = {}
             self._species_feature_dbs[species] = []
+
         coord_system = CoordSystem(core_db=core_db)
-        if set(feature_types).intersection(set(["cpg", "repeat", "gene"])):
-            if "core_db" not in self._species_feature_dbs[species]:
-                self._species_feature_dbs[species].append("core_db")
-                records = self._get_meta_coord_records(core_db)
-                self._add_species_feature_levels(species, records, "core", coord_system)
-        if "variation" in feature_types:
-            if "var_db" not in self._species_feature_dbs[species]:
-                self._species_feature_dbs[species].append("var_db")
-                assert var_db is not None
-                records = self._get_meta_coord_records(var_db)
-                self._add_species_feature_levels(species, records, "var", coord_system)
-        if "est" in feature_types:
-            if "otherfeature_db" not in self._species_feature_dbs[species]:
-                self._species_feature_dbs[species].append("otherfeature_db")
-                assert otherfeature_db is not None
-                records = self._get_meta_coord_records(otherfeature_db)
-                self._add_species_feature_levels(
-                    species, records, "otherfeature", coord_system
-                )
+
+        if (
+            set(feature_types).intersection(set(["cpg", "repeat", "gene"]))
+            and "core_db" not in self._species_feature_dbs[species]
+        ):
+            self._species_feature_dbs[species].append("core_db")
+            records = self._get_meta_coord_records(core_db)
+            self._add_species_feature_levels(species, records, "core", coord_system)
+
+        if (
+            "variation" in feature_types
+            and "var_db" not in self._species_feature_dbs[species]
+        ):
+            self._species_feature_dbs[species].append("var_db")
+            assert var_db is not None
+            records = self._get_meta_coord_records(var_db)
+            self._add_species_feature_levels(species, records, "var", coord_system)
+
+        if (
+            "est" in feature_types
+            and "otherfeature_db" not in self._species_feature_dbs[species]
+        ):
+            self._species_feature_dbs[species].append("otherfeature_db")
+            assert otherfeature_db is not None
+            records = self._get_meta_coord_records(otherfeature_db)
+            self._add_species_feature_levels(
+                species, records, "otherfeature", coord_system
+            )
 
     def __call__(
         self,
@@ -139,12 +149,10 @@ class FeatureCoordLevels(FeatureCoordLevelsCache):
         """print table format"""
         header = ["type", "levels"]
         if self.species not in self._species_feature_levels:
-            result = ""
-        else:
-            collate = []
-            feature_levels = self._species_feature_levels[self.species]
-            for feature in list(feature_levels.keys()):
-                record = feature_levels[feature]
-                collate.append([feature, ", ".join(record.levels)])
-            result = str(Table(header, collate, title=self.species))
-        return result
+            return ""
+        collate = []
+        feature_levels = self._species_feature_levels[self.species]
+        for feature in list(feature_levels.keys()):
+            record = feature_levels[feature]
+            collate.append([feature, ", ".join(record.levels)])
+        return str(Table(header, collate, title=self.species))

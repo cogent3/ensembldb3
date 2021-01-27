@@ -73,11 +73,11 @@ class Compara(object):
         )
 
     def _connect_db(self):
-        # TODO can the connection be all done in init?
-        connection = dict(
-            account=self._account, release=self.release, pool_recycle=self._pool_recycle
-        )
         if self._compara_db is None:
+            # TODO can the connection be all done in init?
+            connection = dict(
+                account=self._account, release=self.release, pool_recycle=self._pool_recycle
+            )
             self._compara_db = Database(
                 db_type="compara", division=self.division, **connection
             )
@@ -156,7 +156,7 @@ class Compara(object):
             parents[parent_id].append(node)
 
         root = None
-        for parent in parents:
+        for parent, value in parents.items():
             if parent not in nodes:
                 node = PhyloNode(name="root")
                 nodes[parent] = node
@@ -165,7 +165,7 @@ class Compara(object):
             for child in parents[parent]:
                 child.parent = node
 
-            if len(parents[parent]) == 1:
+            if len(value) == 1:
                 root = node
 
         # convert tip-names to match genome db names
@@ -305,9 +305,8 @@ class Compara(object):
 
         if not member_records:
             return None
-        else:
-            member_record = asserted_one(member_records)
-            member_id = member_record[mem_id]
+        member_record = asserted_one(member_records)
+        member_id = member_record[mem_id]
 
         # in case query gene_region is not provided
         if gene_region is None:

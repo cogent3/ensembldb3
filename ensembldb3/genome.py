@@ -676,15 +676,14 @@ class Genome(object):
                     coord, feature_coord, db, where=where_feature
                 )
                 for chrom_coord, other_coord in chrom_other_coords:
-                    for region in target_func(
+                    yield from target_func(
                         db,
                         target_class,
                         chrom_coord,
                         other_coord,
                         where_feature,
                         limit=limit,
-                    ):
-                        yield region
+                    )
 
     def get_variation(
         self,

@@ -132,7 +132,7 @@ class RelatedGenes(_RelatedRegions):
             parents[parent_id].append(node)
 
         root = None
-        for parent in parents:
+        for parent, value in parents.items():
             if parent not in nodes:
                 node = PhyloNode(name="root")
                 nodes[parent] = node
@@ -140,7 +140,7 @@ class RelatedGenes(_RelatedRegions):
             node = nodes[parent]
             for child in parents[parent]:
                 child.parent = node
-            if len(parents[parent]) == 1:
+            if len(value) == 1:
                 root = node
 
         if just_members:
