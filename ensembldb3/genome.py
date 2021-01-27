@@ -212,8 +212,7 @@ class Genome(object):
                 xref_table, gene_table.c.display_xref_id == xref_table.c.xref_id
             )
             select_obj.append(xref_table.c.display_label)
-        query = sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
-        return query
+        return sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
 
     def _get_symbol_from_synonym(self, db, synonym):
         """returns the gene symbol for a synonym"""
@@ -405,11 +404,9 @@ class Genome(object):
                 transcript_table, description, biotype, like
             )
 
-        query = self._build_transcript_query(
+        return self._build_transcript_query(
             db, condition, transcript_table, transcript_id_table, xref_table
         )
-
-        return query
 
     def _build_transcript_query(
         self, db, condition, transcript_table, transcript_id_table, xref_table=None
@@ -429,8 +426,7 @@ class Genome(object):
                 xref_table, transcript_table.c.display_xref_id == xref_table.c.xref_id
             )
             select_obj.append(xref_table.c.display_label)
-        query = sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
-        return query
+        return sql.select(select_obj, from_obj=[join_obj], whereclause=condition)
 
     def get_est_matching(self, stableid):
         """returns an Est object from the otherfeatures db with the stableid"""
@@ -610,10 +606,9 @@ class Genome(object):
             dbs["var_db"] = self.VarDb
         if "est" in feature_types:
             dbs["otherfeature_db"] = self.OtherFeaturesDb
-        feature_coord_levels = self._feature_coord_levels(
+        return self._feature_coord_levels(
             self.species, feature_types=feature_types, **dbs
         )
-        return feature_coord_levels
 
     def _feature_coord_levels(self):
         if str(self._feature_coord_levels):

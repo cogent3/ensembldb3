@@ -256,14 +256,13 @@ class Coordinate(object):
         start = min(self.start, other.start)
         end = max(self.end, other.end)
 
-        new = self.__class__(
+        return self.__class__(
             self.genome,
             coord_name=self.coord_name,
             start=start,
             end=end,
             strand=self.strand,
         )
-        return new
 
 
 class _CoordRecord(object):

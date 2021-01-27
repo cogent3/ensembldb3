@@ -95,13 +95,12 @@ class EnsemblDbName(object):
 
     def __repr__(self):
         build = ["", f"; build='{self.build}'"][self.build is not None]
-        s = "db(prefix='%s'; type='%s'; release='%s'%s)" % (
+        return "db(prefix='%s'; type='%s'; release='%s'%s)" % (
             self.prefix,
             self.type,
             self.release,
             build,
         )
-        return s
 
     def __str__(self):
         return self.name

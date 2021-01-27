@@ -513,10 +513,11 @@ class Gene(_StableRegion):
         returns None if no transcripts."""
         if self.transcripts is self.NULL_VALUE:
             return None
-        lengths = [
-            ts.get_cds_length() for ts in self.transcripts if ts.biotype == self.biotype
+        return [
+            ts.get_cds_length()
+            for ts in self.transcripts
+            if ts.biotype == self.biotype
         ]
-        return lengths
 
     def get_longest_cds_transcript(self):
         """returns the Transcript with the longest cds and the same biotype"""
@@ -584,8 +585,7 @@ class Transcript(_StableRegion):
         gene_table = self.db.get_table("gene")
         query = sql.select([gene_table.c.stable_id], gene_table.c.gene_id == gene_id)
         record = asserted_one(query.execute())
-        gene = self.genome.get_gene_by_stableid(record[0])
-        return gene
+        return self.genome.get_gene_by_stableid(record[0])
 
     gene = property(_get_gene)
 
@@ -1178,8 +1178,7 @@ class Variation(_Region):
         query = sql.select(
             [seq_region_table], seq_region_table.c.seq_region_id == seq_region_id
         )
-        record = asserted_one(query.execute())
-        return record
+        return asserted_one(query.execute())
 
     def _get_flanking_seq_data_ge_70(self):
         """return the flanking sequence data if release >= 70"""

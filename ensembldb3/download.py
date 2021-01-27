@@ -23,8 +23,7 @@ __status__ = "alpha"
 
 def get_download_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
-    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_DOWNLOADED")
-    return checkpoint_file
+    return os.path.join(local_path, dbname, "ENSEMBLDB_DOWNLOADED")
 
 
 def is_downloaded(local_path, dbname):
@@ -53,8 +52,7 @@ def lftp_listdir(host, dirname="", debug=True):
     if debug:
         print(cmnd)
     result = exec_command(cmnd)
-    r = result.splitlines()
-    return r
+    return result.splitlines()
 
 
 def rsync_listdir(remote_path, dirname="", debug=True):
@@ -75,8 +73,7 @@ def _sort_dbs(dbnames):
     """returns the dbnames sorted by their type"""
     order = {"compara": 2, "variation": 3, "otherfeatures": 1}
     names = [(order.get(n.type, 0), n.name, n) for n in dbnames]
-    dbs = [db for i, n, db in sorted(names)]
-    return dbs
+    return [db for i, n, db in sorted(names)]
 
 
 def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):

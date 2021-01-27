@@ -61,8 +61,7 @@ class FeatureCoordLevelsCache(object):
         else:
             assert "otherfeature" in str(db.db_name)
             query = sql.select([meta_coord]).where(meta_coord.c.table_name == "gene")
-        records = query.execute().fetchall()
-        return records
+        return query.execute().fetchall()
 
     def _add_species_feature_levels(self, species, records, db_type, coord_system):
         if db_type == "core":

@@ -60,8 +60,7 @@ def get_import_command(mysqlcfg, account, dbname, local_path, verbose=False):
 
 def get_installed_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
-    checkpoint_file = os.path.join(local_path, dbname, "ENSEMBLDB_INSTALLED")
-    return checkpoint_file
+    return os.path.join(local_path, dbname, "ENSEMBLDB_INSTALLED")
 
 
 def is_installed(local_path, dbname):

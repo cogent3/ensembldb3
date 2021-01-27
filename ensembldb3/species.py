@@ -70,14 +70,13 @@ class SpeciesNameMap(dict):
             syn = syns.get(species, "")
 
             rows += [[common, species, ensembl, syn]]
-        display = str(
+        return str(
             Table(
                 ["Common name", "Species name", "Ensembl Db Prefix", "Synonymns"],
                 data=rows,
                 space=2,
             ).sorted()
         )
-        return display
 
     def __repr__(self):
         return "Available species: %s" % (
