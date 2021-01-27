@@ -76,7 +76,9 @@ class Compara(object):
         if self._compara_db is None:
             # TODO can the connection be all done in init?
             connection = dict(
-                account=self._account, release=self.release, pool_recycle=self._pool_recycle
+                account=self._account,
+                release=self.release,
+                pool_recycle=self._pool_recycle,
             )
             self._compara_db = Database(
                 db_type="compara", division=self.division, **connection

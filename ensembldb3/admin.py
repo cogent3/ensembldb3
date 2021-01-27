@@ -118,24 +118,7 @@ def install_one_db(
 
     r = cursor.execute("SHOW TABLES")
     if r < num_tables:
-        result = cursor.fetchall()
-        expected = set()
-        for line in sql.splitlines():
-            if "CREATE TABLE" in line:
-                table = line.replace("`", "").split()[2]
-                expected.update([table])
-
-        got = set(str(g[0]) for g in result)
-
-        diff = got ^ expected  # symmetric diff
-        msg = [
-            "ERR: The symmetric difference in tables between "
-            "SQL statement and actually created:",
-            f"\t{str(diff)}",
-        ]
-        click.secho("\n".join(msg), fg="red")
-
-        raise RuntimeError("number of created tables doesn't match number in sql")
+        _display_sql_created_diff_error(cursor, sql)
 
     if debug:
         click.echo(r)
@@ -156,6 +139,27 @@ def install_one_db(
     checkpoint_file = get_installed_checkpoint_path(local_path, dbname)
     with open(checkpoint_file, "w") as checked:
         pass
+
+
+def _display_sql_created_diff_error(cursor, sql):
+    result = cursor.fetchall()
+    expected = set()
+    for line in sql.splitlines():
+        if "CREATE TABLE" in line:
+            table = line.replace("`", "").split()[2]
+            expected.update([table])
+
+    got = {str(g[0]) for g in result}
+
+    diff = got ^ expected  # symmetric diff
+    msg = [
+        "ERR: The symmetric difference in tables between "
+        "SQL statement and actually created:",
+        f"\t{str(diff)}",
+    ]
+    click.secho("\n".join(msg), fg="red")
+
+    raise RuntimeError("number of created tables doesn't match number in sql")
 
 
 def sorted_by_size(local_path, dbnames, debug=False):
