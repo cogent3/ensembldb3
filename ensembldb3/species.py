@@ -191,10 +191,17 @@ class SpeciesNameMap:
             species = self._common_species[common]
             ensembl = self._species_ensembl[species]
             syn = syns.get(species, "")
+            compara = self.get_compara_name(species)
 
-            rows += [[common, species, ensembl, syn]]
+            rows += [[common, species, ensembl, syn, compara]]
         return Table(
-            ["Common name", "Species name", "Ensembl Db Prefix", "Synonymn"],
+            [
+                "Common name",
+                "Species name",
+                "Ensembl Db Prefix",
+                "Synonymn",
+                "Compara.Name",
+            ],
             data=rows,
             space=2,
         ).sorted()
