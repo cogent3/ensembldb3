@@ -44,7 +44,7 @@ def load_species(species_path):
 _species_common_map = load_species(os.path.join(ENSEMBLDBRC, "species.tsv"))
 
 
-class SpeciesNameMap(dict):
+class SpeciesNameMap:
     """mapping between common names and latin names"""
 
     def __init__(self, species_common=_species_common_map):
