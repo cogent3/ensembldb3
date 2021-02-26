@@ -59,29 +59,14 @@ class SpeciesNameMap:
             self.amend_species(*names)
 
     def __str__(self):
-        rows = []
-        have_syns = defaultdict(list)
-        for syn in self._synonyms:
-            have_syns[self._synonyms[syn]].append(syn)
-        syns = dict([(sp, ", ".join(have_syns[sp])) for sp in have_syns])
-        for common in self._common_species:
-            species = self._common_species[common]
-            ensembl = self._species_ensembl[species]
-            syn = syns.get(species, "")
-
-            rows += [[common, species, ensembl, syn]]
-        return str(
-            Table(
-                ["Common name", "Species name", "Ensembl Db Prefix", "Synonymns"],
-                data=rows,
-                space=2,
-            ).sorted()
-        )
+        return str(self.to_table())
 
     def __repr__(self):
-        return "Available species: %s" % (
-            "'" + "'; '".join(list(self._common_species.keys())) + "'"
-        )
+        return repr(self.to_table())
+
+    def _repr_html_(self):
+        table = self.to_table()
+        return table._repr_html_()
 
     def add_synonym(self, species, synonym):
         """add a synonym for a species name
@@ -195,7 +180,24 @@ class SpeciesNameMap:
         if synonym:
             self.add_synonym(species_name, CaseInsensitiveString(synonym))
 
-        return
+    def to_table(self):
+        """returns cogent3 Table"""
+        rows = []
+        have_syns = defaultdict(list)
+        for syn in self._synonyms:
+            have_syns[self._synonyms[syn]].append(syn)
+        syns = dict([(sp, ", ".join(have_syns[sp])) for sp in have_syns])
+        for common in self._common_species:
+            species = self._common_species[common]
+            ensembl = self._species_ensembl[species]
+            syn = syns.get(species, "")
+
+            rows += [[common, species, ensembl, syn]]
+        return Table(
+            ["Common name", "Species name", "Ensembl Db Prefix", "Synonymn"],
+            data=rows,
+            space=2,
+        ).sorted()
 
 
 Species = SpeciesNameMap()

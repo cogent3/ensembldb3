@@ -1,5 +1,7 @@
 from unittest import TestCase, main
 
+from cogent3.util.table import Table
+
 from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"
@@ -86,6 +88,13 @@ class TestSpeciesNamemaps(TestCase):
             Species.get_ensembl_db_prefix("Canis lupus familiaris"), "canis_familiaris"
         )
         self.assertEqual(Species.get_compara_name("Canis lupus familiaris"), "Dog")
+
+    def test_to_table(self):
+        """returns a table object"""
+        table = Species.to_table()
+        self.assertIsInstance(table, Table)
+        self.assertTrue(table.shape[0] > 20)
+        self.assertEqual(table.shape[1], 4)
 
 
 if __name__ == "__main__":
