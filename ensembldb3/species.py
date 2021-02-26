@@ -1,4 +1,5 @@
 import os
+import re
 from collections import defaultdict
 
 from cogent3.util.table import Table
@@ -14,6 +15,8 @@ __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
+
+_invalid_chars = re.compile("[^a-zA-Z _]")
 
 
 def load_species(species_path):
@@ -149,12 +152,17 @@ class SpeciesNameMap:
         return str(species_name.lower().replace(" ", "_"))
 
     def get_compara_name(self, name):
-        """returns string matching a compara instance attribute name for a
-        species"""
+        """the compara instance attribute name for species matching ``name``"""
         name = self.get_common_name(name)
-        name = name.replace(".", "") if "." in name else name.title()
+        name = name.replace(".", "")
         name = name.split()
-        return "".join(name)
+        for i, word in enumerate(name):
+            name[i] = word.title()
+        name = "".join(name)
+        for invalid in _invalid_chars.findall(name):
+            name = name.replace(invalid, "")
+
+        return name
 
     def _purge_species(self, species_name):
         """removes a species record"""
