@@ -1,4 +1,5 @@
 import os
+import re
 from collections import defaultdict
 
 from cogent3.util.table import Table
@@ -14,6 +15,8 @@ __version__ = "3.0a1"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
+
+_invalid_chars = re.compile("[^a-zA-Z _]")
 
 
 def load_species(species_path):
@@ -44,7 +47,7 @@ def load_species(species_path):
 _species_common_map = load_species(os.path.join(ENSEMBLDBRC, "species.tsv"))
 
 
-class SpeciesNameMap(dict):
+class SpeciesNameMap:
     """mapping between common names and latin names"""
 
     def __init__(self, species_common=_species_common_map):
@@ -59,29 +62,14 @@ class SpeciesNameMap(dict):
             self.amend_species(*names)
 
     def __str__(self):
-        rows = []
-        have_syns = defaultdict(list)
-        for syn in self._synonyms:
-            have_syns[self._synonyms[syn]].append(syn)
-        syns = dict([(sp, ", ".join(have_syns[sp])) for sp in have_syns])
-        for common in self._common_species:
-            species = self._common_species[common]
-            ensembl = self._species_ensembl[species]
-            syn = syns.get(species, "")
-
-            rows += [[common, species, ensembl, syn]]
-        return str(
-            Table(
-                ["Common name", "Species name", "Ensembl Db Prefix", "Synonymns"],
-                data=rows,
-                space=2,
-            ).sorted()
-        )
+        return str(self.to_table())
 
     def __repr__(self):
-        return "Available species: %s" % (
-            "'" + "'; '".join(list(self._common_species.keys())) + "'"
-        )
+        return repr(self.to_table())
+
+    def _repr_html_(self):
+        table = self.to_table()
+        return table._repr_html_()
 
     def add_synonym(self, species, synonym):
         """add a synonym for a species name
@@ -164,12 +152,17 @@ class SpeciesNameMap(dict):
         return str(species_name.lower().replace(" ", "_"))
 
     def get_compara_name(self, name):
-        """returns string matching a compara instance attribute name for a
-        species"""
+        """the compara instance attribute name for species matching ``name``"""
         name = self.get_common_name(name)
-        name = name.replace(".", "") if "." in name else name.title()
+        name = name.replace(".", "")
         name = name.split()
-        return "".join(name)
+        for i, word in enumerate(name):
+            name[i] = word.title()
+        name = "".join(name)
+        for invalid in _invalid_chars.findall(name):
+            name = name.replace(invalid, "")
+
+        return name
 
     def _purge_species(self, species_name):
         """removes a species record"""
@@ -195,7 +188,31 @@ class SpeciesNameMap(dict):
         if synonym:
             self.add_synonym(species_name, CaseInsensitiveString(synonym))
 
-        return
+    def to_table(self):
+        """returns cogent3 Table"""
+        rows = []
+        have_syns = defaultdict(list)
+        for syn in self._synonyms:
+            have_syns[self._synonyms[syn]].append(syn)
+        syns = dict([(sp, ", ".join(have_syns[sp])) for sp in have_syns])
+        for common in self._common_species:
+            species = self._common_species[common]
+            ensembl = self._species_ensembl[species]
+            syn = syns.get(species, "")
+            compara = self.get_compara_name(species)
+
+            rows += [[species, common, syn, ensembl, compara]]
+        return Table(
+            [
+                "Species name",
+                "Common name",
+                "Synonymn",
+                "Ensembl Db Prefix",
+                "Compara.Name",
+            ],
+            data=rows,
+            space=2,
+        ).sorted()
 
 
 Species = SpeciesNameMap()
