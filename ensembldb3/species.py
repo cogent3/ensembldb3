@@ -201,13 +201,13 @@ class SpeciesNameMap:
             syn = syns.get(species, "")
             compara = self.get_compara_name(species)
 
-            rows += [[common, species, ensembl, syn, compara]]
+            rows += [[species, common, syn, ensembl, compara]]
         return Table(
             [
-                "Common name",
                 "Species name",
-                "Ensembl Db Prefix",
+                "Common name",
                 "Synonymn",
+                "Ensembl Db Prefix",
                 "Compara.Name",
             ],
             data=rows,
