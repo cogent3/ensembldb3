@@ -70,7 +70,7 @@ def decompress_files(local_path):
 
 def get_installed_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
-    return os.path.join(local_path, dbname, "ENSEMBLDB_INSTALLED")
+    return pathlib.Path(local_path) / dbname / "ENSEMBLDB_INSTALLED"
 
 
 def is_installed(local_path, dbname):
@@ -95,7 +95,7 @@ def install_one_db(
     # then execute using mysql cursor?
     # ensembl instructions suggest the following
     # $ mysql -u uname dname < dbname.sql
-    dbpath = os.path.join(local_path, dbname)
+    dbpath = pathlib.Path(local_path) / dbname
     if is_installed(local_path, dbname) and not force_overwrite:
         click.echo(f"ALREADY INSTALLED: {dbname}, skipping")
         return True
@@ -344,13 +344,13 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
     dbnames = reduce_dirnames(content, species_dbs)
     dbnames = sorted_by_size(local_path, dbnames, debug=debug)
     for dbname in dbnames:
+        chk = get_installed_checkpoint_path(local_path, dbname.name)
         server.ping(reconnect=True)  # reconnect if server not alive
         cursor = server.cursor()
-        if force_overwrite or not is_installed(local_path, dbname.name):
+        if force_overwrite:
             _drop_db(cursor, dbname.name)
-            if is_installed(local_path, dbname.name):
-                chk = get_installed_checkpoint_path(local_path, dbname.name)
-                os.remove(chk)
+            if chk.exists():
+                chk.unlink()
 
         if verbose:
             click.echo(f"Creating database {dbname.name}")
