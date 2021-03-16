@@ -34,13 +34,23 @@ def listpaths(dirname, glob_pattern):
 
 
 def decompress_files(local_path):
-    """gunzip all the files in local_path"""
-    paths = pathlib.Path(local_path).glob("*.gz")
+    """gunzip files
+
+
+    Parameters
+    ----------
+    local_path: pathlib.Path
+        single file, or directory
+
+    Notes
+    -----
+    If directory, does all .gz files.
+    """
+    local_path = pathlib.Path(local_path)
+    paths = [local_path] if local_path.is_file() else local_path.glob("*.gz")
     for path in paths:
-        r = exec_command(f"gunzip {path}")
+        _ = exec_command(f"gunzip {path}")
 
-
-def get_import_command(mysqlcfg, account, dbname, local_path, verbose=False):
     info = read_mysql_config(mysqlcfg, "mysqlimport", verbose=verbose)
     command = info.get("command", r"mysqlimport --fields_escaped_by=\\")
     acct = r" -u %(user)s -p%(passwd)s "
