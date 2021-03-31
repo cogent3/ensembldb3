@@ -346,6 +346,7 @@ _release = click.option("-r", "--release", type=int, help="Ensembl release numbe
 
 
 @click.group()
+@click.version_option(__version__)
 def main():
     """admin tools for an Ensembl MySQL installation"""
     pass
