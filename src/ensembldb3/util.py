@@ -1,6 +1,8 @@
 import bz2
 import gzip
 import os
+import pathlib
+import re
 import subprocess
 import sys
 
@@ -11,7 +13,7 @@ __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
 __credits__ = ["Gavin Huttley"]
 __license__ = "BSD"
-__version__ = "3.0a1"
+__version__ = "2021.04.01"
 __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
@@ -226,3 +228,47 @@ def flatten(data):
         except Exception:
             result.append(element)
     return result
+
+
+class FileSet(set):
+    """Determines names of all files in a directory with matching suffixes.
+    Does not recurse."""
+
+    _dot = re.compile(r"^\.")
+
+    def __init__(self, path, suffixes=("txt", "sql"), trim_suffixes=True):
+        """
+        Parameters
+        ----------
+        path
+            directory path
+        suffixes
+            filename suffixes to match
+        trim_suffixes
+            whether suffixes are to be trimmed before adding to self
+        """
+        super().__init__()
+        if isinstance(suffixes, str):
+            suffixes = (suffixes,)
+
+        path = pathlib.Path(path).expanduser()
+        suffixes = {self._dot.sub("", s) for s in suffixes}
+        collected = set()
+        for p in path.glob("*"):
+            if p.is_dir() or p.name.startswith("."):
+                # don't consider nested directories, hidden files, files without a suffix
+                continue
+
+            if not {self._dot.sub("", s) for s in p.suffixes} & suffixes:
+                continue
+
+            if trim_suffixes:
+                num_suffixes = len(p.suffixes)
+                name = ".".join(p.name.split(".")[:-num_suffixes])
+            else:
+                name = p.name
+
+            collected.add(name)
+
+        self.path = path
+        self.update(collected)
