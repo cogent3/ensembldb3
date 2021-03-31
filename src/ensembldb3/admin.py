@@ -13,7 +13,7 @@ from . import HostAccount
 from .download import (_cfg, download_dbs, is_downloaded, read_config,
                        reduce_dirnames)
 from .host import DbConnection, get_db_name
-from .util import ENSEMBLDBRC, exec_command, open_
+from .util import ENSEMBLDBRC, FileSet, exec_command, open_
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb Project"
@@ -51,8 +51,12 @@ def decompress_files(local_path):
     for path in paths:
         _ = exec_command(f"gunzip {path}")
 
+
+def get_import_command(
+    mysqlcfg, account, dbname, local_path, table_name=None, verbose=False
+):
     info = read_mysql_config(mysqlcfg, "mysqlimport", verbose=verbose)
-    command = info.get("command", r"mysqlimport --fields_escaped_by=\\")
+    command = info.get("command", r"mysqlimport  --local --fields_escaped_by=\\")
     acct = r" -u %(user)s -p%(passwd)s "
     host = "" if info["host"] is None else r" -h %(host)s "
     port = "" if info["port"] is None else r" --port %(port)s "
@@ -63,9 +67,29 @@ def decompress_files(local_path):
         port=info["port"] or account.port,
     )
 
-    cmnd = command + port + host + acct + f" {dbname} {local_path}/{dbname}/*.txt"
+    if table_name is None:
+        cmnd = command + port + host + acct + f" {dbname} {local_path}/{dbname}/*.txt"
+    else:
+        cmnd = (
+            command
+            + port
+            + host
+            + acct
+            + f" {dbname} {local_path}/{dbname}/{table_name}.txt"
+        )
     cmnd = cmnd % opts
     return cmnd
+
+
+def tables_to_install(checkpoint):
+    """tables whose installation was not completed"""
+    if checkpoint.exists():
+        installed_tables = {l.strip() for l in checkpoint.read_text().splitlines()}
+    else:
+        installed_tables = set()
+
+    all_tables = FileSet(checkpoint.parent, suffixes="txt")
+    return installed_tables ^ all_tables
 
 
 def get_installed_checkpoint_path(local_path, dbname):
@@ -76,7 +100,12 @@ def get_installed_checkpoint_path(local_path, dbname):
 def is_installed(local_path, dbname):
     """returns True if checkpoint file exists for dbname"""
     chk = get_installed_checkpoint_path(local_path, dbname)
-    return os.path.exists(chk)
+    if not chk.exists():
+        return False
+
+    data = chk.read_text().splitlines()
+
+    return data[-1] == "INSTALL COMPLETED"
 
 
 def install_one_db(
@@ -90,6 +119,7 @@ def install_one_db(
     debug=False,
 ):
     """installs a single ensembl database"""
+    checkpoint = get_installed_checkpoint_path(local_path, dbname)
     # first create the database in mysql
     # find the .sql file, load all contents into memory
     # then execute using mysql cursor?
@@ -113,12 +143,16 @@ def install_one_db(
     # select the database
     if verbose or debug:
         click.echo(f"  Creating table definitions for {dbname}")
+
     cursor = server.cursor()
+
+    table_names = tables_to_install(checkpoint)
+    if debug:
+        click.echo(str(table_names))
+
     r = cursor.execute(f"USE {dbname}")
     # make sure tables don't exist
-    r = cursor.execute("SHOW TABLES")
-    result = cursor.fetchall()
-    for table in result:
+    for table in table_names:
         click.echo(table)
         r = cursor.execute(f"DROP TABLE IF EXISTS {table}")
 
@@ -126,29 +160,39 @@ def install_one_db(
     num_tables = sql.count("CREATE TABLE")
     r = cursor.execute(sql)
 
-    r = cursor.execute("SHOW TABLES")
-    if r < num_tables:
-        _display_sql_created_diff_error(cursor, sql)
+    # print("here")
+    # r = cursor.execute("SHOW TABLES")
+    # print("here 2")
 
-    if debug:
-        click.echo(r)
-        click.echo()
-        display_dbs_tables(cursor, dbname)
+    # if r < num_tables:
+    #     _display_sql_created_diff_error(cursor, sql)
+
+    # print("here 3")
+    # if debug:
+    #     click.echo(r)
+    #     click.echo()
+    #     display_dbs_tables(cursor, dbname)
 
     cursor.close()
-    decompress_files(dbpath)
-    tablenames = listpaths(dbpath, "*.txt")
-    if debug:
-        click.echo(str(tablenames))
+    for table_name in table_names:
+        tablepath = dbpath / f"{table_name}.txt.gz"
+        if tablepath.exists():
+            decompress_files(tablepath)
 
-    mysqlimport_command = get_import_command(
-        mysqlcfg, account, dbname, local_path, verbose=verbose
-    )
-    r = exec_command(mysqlimport_command)
-    # existence of this checkpoint file signals completion of the install without failure
-    checkpoint_file = get_installed_checkpoint_path(local_path, dbname)
-    with open(checkpoint_file, "w") as checked:
-        pass
+        tablepath = dbpath / f"{table_name}.txt"
+
+        mysqlimport_command = get_import_command(
+            mysqlcfg,
+            account,
+            dbname,
+            local_path,
+            table_name=table_name,
+            verbose=verbose,
+        )
+        r = exec_command(mysqlimport_command)
+        checkpoint.write_text(f"{table_name}\n")
+
+    checkpoint.write_text("INSTALL COMPLETED\n")
 
 
 def _display_sql_created_diff_error(cursor, sql):
