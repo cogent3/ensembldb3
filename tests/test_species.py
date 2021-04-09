@@ -89,6 +89,16 @@ class TestSpeciesNamemaps(TestCase):
         )
         self.assertEqual(Species.get_compara_name("Canis lupus familiaris"), "Dog")
 
+    def test_get_synonyms(self):
+        """correctly returns synonyms given either a common or latin name"""
+        expect = ["Canis familiaris", "Canis lupus familiaris"]
+        got = Species.get_synonymns("Canis familiaris")
+        self.assertEqual(set(got), set(expect))
+        got = Species.get_synonymns("Canis lupus familiaris")
+        self.assertEqual(set(got), set(expect))
+        got = Species.get_synonymns("dog")
+        self.assertEqual(set(got), set(expect))
+
     def test_to_table(self):
         """returns a table object"""
         table = Species.to_table()

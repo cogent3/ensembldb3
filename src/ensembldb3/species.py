@@ -80,6 +80,18 @@ class SpeciesNameMap:
         synonym = CaseInsensitiveString(synonym)
         self._synonyms[synonym] = species
 
+    def get_synonymns(self, name: str) -> set:
+        """all species names matching name
+
+        Parameters
+        ----------
+        name
+            can be common name or a species name
+        """
+        name = self.get_species_name(name)
+        result = {str(k) for k, v in self._synonyms.items() if v == name}
+        return result | {name}
+
     def get_common_name(self, name, level="raise"):
         """returns the common name for the given name (which can be either a
         species name or the ensembl version)"""
