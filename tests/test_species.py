@@ -20,6 +20,9 @@ class TestSpeciesNamemaps(TestCase):
         db prefix names"""
         self.assertEqual(Species.get_species_name("human"), "Homo sapiens")
         self.assertEqual(Species.get_species_name("homo_sapiens"), "Homo sapiens")
+        self.assertEqual(
+            Species.get_species_name("canis_lupus_familiaris"), "Canis lupus familiaris"
+        )
         self.assertEqual(Species.get_common_name("Mus musculus"), "Mouse")
         self.assertEqual(Species.get_common_name("mus_musculus"), "Mouse")
 

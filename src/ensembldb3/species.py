@@ -79,6 +79,8 @@ class SpeciesNameMap:
         species = CaseInsensitiveString(species)
         synonym = CaseInsensitiveString(synonym)
         self._synonyms[synonym] = species
+        ensembl_name = synonym.lower().replace(" ", "_")
+        self._ensembl_species[ensembl_name] = synonym
 
     def get_synonymns(self, name: str) -> set:
         """all species names matching name
@@ -130,7 +132,6 @@ class SpeciesNameMap:
 
         species_name = None
         level = level.lower().strip()
-        name = name
         for data in [self._common_species, self._ensembl_species]:
             if name in data:
                 species_name = data[name]
