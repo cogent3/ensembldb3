@@ -120,17 +120,17 @@ def read_config(config_path, verbose=False):
         if section in ("release", "remote path", "local path"):
             continue
 
-        if section != "compara":
-            species = Species.get_species_name(section, level="raise")
-        else:
-            species = "compara"
         dbs = [db.strip() for db in parser.get(section, "db").split(",")]
-        species_dbs[species] = dbs
 
-    if verbose:
-        click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
-        click.secho("\n".join("  %s" % d for d in species_dbs), fg="green")
-        click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
+        if section == "compara":
+            species_dbs["compara"] = dbs
+            continue
+
+        # handle synonymns
+        species = Species.get_species_name(section, level="raise")
+        for synonym in Species.get_synonymns(species):
+            species_dbs[synonym] = dbs
+
     return release, remote_path, local_path, species_dbs
 
 
@@ -184,8 +184,10 @@ def download_dbs(configpath, numprocs, verbose, debug):
         remote_path, dirname=f"release-{release}/mysql/", debug=debug
     )
     db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
-    if verbose or debug:
-        pprint(db_names)
+    if verbose:
+        click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
+        click.secho("\n".join(f"  {d.name}" for d in db_names), fg="green")
+        click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
 
     lftp = Download(
         remote_path, local_path, release, numprocs, verbose=verbose, debug=debug
