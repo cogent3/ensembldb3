@@ -47,6 +47,9 @@ class TestEnsemblDbName(TestCase):
         self.assertEqual(n.prefix, "mustela_putorius_furo")
         self.assertEqual(n.type, "core")
         self.assertEqual(n.build, "1")
+        self.assertEqual(n.species, "Mustela putorius furo")
+        n = EnsemblDbName("canis_lupus_familiaris_core_102_31")
+        self.assertEqual(n.species, "Canis lupus familiaris")
 
     def test_ensemblgenomes_names(self):
         """correctly handle the ensemblgenomes naming system"""
