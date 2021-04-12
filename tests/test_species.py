@@ -5,7 +5,7 @@ from cogent3.util.table import Table
 from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley", "Hua Ying"]
 __license__ = "BSD"
 __version__ = "2021.04.01"

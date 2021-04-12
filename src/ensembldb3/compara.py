@@ -14,7 +14,7 @@ from .species import Species as _Species
 from .util import NoItemError, asserted_one
 
 __author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley", "Hua Ying", "Jason Merkin"]
 __license__ = "BSD"
 __version__ = "2021.04.01"
