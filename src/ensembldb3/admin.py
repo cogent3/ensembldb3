@@ -24,6 +24,8 @@ __maintainer__ = "Gavin Huttley"
 __email__ = "Gavin.Huttley@anu.edu.au"
 __status__ = "alpha"
 
+INSTALL_COMPLETED = "INSTALL COMPLETED"
+
 
 def listpaths(dirname, glob_pattern):
     """return path to all files matching glob_pattern"""
@@ -105,7 +107,7 @@ def is_installed(local_path, dbname):
 
     data = chk.read_text().splitlines()
 
-    return data[-1] == "INSTALL COMPLETED"
+    return data[-1] == INSTALL_COMPLETED
 
 
 def install_one_db(
@@ -160,21 +162,16 @@ def install_one_db(
     num_tables = sql.count("CREATE TABLE")
     r = cursor.execute(sql)
 
-    # print("here")
-    # r = cursor.execute("SHOW TABLES")
-    # print("here 2")
+    if debug:
+        _display_sql_created_diff_error(cursor, sql)
+        display_dbs_tables(cursor, dbname)
 
-    # if r < num_tables:
-    #     _display_sql_created_diff_error(cursor, sql)
-
-    # print("here 3")
-    # if debug:
-    #     click.echo(r)
-    #     click.echo()
-    #     display_dbs_tables(cursor, dbname)
-
-    cursor.close()
     for table_name in table_names:
+        # turn off key creation to speed up loading
+        server.ping(reconnect=True)
+        cursor.execute(f"ALTER TABLE `{table_name}` DISABLE KEYS")
+        server.commit()
+
         tablepath = dbpath / f"{table_name}.txt.gz"
         if tablepath.exists():
             decompress_files(tablepath)
@@ -190,12 +187,24 @@ def install_one_db(
             verbose=verbose,
         )
         r = exec_command(mysqlimport_command)
-        checkpoint.write_text(f"{table_name}\n")
 
-    checkpoint.write_text("INSTALL COMPLETED\n")
+        # turn on key creation to speed up usage
+        server.ping(reconnect=True)
+        cursor.execute(f"ALTER TABLE `{table_name}` ENABLE KEYS")
+        server.commit()
+
+        # we open to append in line buffering mode
+        with checkpoint.open(mode="at", buffering=1) as out:
+            out.write(f"{table_name}\n")
+
+    with checkpoint.open(mode="at", buffering=1) as out:
+        out.write(f"{INSTALL_COMPLETED}\n")
+
+    cursor.close()
 
 
 def _display_sql_created_diff_error(cursor, sql):
+    _ = cursor.execute("SHOW TABLES")
     result = cursor.fetchall()
     expected = set()
     for line in sql.splitlines():
@@ -385,13 +394,11 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
     cursor = server.cursor()
     sql_for_speed = ["SET FOREIGN_KEY_CHECKS=0;", "SET UNIQUE_CHECKS=0;"]
     cursor.execute("\n".join(sql_for_speed))
-    cursor.close()
     dbnames = reduce_dirnames(content, species_dbs)
     dbnames = sorted_by_size(local_path, dbnames, debug=debug)
     for dbname in dbnames:
         chk = get_installed_checkpoint_path(local_path, dbname.name)
         server.ping(reconnect=True)  # reconnect if server not alive
-        cursor = server.cursor()
         if force_overwrite:
             _drop_db(cursor, dbname.name)
             if chk.exists():
@@ -403,7 +410,6 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
         # now create dbname
         sql = f"CREATE DATABASE IF NOT EXISTS {dbname}"
         r = cursor.execute(sql)
-        cursor.close()
         install_one_db(
             mysqlcfg,
             server,
@@ -420,7 +426,7 @@ def install(configpath, mysqlcfg, force_overwrite, verbose, debug):
         click.echo(server)
 
     undo_sql_for_speed = ["SET FOREIGN_KEY_CHECKS=1;", "SET UNIQUE_CHECKS=1;"]
-    cursor = server.cursor()
+    server.ping(reconnect=True)
     cursor.execute("\n".join(undo_sql_for_speed))
     cursor.close()
 
