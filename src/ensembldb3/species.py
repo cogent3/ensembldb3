@@ -157,6 +157,9 @@ class SpeciesNameMap:
             name = self._common_species[name]
         try:
             species_name = self.get_species_name(name, level="raise")
+            species_name = (
+                name if str(name) in self.get_synonymns(species_name) else species_name
+            )
         except ValueError:
             if name not in self._species_common:
                 raise ValueError(f"Unknown name {name}")
