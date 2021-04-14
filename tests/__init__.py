@@ -1,3 +1,7 @@
+import os
+
+os.chdir(os.path.dirname(__file__))
+
 __all__ = [
     "test_ensembl_admin",
     "test_assembly",
