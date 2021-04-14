@@ -253,7 +253,7 @@ class Compara(object):
             header=header,
             data=rows,
             space=2,
-            index="method_link_species_set_id",
+            index_name="method_link_species_set_id",
             title="Align Methods/Clades",
         )
         self._method_species_link = t
