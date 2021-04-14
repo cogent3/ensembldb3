@@ -93,25 +93,26 @@ class TestCompara(ComparaTestBase):
         mid = "ENSMUSG00000017119"
         nbr1 = self.eutheria.Mouse.get_gene_by_stableid(stableid=mid)
         ## previous test gene mouse brca2 doesn't have alignment to other species using PECAN since release 86.
-        result = list(
+        results = list(
             self.eutheria.get_syntenic_regions(
                 region=nbr1, align_method="PECAN", align_clade="vertebrates"
             )
         )
-        result = result[-1]
-        aln = result.get_alignment()
         # to improve test robustness across Ensembl releases, where alignment
         # coordinates change due to inclusion of new species, we search for
-        # the mouse subseq and use the resulting coords to ensure we get the
+        # a mouse subseq and use the resulting coords to ensure we get the
         # same match as that from the Ensembl website
-        mouse_name = [n for n in aln.names if "Mus musculus" in n][0]
-        start = aln.to_dict()[mouse_name].find("ACAGGATCAGCTCAAGCAAA")
-        sub_aln = aln[start : start + 20]
+        aln = results[-1].get_alignment().to_type(array_align=True)
+        mouse_name = [n for n in aln.names if n.startswith("Mus")][0]
+        mouse_seq = str(aln.get_seq(mouse_name))
+        start = mouse_seq.find("CTGCTGCTGACTTTCCG")
+
+        sub_aln = aln[start : start + 17]
         seqs = list(sub_aln.to_dict().values())
         expect = {
-            "GCATGATCAGCTCAAGCAAA",  # human
-            "ACAGGATCAGCTCAAGCAAA",  # mouse
-            "ATGGGATTAGCTCAAGCAAA",  # rat
+            "ATGCTGATGACTTCTTT",  # human
+            "CTGCTGCTGACTTTCCG",  # mouse
+            "ATGCTGGTGACGTCTCG",  # rat
         }
         self.assertEqual(set(seqs), expect)
         self.assertTrue(len(aln) > 1000)
