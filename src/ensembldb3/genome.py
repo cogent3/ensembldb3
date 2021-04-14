@@ -102,7 +102,7 @@ class Genome(object):
         self._var_db = None
         self._other_db = None
         self._feature_type_ids = FeatureTypeCache(self)
-        self._feature_coord_levels = FeatureCoordLevels(self.species)
+        self._feature_coord_levels = None
 
     def __str__(self):
         my_type = self.__class__.__name__
@@ -139,6 +139,15 @@ class Genome(object):
             self._var_db = Database(db_type="variation", **connection)
         elif self._other_db is None and db_type == "otherfeatures":
             self._other_db = Database(db_type="otherfeatures", **connection)
+
+        # reset species based on the db name, crude way of dealing with
+        # synonyms
+        for db in (self._core_db, self._var_db, self._other_db):
+            if db is not None:
+                break
+
+        self.species = db.db_name.species
+        self._feature_coord_levels = FeatureCoordLevels(self.species)
 
     def _get_core_db(self):
         self._connect_db("core")

@@ -191,14 +191,14 @@ class TestCompara(ComparaTestBase):
             {
                 "Homo sapiens",
                 "Rattus norvegicus",
-                "Canis familiaris",
+                "Canis lupus familiaris",
                 "Ornithorhynchus anatinus",
             },
         )
         # topology should match current topology belief
         expect = make_tree(
             treestring="(((Homo_sapiens,Rattus_norvegicus),"
-            "Canis_familiaris),Ornithorhynchus_anatinus)",
+            "Canis_lupus_familiaris),Ornithorhynchus_anatinus)",
             underscore_unmunge=True,
         )
         self.assertTrue(sub_species.same_topology(expect))

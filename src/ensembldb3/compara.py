@@ -52,6 +52,7 @@ class Compara(object):
         self.division = division
 
     def _attach_genomes(self):
+        updated_species = []
         for species in self.species:
             attr_name = _Species.get_compara_name(species)
             genome = Genome(
@@ -60,8 +61,12 @@ class Compara(object):
             if self.general_release is None:
                 self.general_release = genome.general_release
 
+            species = genome.CoreDb.db_name.species
+            updated_species.append(species)
             self._genomes[species] = genome
             setattr(self, attr_name, genome)
+
+        self.species = tuple(updated_species)
 
     def __str__(self):
         my_type = self.__class__.__name__
