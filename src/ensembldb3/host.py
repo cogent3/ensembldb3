@@ -118,19 +118,20 @@ DbConnection = EngineCache()
 
 
 def make_db_name_pattern(species=None, db_type=None, release=None):
-    """returns a pattern for matching the db name against"""
-    sep = r"%"
+    """returns a regexp pattern for matching the db name against"""
     pattern = ""
     if species:
-        species = Species.get_ensembl_db_prefix(species)
-        pattern = f"{sep}{species}"
+        synonyms = "|".join(
+            Species.get_ensembl_db_prefix(sp) for sp in Species.get_synonymns(species)
+        )
+        pattern = f".*({synonyms})"
     if db_type:
-        pattern = f"{pattern}{sep}{db_type}"
+        pattern = f"{pattern}.*{db_type}"
     if release:
-        pattern = f"{pattern}{sep}{release}"
+        pattern = f"{pattern}.*{release}"
     assert pattern
 
-    return f"'{pattern}{sep}'"
+    return f"'{pattern}.*'"
 
 
 def get_db_name(
@@ -146,10 +147,10 @@ def get_db_name(
 
     server = DbConnection(account, db_name="PARENT")
     cursor = server.cursor()
-    show = "SHOW DATABASES"
+    show = "SELECT schema_name FROM information_schema.schemata"
     if species or db_type or release:
         pattern = make_db_name_pattern(species, db_type, release)
-        show = f"{show} LIKE {pattern}"
+        show = f" {show} WHERE schema_name REGEXP {pattern}"
     if DEBUG:
         print(show)
     cursor.execute(show)
