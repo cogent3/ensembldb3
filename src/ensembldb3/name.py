@@ -3,7 +3,7 @@ import re
 from .species import Species
 
 __author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley"]
 __license__ = "BSD"
 __version__ = "2021.04.01"

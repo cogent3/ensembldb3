@@ -8,7 +8,7 @@ from pkg_resources import resource_filename
 from .util import ENSEMBLDBRC, CaseInsensitiveString
 
 __author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley", "Jason Merkin"]
 __license__ = "BSD"
 __version__ = "2021.04.01"
@@ -157,6 +157,9 @@ class SpeciesNameMap:
             name = self._common_species[name]
         try:
             species_name = self.get_species_name(name, level="raise")
+            species_name = (
+                name if str(name) in self.get_synonymns(species_name) else species_name
+            )
         except ValueError:
             if name not in self._species_common:
                 raise ValueError(f"Unknown name {name}")

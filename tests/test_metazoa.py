@@ -6,7 +6,7 @@ from ensembldb3.host import HostAccount
 from . import ENSEMBL_GENOMES_RELEASE
 
 __author__ = "Jason Merkin"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Jason Merkin", "Gavin Huttley", "Hua Ying"]
 __license__ = "BSD"
 __version__ = "2021.04.01"

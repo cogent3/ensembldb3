@@ -10,7 +10,7 @@ import numpy
 from pkg_resources import resource_filename
 
 __author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley"]
 __license__ = "BSD"
 __version__ = "2021.04.01"
@@ -218,16 +218,9 @@ def yield_selected(sqlalchemy_select, limit=100):
 def flatten(data):
     """returns 1D list
 
-    Removes nesting via numpy and 1D traversal
+    Removes nesting via numpy
     """
-    data = numpy.array(data).flatten().tolist()
-    result = []
-    for element in data:
-        try:
-            result.extend(element)
-        except Exception:
-            result.append(element)
-    return result
+    return numpy.array(data).flatten().tolist()
 
 
 class FileSet(set):

@@ -7,7 +7,7 @@ from ensembldb3.host import HostAccount, get_ensembl_account
 from . import ENSEMBL_RELEASE
 
 __author__ = "Gavin Huttley, Hua Ying"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley", "hua Ying"]
 __license__ = "BSD"
 __version__ = "2021.04.01"
@@ -94,7 +94,7 @@ class TestDatabase(TestCase):
         )
 
         self.assertTrue(coredb.table_has_column("seq_region", "name"))
-        self.assertFalse(coredb.table_has_column("seq_region", "length"))
+        self.assertFalse(coredb.table_has_column("seq_region", "blahblah"))
 
 
 if __name__ == "__main__":

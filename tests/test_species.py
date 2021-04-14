@@ -5,7 +5,7 @@ from cogent3.util.table import Table
 from ensembldb3.species import Species
 
 __author__ = "Gavin Huttley, Hua Ying"
-__copyright__ = "Copyright 2016-, The EnsemblDb Project"
+__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley", "Hua Ying"]
 __license__ = "BSD"
 __version__ = "2021.04.01"
@@ -32,6 +32,13 @@ class TestSpeciesNamemaps(TestCase):
         self.assertEqual(Species.get_ensembl_db_prefix("human"), "homo_sapiens")
         self.assertEqual(Species.get_ensembl_db_prefix("mouse"), "mus_musculus")
         self.assertEqual(Species.get_ensembl_db_prefix("Mus musculus"), "mus_musculus")
+        self.assertEqual(
+            Species.get_ensembl_db_prefix("Canis lupus familiaris"),
+            "canis_lupus_familiaris",
+        )
+        self.assertEqual(
+            Species.get_ensembl_db_prefix("Canis familiaris"), "canis_familiaris"
+        )
 
     def test_add_new_species(self):
         """should correctly add a new species/common combination and infer the
@@ -87,10 +94,6 @@ class TestSpeciesNamemaps(TestCase):
             Species.get_species_name("Canis lupus familiaris"), "Canis familiaris"
         )
         self.assertEqual(Species.get_common_name("Canis lupus familiaris"), "Dog")
-        self.assertEqual(
-            Species.get_ensembl_db_prefix("Canis lupus familiaris"), "canis_familiaris"
-        )
-        self.assertEqual(Species.get_compara_name("Canis lupus familiaris"), "Dog")
 
     def test_get_synonyms(self):
         """correctly returns synonyms given either a common or latin name"""
