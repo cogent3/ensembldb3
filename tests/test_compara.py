@@ -148,13 +148,20 @@ class TestCompara(ComparaTestBase):
 
     def test_get_species_set(self):
         """should return the correct set of species"""
-        # from release 98, platypus has a one2many ortholog
-        expect = {"Homo sapiens", "Mus musculus", "Rattus norvegicus"}
+        expect = {
+            "Homo sapiens",
+            "Mus musculus",
+            "Rattus norvegicus",
+            "Ornithorhynchus anatinus",
+        }
         brca1 = self.comp.Human.get_gene_by_stableid(stableid="ENSG00000012048")
-        Orthologs = self.comp.get_related_genes(
-            gene_region=brca1, relationship="ortholog_one2one"
+        orthologs = list(
+            self.comp.get_related_genes(
+                gene_region=brca1, relationship="ortholog_one2one"
+            )
         )
-        self.assertEqual(list(Orthologs)[0].get_species_set(), expect)
+        got = orthologs[0].get_species_set()
+        self.assertEqual(got, expect)
 
     def test_gene_tree(self):
         """gene tree should match one downloaded from ensembl web"""
