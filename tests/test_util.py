@@ -16,7 +16,7 @@ __status__ = "alpha"
 class TestFileSet(TestCase):
     def test_init_no_matches(self):
         """correct constructs when no matches"""
-        fset = FileSet(pathlib.Path(__file__).parent, suffixes="txt")
+        fset = FileSet(pathlib.Path(__file__).parent, suffixes="blah")
         self.assertEqual(fset, set())
 
     def test_init_matches(self):
