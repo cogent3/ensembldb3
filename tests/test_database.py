@@ -94,7 +94,7 @@ class TestDatabase(TestCase):
         )
 
         self.assertTrue(coredb.table_has_column("seq_region", "name"))
-        self.assertFalse(coredb.table_has_column("seq_region", "length"))
+        self.assertFalse(coredb.table_has_column("seq_region", "blahblah"))
 
 
 if __name__ == "__main__":
