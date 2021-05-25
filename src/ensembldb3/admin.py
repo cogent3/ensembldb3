@@ -169,7 +169,7 @@ def install_one_db(
     for table_name in table_names:
         # turn off key creation to speed up loading
         server.ping(reconnect=True)
-        cursor.execute(f"ALTER TABLE `{table_name}` DISABLE KEYS")
+        cursor.execute(f"USE {dbname}; ALTER TABLE `{table_name}` DISABLE KEYS")
         server.commit()
 
         tablepath = dbpath / f"{table_name}.txt.gz"
@@ -190,7 +190,7 @@ def install_one_db(
 
         # turn on key creation to speed up usage
         server.ping(reconnect=True)
-        cursor.execute(f"ALTER TABLE `{table_name}` ENABLE KEYS")
+        cursor.execute(f"USE {dbname}; ALTER TABLE `{table_name}` ENABLE KEYS")
         server.commit()
 
         # we open to append in line buffering mode
