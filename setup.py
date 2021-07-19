@@ -3,6 +3,7 @@ import sys
 
 from setuptools import find_packages, setup
 
+
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The Cogent Project"
 __contributors__ = ["Gavin Huttley", "Hua Ying"]

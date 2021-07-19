@@ -7,7 +7,9 @@ import subprocess
 import sys
 
 import numpy
+
 from pkg_resources import resource_filename
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

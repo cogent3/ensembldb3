@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import sqlalchemy as sql
+
 from cogent3.core.tree import PhyloNode
 from cogent3.util.table import Table
 from numpy import empty
@@ -12,6 +13,7 @@ from .host import get_ensembl_account
 from .related_region import RelatedGenes, SyntenicRegions
 from .species import Species as _Species
 from .util import NoItemError, asserted_one
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

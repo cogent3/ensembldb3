@@ -1,11 +1,13 @@
 import os
 import re
+
 from collections import defaultdict
 
 from cogent3.util.table import Table
 from pkg_resources import resource_filename
 
 from .util import ENSEMBLDBRC, CaseInsensitiveString
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

@@ -1,4 +1,5 @@
 import os
+
 from unittest import TestCase, main
 
 from cogent3 import load_tree, make_tree
@@ -8,6 +9,7 @@ from ensembldb3.compara import Compara
 from ensembldb3.host import HostAccount, get_ensembl_account
 
 from . import ENSEMBL_RELEASE
+
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

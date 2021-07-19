@@ -2,14 +2,21 @@ import configparser
 import os
 import sys
 import warnings
+
 from pprint import pprint
 
 import click
 
 from ensembldb3.name import EnsemblDbName
 from ensembldb3.species import Species
-from ensembldb3.util import (ENSEMBLDBRC, abspath, exec_command,
-                             lftp_installed, makedirs)
+from ensembldb3.util import (
+    ENSEMBLDBRC,
+    abspath,
+    exec_command,
+    lftp_installed,
+    makedirs,
+)
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

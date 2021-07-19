@@ -2,18 +2,25 @@ import configparser
 import os
 import pathlib
 import shutil
+
 from collections import defaultdict
 from pprint import pprint
 
 import click
+
 from cogent3 import make_table
 from cogent3.util import parallel
 
-from . import HostAccount
-from .download import (_cfg, download_dbs, is_downloaded, read_config,
-                       reduce_dirnames)
-from .host import DbConnection, get_db_name
-from .util import ENSEMBLDBRC, FileSet, exec_command, open_
+from ensembldb3.download import (
+    _cfg,
+    download_dbs,
+    is_downloaded,
+    read_config,
+    reduce_dirnames,
+)
+from ensembldb3.host import DbConnection, HostAccount, get_db_name
+from ensembldb3.util import ENSEMBLDBRC, FileSet, exec_command, open_
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

@@ -3,6 +3,7 @@ import sqlalchemy as sql
 from .species import Species as _Species
 from .util import DisplayString, asserted_one, convert_strand
 
+
 __author__ = "Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
 __credits__ = ["Gavin Huttley", "Hua Ying"]

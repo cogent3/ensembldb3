@@ -1,11 +1,18 @@
 import os
+
 from unittest import TestCase, main
 
-from ensembldb3.host import (DbConnection, HostAccount, get_db_name,
-                             get_ensembl_account, get_latest_release)
+from ensembldb3.host import (
+    DbConnection,
+    HostAccount,
+    get_db_name,
+    get_ensembl_account,
+    get_latest_release,
+)
 from ensembldb3.name import EnsemblDbName
 
 from . import ENSEMBL_RELEASE
+
 
 __author__ = "Gavin Huttley, Hua Ying"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
