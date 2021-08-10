@@ -38,7 +38,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     platforms=["any"],
-    license=["BSD"],
+    license="BSD",
     keywords=["biology", "genomics", "bioinformatics"],
     classifiers=[
         "Development status :: 5 - Production/Stable",
