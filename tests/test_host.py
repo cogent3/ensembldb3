@@ -85,6 +85,16 @@ class TestHostAccount(TestCase):
         self.assertNotEqual(h1, h3)
         self.assertNotEqual(hash(h1), hash(h3))
 
+    def test_account_str(self):
+        """str"""
+        h1 = HostAccount("ensembldb.ensembl.org", "anonymous", "", port=5306)
+        self.assertEqual(str(h1), "user:passwd@ensembldb.ensembl.org:5306")
+        self.assertEqual(h1.formatted(), "anonymous:@ensembldb.ensembl.org:5306")
+        # default port, actual password
+        h2 = HostAccount("mysql.host.org", "me", "tricky")
+        self.assertEqual(str(h2), "user:passwd@mysql.host.org:3306")
+        self.assertEqual(h2.formatted(), "me:tricky@mysql.host.org:3306")
+
 
 class TestDBconnects(TestCase):
     def test_get_ensembl_account(self):
