@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import sqlalchemy as sql
+
 from cogent3.util.table import Table
 
 from .assembly import CoordSystem
 from .species import Species as _Species
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

@@ -5,13 +5,19 @@ import sqlalchemy as sql
 from .name import EnsemblDbName
 from .species import Species
 
-_engine_kwargs = {}
+
+_engine_kwargs = {"local_infile": True}
+# exposing these here so their formatting can be checked
+_connect_templates = {
+    "mysqlconnector": "mysql+mysqlconnector://{account}/{db_name}?raise_on_warnings=False",
+    "pymysql": "mysql+pymysql://{account}/{db_name}",
+    "mysqldb": "mysql+mysqldb://{account}/{db_name}",
+}
 
 try:
     import mysql.connector as mysql_connect
 
-    connect_template = "mysql+mysqlconnector://"
-    "%(account)s/%(db_name)s?raise_on_warnings=False"
+    connect_template = _connect_templates["mysqlconnector"]
     password_arg = "password"
     sql_version = tuple([int(v) for v in sql.__version__.split(".") if v.isdigit()])
     if sql_version < (0, 9, 7):
@@ -20,16 +26,17 @@ try:
 except ImportError:
     try:
         import pymysql as mysql_connect
+
         from pymysql.constants.CLIENT import MULTI_STATEMENTS
 
-        connect_template = "mysql+pymysql://%(account)s/%(db_name)s"
+        connect_template = _connect_templates["pymysql"]
         password_arg = "passwd"
         # handle change in pymysql default value from version 0.8
         _engine_kwargs["client_flag"] = MULTI_STATEMENTS
     except ImportError:
         import MySQLdb as mysql_connect
 
-        connect_template = "mysql+mysqldb://%(account)s/%(db_name)s"
+        connect_template = _connect_templates["mysqldb"]
         password_arg = "passwd"
 
 
@@ -70,6 +77,12 @@ class HostAccount(object):
         return self._hash
 
     def __str__(self):
+        # string representation obscures the account details so they don't
+        # inadvertently appear in logfiles etc...
+        return f"user:passwd@{self.host}:{self.port}"
+
+    def formatted(self):
+        """returns string for injection into connection string"""
         return f"{self.user}:{self.passwd}@{self.host}:{self.port}"
 
 
@@ -92,7 +105,7 @@ class EngineCache(object):
 
     _db_account = {}
 
-    def __call__(self, account, db_name=None, pool_recycle=None):
+    def __call__(self, account: HostAccount, db_name=None, pool_recycle=None):
         """returns an active SQLAlchemy connection engine"""
         assert account and db_name, "Must provide an account and a db"
         pool_recycle = pool_recycle or 3600
@@ -105,7 +118,9 @@ class EngineCache(object):
                 )
             else:
                 engine = sql.create_engine(
-                    connect_template % dict(account=account, db_name=db_name),
+                    connect_template.format(
+                        account=account.formatted(), db_name=db_name
+                    ),
                     pool_recycle=pool_recycle,
                 )
             if db_name not in self._db_account:

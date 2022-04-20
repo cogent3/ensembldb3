@@ -1,12 +1,14 @@
 from collections import defaultdict
 
 import sqlalchemy as sql
+
 from cogent3 import DNA
 from cogent3.core.alignment import Aligned, Alignment, SequenceCollection
 from cogent3.core.tree import PhyloNode
 from cogent3.parse import cigar
 
 from .util import LazyRecord, asserted_one
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

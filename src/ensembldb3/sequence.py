@@ -1,10 +1,12 @@
 import sqlalchemy as sql
+
 from cogent3 import DNA
 from cogent3.core.location import Map
 
 from .assembly import Coordinate, CoordSystem, get_coord_conversion
 from .species import Species
 from .util import NoItemError, asserted_one
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

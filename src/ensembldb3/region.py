@@ -1,6 +1,7 @@
 import sys
 
 import sqlalchemy as sql
+
 from cogent3 import DNA
 from cogent3.core.annotation import Feature
 from cogent3.core.location import Map
@@ -10,6 +11,7 @@ from .assembly import Coordinate, CoordSystem, assembly_exception_coordinate
 from .database import cached_attribs
 from .sequence import get_sequence
 from .util import DisplayString, LazyRecord, NoItemError, asserted_one
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

@@ -3,6 +3,7 @@ import sys
 
 from setuptools import find_packages, setup
 
+
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The Cogent Project"
 __contributors__ = ["Gavin Huttley", "Hua Ying"]
@@ -37,7 +38,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     platforms=["any"],
-    license=["BSD"],
+    license="BSD",
     keywords=["biology", "genomics", "bioinformatics"],
     classifiers=[
         "Development status :: 5 - Production/Stable",

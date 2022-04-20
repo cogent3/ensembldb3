@@ -2,16 +2,33 @@ import re
 
 import sqlalchemy as sql
 
-from .assembly import (Coordinate, CoordSystem, get_coord_conversion,
-                       location_query)
+from .assembly import (
+    Coordinate,
+    CoordSystem,
+    get_coord_conversion,
+    location_query,
+)
 from .database import Database
 from .feature_level import FeatureCoordLevels
 from .host import get_ensembl_account, get_latest_release
-from .region import (CpGisland, Est, Gene, GenericRegion, Repeat, Transcript,
-                     Variation)
+from .region import (
+    CpGisland,
+    Est,
+    Gene,
+    GenericRegion,
+    Repeat,
+    Transcript,
+    Variation,
+)
 from .species import Species as _Species
-from .util import (DisplayString, LazyRecord, asserted_one, convert_strand,
-                   flatten)
+from .util import (
+    DisplayString,
+    LazyRecord,
+    asserted_one,
+    convert_strand,
+    flatten,
+)
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"

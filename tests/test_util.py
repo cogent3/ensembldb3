@@ -1,7 +1,9 @@
 import pathlib
+
 from unittest import TestCase, main
 
 from ensembldb3.util import FileSet
+
 
 __author__ = "Gavin Huttley"
 __copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
