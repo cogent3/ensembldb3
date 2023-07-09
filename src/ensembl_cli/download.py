@@ -18,16 +18,6 @@ from ensembl_cli.util import (
 )
 
 
-__author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
-__credits__ = ["Gavin Huttley"]
-__license__ = "BSD"
-__version__ = "2021.04.01"
-__maintainer__ = "Gavin Huttley"
-__email__ = "Gavin.Huttley@anu.edu.au"
-__status__ = "alpha"
-
-
 def get_download_checkpoint_path(local_path, dbname):
     """returns path to db checkpoint file"""
     return os.path.join(local_path, dbname, "ENSEMBLDB_DOWNLOADED")

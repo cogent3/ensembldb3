@@ -6,17 +6,11 @@ from pprint import pprint
 
 import click
 
-from ensembl_cli.download import (
-    _cfg,
-    download_dbs,
-    is_downloaded,
-    read_config,
-    reduce_dirnames,
-)
-from ensembl_cli.util import ENSEMBLDBRC, FileSet, exec_command, open_
+from ensembl_cli import __version__
+from ensembl_cli.download import _cfg, download_dbs
+from ensembl_cli.util import ENSEMBLDBRC, exec_command
 
 
-__version__ = "2023.7.9.a1"
 INSTALL_COMPLETED = "INSTALL COMPLETED"
 
 

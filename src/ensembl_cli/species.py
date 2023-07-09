@@ -3,20 +3,12 @@ import re
 
 from collections import defaultdict
 
+from cogent3 import open_
 from cogent3.util.table import Table
 from pkg_resources import resource_filename
 
 from .util import ENSEMBLDBRC, CaseInsensitiveString
 
-
-__author__ = "Gavin Huttley"
-__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
-__credits__ = ["Gavin Huttley", "Jason Merkin"]
-__license__ = "BSD"
-__version__ = "2021.04.01"
-__maintainer__ = "Gavin Huttley"
-__email__ = "Gavin.Huttley@anu.edu.au"
-__status__ = "alpha"
 
 _invalid_chars = re.compile("[^a-zA-Z _]")
 
@@ -28,7 +20,7 @@ def load_species(species_path):
     if not os.path.exists(species_path):
         species_path = resource_filename("data", "species.tsv")
 
-    with open(species_path, "r") as infile:
+    with open_(species_path, "r") as infile:
         data = []
         for line in infile:
             line = [e.strip() for e in line.split("\t")]
@@ -63,17 +55,17 @@ class SpeciesNameMap:
             names = list(map(CaseInsensitiveString, names))
             self.amend_species(*names)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.to_table())
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.to_table())
 
-    def _repr_html_(self):
+    def _repr_html_(self) -> str:
         table = self.to_table()
         return table._repr_html_()
 
-    def add_synonym(self, species, synonym):
+    def add_synonym(self, species: str, synonym: str) -> None:
         """add a synonym for a species name
 
         This provides an additional mapping to common names and ensembl
@@ -96,7 +88,7 @@ class SpeciesNameMap:
         result = {str(k) for k, v in self._synonyms.items() if v == name}
         return result | {name}
 
-    def get_common_name(self, name, level="raise"):
+    def get_common_name(self, name: str, level="raise") -> str:
         """returns the common name for the given name (which can be either a
         species name or the ensembl version)"""
         name = CaseInsensitiveString(name)
@@ -122,7 +114,7 @@ class SpeciesNameMap:
 
         return str(common_name)
 
-    def get_species_name(self, name, level="ignore"):
+    def get_species_name(self, name: str, level="ignore") -> str:
         """returns the species name for the given common name"""
         name = CaseInsensitiveString(name)
         if name in self._species_common:
@@ -147,8 +139,7 @@ class SpeciesNameMap:
 
     def get_species_names(self):
         """returns the list of species names"""
-        names = list(self._species_common.keys())
-        names.sort()
+        names = sorted(self._species_common.keys())
         return [str(n) for n in names]
 
     def get_ensembl_db_prefix(self, name):
