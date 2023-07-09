@@ -1,0 +1,135 @@
+import os
+import pathlib
+import shutil
+
+from pprint import pprint
+
+import click
+
+from ensembl_cli.download import (
+    _cfg,
+    download_dbs,
+    is_downloaded,
+    read_config,
+    reduce_dirnames,
+)
+from ensembl_cli.util import ENSEMBLDBRC, FileSet, exec_command, open_
+
+
+__version__ = "2023.7.9.a1"
+INSTALL_COMPLETED = "INSTALL COMPLETED"
+
+
+def listpaths(dirname, glob_pattern):
+    """return path to all files matching glob_pattern"""
+    fns = [str(p) for p in pathlib.Path(dirname).glob(glob_pattern)]
+    if not fns:
+        return None
+    return fns
+
+
+def decompress_files(local_path):
+    """gunzip files
+
+
+    Parameters
+    ----------
+    local_path: pathlib.Path
+        single file, or directory
+
+    Notes
+    -----
+    If directory, does all .gz files.
+    """
+    local_path = pathlib.Path(local_path)
+    paths = [local_path] if local_path.is_file() else local_path.glob("*.gz")
+    for path in paths:
+        _ = exec_command(f"gunzip {path}")
+
+
+def sorted_by_size(local_path, dbnames, debug=False):
+    """returns dbnames ordered by directory size"""
+    join = os.path.join
+    getsize = os.path.getsize
+    size_dbnames = []
+    for dbname in dbnames:
+        path = join(local_path, dbname.name)
+        size = sum(getsize(join(path, fname)) for fname in os.listdir(path))
+        size_dbnames.append([size, dbname])
+    size_dbnames.sort()
+
+    if debug:
+        pprint(size_dbnames)
+
+    sizes, dbnames = zip(*size_dbnames)
+    return dbnames
+
+
+# defining some of the options
+_cfgpath = click.option(
+    "-c",
+    "--configpath",
+    default=_cfg,
+    type=click.File(),
+    help="path to config file specifying databases, only "
+    "species or compara at present",
+)
+_verbose = click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    help="causes stdout/stderr from rsync download to be " "written to screen",
+)
+_numprocs = click.option(
+    "-n",
+    "--numprocs",
+    type=int,
+    default=1,
+    help="number of processes to use for download",
+)
+_force = click.option(
+    "-f",
+    "--force_overwrite",
+    is_flag=True,
+    help="drop existing database if it exists prior to " "installing",
+)
+_debug = click.option("-d", "--debug", is_flag=True, help="maximum verbosity")
+_dbrc_out = click.option(
+    "-o",
+    "--outpath",
+    type=click.Path(),
+    help="path to directory to export all rc contents",
+)
+_release = click.option("-r", "--release", type=int, help="Ensembl release number")
+
+
+@click.group()
+@click.version_option(__version__)
+def main():
+    """admin tools for an Ensembl MySQL installation"""
+    pass
+
+
+@main.command()
+@_cfgpath
+@_numprocs
+@_verbose
+@_debug
+def download(configpath, numprocs, verbose, debug):
+    """download databases from Ensembl using rsync, can be done in parallel"""
+    download_dbs(configpath, numprocs, verbose, debug)
+
+
+@main.command()
+@_dbrc_out
+def exportrc(outpath):
+    """exports the rc directory to the nominated path
+
+    setting an environment variable ENSEMBLDBRC with this path
+    will force it's contents to override the default ensembl_cli settings"""
+    shutil.copytree(ENSEMBLDBRC, outpath)
+    click.echo(f"Contents written to {outpath}")
+
+
+if __name__ == "__main__":
+    main()

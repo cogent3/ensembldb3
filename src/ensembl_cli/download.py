@@ -7,9 +7,9 @@ from pprint import pprint
 
 import click
 
-from ensembldb3.name import EnsemblDbName
-from ensembldb3.species import Species
-from ensembldb3.util import (
+from ensembl_cli.name import EnsemblDbName
+from ensembl_cli.species import Species
+from ensembl_cli.util import (
     ENSEMBLDBRC,
     abspath,
     exec_command,

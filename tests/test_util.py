@@ -2,7 +2,7 @@ import pathlib
 
 from unittest import TestCase, main
 
-from ensembldb3.util import FileSet
+from ensembl_cli.util import FileSet
 
 
 __author__ = "Gavin Huttley"

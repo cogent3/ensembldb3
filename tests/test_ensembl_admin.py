@@ -6,7 +6,7 @@ from unittest import TestCase, main
 
 from click.testing import CliRunner
 
-from ensembldb3.admin import (
+from ensembl_cli.admin import (
     ENSEMBLDBRC,
     download,
     drop,
@@ -15,7 +15,7 @@ from ensembldb3.admin import (
     install,
     show,
 )
-from ensembldb3.download import get_download_checkpoint_path
+from ensembl_cli.download import get_download_checkpoint_path
 
 
 class TestAdminCli(TestCase):

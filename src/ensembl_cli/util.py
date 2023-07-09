@@ -26,7 +26,7 @@ def get_resource_dir():
     if "ENSEMBLDBRC" in os.environ:
         path = os.environ["ENSEMBLDBRC"]
     else:
-        path = resource_filename("ensembldb3", "data")
+        path = resource_filename("ensembl_cli", "data")
 
     path = os.path.abspath(os.path.expanduser(path))
     if not os.path.exists(path):

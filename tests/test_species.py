@@ -2,7 +2,7 @@ from unittest import TestCase, main
 
 from cogent3.util.table import Table
 
-from ensembldb3.species import Species
+from ensembl_cli.species import Species
 
 
 __author__ = "Gavin Huttley, Hua Ying"

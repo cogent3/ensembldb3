@@ -1,7 +1,5 @@
 from warnings import filterwarnings
 
-from .compara import Compara
-from .genome import Genome
 from .host import HostAccount
 from .species import Species
 from .util import NoItemError
@@ -12,21 +10,12 @@ filterwarnings("ignore", message="Can't drop database.*")
 
 
 __all__ = [
-    "assembly",
-    "compara",
-    "database",
-    "genome",
     "host",
     "name",
-    "region",
-    "related_region",
-    "sequence",
     "species",
     "util",
     "HostAccount",
     "Species",
-    "Genome",
-    "Compara",
 ]
 
 __author__ = "Gavin Huttley"
