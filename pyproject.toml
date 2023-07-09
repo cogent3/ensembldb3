@@ -18,7 +18,9 @@ dependencies = ["click",
         "scitrack",
         "typing_extensions",
         "cogent3 @ git+https://github.com/cogent3/cogent3.git@develop",
-        "rich"
+        "pydantic",
+        "rich",
+        "numpy"
         ]
 classifiers = [
         "Development Status :: 5 - Production/Stable",
