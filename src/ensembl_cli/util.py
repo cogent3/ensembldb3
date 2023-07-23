@@ -1,27 +1,37 @@
-import bz2
-import gzip
+import configparser
 import os
 import pathlib
 import re
 import subprocess
 import sys
 
+from math import ceil
+from typing import Union
+
 import numpy
 
-from pkg_resources import resource_filename
 
 
-def get_resource_dir():
+
+def get_resource_dir() -> os.PathLike:
     """returns path to resource directory"""
     if "ENSEMBLDBRC" in os.environ:
         path = os.environ["ENSEMBLDBRC"]
     else:
-        path = resource_filename("ensembl_cli", "data")
+        from ensembl_cli import data
+
+        path = pathlib.Path(data.__file__).parent
 
     path = os.path.abspath(os.path.expanduser(path))
     if not os.path.exists(path):
         raise ValueError("ENSEMBLDBRC directory '%s' does not exist")
 
+    return pathlib.Path(path)
+
+
+def get_resource_path(resource: Union[str, os.PathLike]) -> os.PathLike:
+    path = ENSEMBLDBRC / resource
+    assert path.exists()
     return path
 
 

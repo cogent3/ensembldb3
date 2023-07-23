@@ -5,9 +5,8 @@ from collections import defaultdict
 
 from cogent3 import open_
 from cogent3.util.table import Table
-from pkg_resources import resource_filename
 
-from .util import ENSEMBLDBRC, CaseInsensitiveString
+from .util import ENSEMBLDBRC, CaseInsensitiveString, get_resource_path
 
 
 _invalid_chars = re.compile("[^a-zA-Z _]")
@@ -18,7 +17,7 @@ def load_species(species_path):
 
     if species_path does not exist, defaults to default one"""
     if not os.path.exists(species_path):
-        species_path = resource_filename("data", "species.tsv")
+        species_path = get_resource_path("species.tsv")
 
     with open_(species_path, "r") as infile:
         data = []
