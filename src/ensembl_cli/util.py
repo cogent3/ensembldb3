@@ -11,6 +11,19 @@ from typing import Union
 import numpy
 
 
+# based on https://www.reddit.com/r/learnpython/comments/9bpgjl/implementing_bsd_16bit_checksum/
+# and https://www.gnu.org/software/coreutils/manual/html_node/sum-invocation.html#sum-invocation
+def checksum(path) -> tuple[int, int]:
+    """computes BSD style checksum"""
+    # equivalent to command line BSD sum
+    path = pathlib.Path(path)
+    cksum = 0
+    for c in path.read_bytes():
+        cksum = (cksum >> 1) + ((cksum & 1) << 15)
+        cksum += c
+        cksum &= 0xFFFF
+    nb = ceil(path.stat().st_size / 1024)
+    return cksum, nb
 
 
 def get_resource_dir() -> os.PathLike:
