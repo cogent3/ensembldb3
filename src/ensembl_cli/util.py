@@ -200,3 +200,33 @@ class FileSet(set):
 
         self.path = path
         self.update(collected)
+
+
+def read_config(config_path, verbose=False):
+    """returns ensembl release, local path, and db specifics from the provided
+    config path"""
+    from ensembl_cli.species import Species
+
+    parser = configparser.ConfigParser()
+    parser.read_file(config_path)
+    release = parser.get("release", "release")
+    remote_path = parser.get("remote path", "path")
+    local_path = parser.get("local path", "path")
+    local_path = abspath(local_path)
+    species_dbs = {}
+    for section in parser.sections():
+        if section in ("release", "remote path", "local path"):
+            continue
+
+        dbs = [db.strip() for db in parser.get(section, "db").split(",")]
+
+        if section == "compara":
+            species_dbs["compara"] = dbs
+            continue
+
+        # handle synonymns
+        species = Species.get_species_name(section, level="raise")
+        for synonym in Species.get_synonymns(species):
+            species_dbs[synonym] = dbs
+
+    return release, remote_path, local_path, species_dbs

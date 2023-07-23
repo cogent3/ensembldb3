@@ -1,4 +1,3 @@
-import configparser
 import os
 import sys
 import warnings
@@ -8,13 +7,12 @@ from pprint import pprint
 import click
 
 from ensembl_cli.name import EnsemblDbName
-from ensembl_cli.species import Species
 from ensembl_cli.util import (
     ENSEMBLDBRC,
-    abspath,
     exec_command,
     lftp_installed,
     makedirs,
+    read_config,
 )
 
 
@@ -101,34 +99,6 @@ def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
 
     db_names = _sort_dbs(db_names)
     return db_names
-
-
-def read_config(config_path, verbose=False):
-    """returns ensembl release, local path, and db specifics from the provided
-    config path"""
-    parser = configparser.ConfigParser()
-    parser.read_file(config_path)
-    release = parser.get("release", "release")
-    remote_path = parser.get("remote path", "path")
-    local_path = parser.get("local path", "path")
-    local_path = abspath(local_path)
-    species_dbs = {}
-    for section in parser.sections():
-        if section in ("release", "remote path", "local path"):
-            continue
-
-        dbs = [db.strip() for db in parser.get(section, "db").split(",")]
-
-        if section == "compara":
-            species_dbs["compara"] = dbs
-            continue
-
-        # handle synonymns
-        species = Species.get_species_name(section, level="raise")
-        for synonym in Species.get_synonymns(species):
-            species_dbs[synonym] = dbs
-
-    return release, remote_path, local_path, species_dbs
 
 
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
