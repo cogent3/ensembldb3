@@ -41,7 +41,7 @@ Documentation = "https://github.com/cogent3/ensembl_cli"
 "Source Code" = "https://github.com/cogent3/ensembl_cli"
 
 [project.scripts]
-ensembl_cli = "ensembl_cli:admin"
+ensembl_cli = "ensembl_cli.admin:main"
 
 [project.optional-dependencies]
 test = [
