@@ -202,9 +202,10 @@ def read_config(config_path, verbose=False):
     parser = configparser.ConfigParser()
     parser.read_file(config_path)
     release = parser.get("release", "release")
+    host = parser.get("remote path", "host")
     remote_path = parser.get("remote path", "path")
-    local_path = parser.get("local path", "path")
-    local_path = abspath(local_path)
+    remote_path = remote_path[:-1] if remote_path.endswith("/") else remote_path
+    local_path = pathlib.Path(parser.get("local path", "path")).expanduser().absolute()
     species_dbs = {}
     for section in parser.sections():
         if section in ("release", "remote path", "local path"):
@@ -221,4 +222,6 @@ def read_config(config_path, verbose=False):
         for synonym in Species.get_synonymns(species):
             species_dbs[synonym] = dbs
 
-    return release, remote_path, local_path, species_dbs
+    return host, remote_path, release, local_path, species_dbs
+
+
