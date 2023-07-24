@@ -225,3 +225,13 @@ def read_config(config_path, verbose=False):
     return host, remote_path, release, local_path, species_dbs
 
 
+def load_ensembl_checksum(path: os.PathLike) -> dict:
+    result = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        s, b, p = line.split()
+        result[p] = int(s), int(b)
+    result.pop("README", None)
+    return result
