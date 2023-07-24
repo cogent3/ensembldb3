@@ -91,7 +91,7 @@ _debug = click.option("-d", "--debug", is_flag=True, help="maximum verbosity")
 _dbrc_out = click.option(
     "-o",
     "--outpath",
-    type=click.Path(),
+    type=pathlib.Path,
     help="path to directory to export all rc contents",
 )
 _release = click.option("-r", "--release", type=int, help="Ensembl release number")
