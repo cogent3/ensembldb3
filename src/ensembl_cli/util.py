@@ -8,21 +8,21 @@ import sys
 from math import ceil
 from typing import Union
 
+import numba
 import numpy
-
 
 # based on https://www.reddit.com/r/learnpython/comments/9bpgjl/implementing_bsd_16bit_checksum/
 # and https://www.gnu.org/software/coreutils/manual/html_node/sum-invocation.html#sum-invocation
-def checksum(path) -> tuple[int, int]:
+@numba.jit(nopython=True)
+def checksum(data: bytes, size: int):
     """computes BSD style checksum"""
     # equivalent to command line BSD sum
-    path = pathlib.Path(path)
+    nb = numpy.ceil(size / 1024)
     cksum = 0
-    for c in path.read_bytes():
+    for c in data:
         cksum = (cksum >> 1) + ((cksum & 1) << 15)
         cksum += c
         cksum &= 0xFFFF
-    nb = ceil(path.stat().st_size / 1024)
     return cksum, nb
 
 

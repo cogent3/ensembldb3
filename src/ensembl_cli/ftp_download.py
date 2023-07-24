@@ -61,7 +61,8 @@ def download_data(
             if path.name == "CHECKSUMS":
                 checksums = load_ensembl_checksum(path)
             continue
-        summed, blocks = checksum(path)
+
+        summed, blocks = checksum(path.read_bytes(), path.stat().st_size)
         checkpoint_file.write(f"{summed}\t{blocks}\t{path}\n")
         downloaded_chksums[path.name] = summed, blocks
     for fn in checksums:
