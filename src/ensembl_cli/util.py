@@ -150,14 +150,6 @@ def convert_strand(val):
     return val
 
 
-def flatten(data):
-    """returns 1D list
-
-    Removes nesting via numpy
-    """
-    return numpy.array(data).flatten().tolist()
-
-
 class FileSet(set):
     """Determines names of all files in a directory with matching suffixes.
     Does not recurse."""
