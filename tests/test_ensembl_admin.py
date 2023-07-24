@@ -21,7 +21,7 @@ def test_download(tmp_dir):
     parser.read(os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg"))
     parser.remove_section("C.elegans")
     parser.set("local path", "path", value=str(tmp_dir))
-    download_cfg = os.path.abspath(os.path.join(tmp_dir, "download.cfg"))
+    download_cfg = tmp_dir / "download.cfg"
     with open(download_cfg, "wt") as out:
         parser.write(out)
 
