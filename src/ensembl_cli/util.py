@@ -26,7 +26,7 @@ def checksum(path) -> tuple[int, int]:
     return cksum, nb
 
 
-def get_resource_dir() -> os.PathLike:
+def _get_resource_dir() -> os.PathLike:
     """returns path to resource directory"""
     if "ENSEMBLDBRC" in os.environ:
         path = os.environ["ENSEMBLDBRC"]
@@ -50,7 +50,7 @@ def get_resource_path(resource: Union[str, os.PathLike]) -> os.PathLike:
 
 # the following is where essential files live, such as
 # the species/common name map and sample download.cfg
-ENSEMBLDBRC = get_resource_dir()
+ENSEMBLDBRC = _get_resource_dir()
 
 
 def lftp_installed():
