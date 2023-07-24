@@ -106,12 +106,11 @@ def main():
 
 @main.command()
 @_cfgpath
-@_numprocs
 @_verbose
 @_debug
-def download(configpath, numprocs, verbose, debug):
+def download(configpath, verbose, debug):
     """download databases from Ensembl using rsync, can be done in parallel"""
-    download_dbs(configpath, numprocs, verbose, debug)
+    download_dbs(configpath, verbose, debug)
 
 
 @main.command()

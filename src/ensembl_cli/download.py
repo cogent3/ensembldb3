@@ -4,14 +4,12 @@ import os
 
 import click
 
+from cogent3 import open_
+
+from ensembl_cli.ftp_download import download_data, listdir
 from ensembl_cli.name import EnsemblDbName
-from ensembl_cli.util import (
-    ENSEMBLDBRC,
-    exec_command,
-    lftp_installed,
-    makedirs,
-    read_config,
-)
+from ensembl_cli.species import Species
+from ensembl_cli.util import ENSEMBLDBRC, makedirs, read_config
 
 
 def get_download_checkpoint_path(local_path, dbname):
@@ -61,29 +59,42 @@ class Download:
         click.secho(f"Completed download: {dbname}", fg="green")
 
 
-def download_dbs(configpath, numprocs, verbose, debug):
-    if not lftp_installed():
-        click.secho("download requires lftp", fg="red")
-        sys.exit(1)
-
+def download_dbs(configpath, verbose, debug):
     if configpath.name == _cfg:
-        warnings.warn("WARN: using the built in demo cfg, will write to /tmp")
+        click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
 
-    release, remote_path, local_path, sp_db = read_config(configpath, verbose=verbose)
-    makedirs(local_path)
-    contents = lftp_listdir(
-        remote_path, dirname=f"release-{release}/mysql/", debug=debug
+    host, remote_path, release, local_path, species_dbs = read_config(
+        configpath, verbose=verbose
     )
-    db_names = reduce_dirnames(contents, sp_db, verbose=verbose, debug=debug)
+
+    # TODO identify single file name convention enabling single file downloads from subdir
+    remote_template = f"{remote_path}/release-{release}/" + "{}/{}"
+
     if verbose:
         click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
         click.secho("\n".join(f"  {d.name}" for d in db_names), fg="green")
         click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
 
-    lftp = Download(
-        remote_path, local_path, release, numprocs, verbose=verbose, debug=debug
-    )
-    for db in db_names:
-        lftp(db.name)
+    for key in species_dbs:
+        db_prefix = Species.get_ensembl_db_prefix(key)
+        local_root = local_path / db_prefix
+        local_root.mkdir(parents=True, exist_ok=True)
+        with open_(local_root / "DOWNLOADED_CHECKSUMS", mode="w") as chkpt:
+            for subdir in ("fasta", "gff3"):
+                path = remote_template.format(subdir, db_prefix)
+                if subdir == "fasta":
+                    path += "/dna"
+                dest_path = local_path / db_prefix / subdir
+                dest_path.mkdir(parents=True, exist_ok=True)
+                paths = [f"{path}/{fn}" for fn in listdir(host, path=path, debug=debug)]
+                download_data(
+                    host,
+                    dest_path,
+                    paths,
+                    description=f"{db_prefix[:5]}.../{subdir}",
+                    checkpoint_file=chkpt,
+                )
+
+    # now check if downloaded files match expected checksum
 
     click.secho(f"\nWROTE to output path={local_path}\n", fg="green")

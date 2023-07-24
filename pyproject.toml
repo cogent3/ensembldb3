@@ -20,7 +20,8 @@ dependencies = ["click",
         "cogent3 @ git+https://github.com/cogent3/cogent3.git@develop",
         "pydantic",
         "rich",
-        "numpy"
+        "numpy",
+        "unsync",
         ]
 classifiers = [
         "Development Status :: 5 - Production/Stable",
