@@ -1,8 +1,6 @@
-import os
-import sys
-import warnings
+from __future__ import annotations
 
-from pprint import pprint
+import os
 
 import click
 
@@ -25,80 +23,6 @@ def is_downloaded(local_path, dbname):
     """returns True if checkpoint file exists for dbname"""
     chk = get_download_checkpoint_path(local_path, dbname)
     return os.path.exists(chk)
-
-
-def do_lftp_command(host, remote_dir, db_name, local_dir, numprocs):
-    command = (
-        f'lftp -e "cd {remote_dir}; mirror -c '
-        f'--use-pget-n={numprocs} --parallel={numprocs} {db_name} {local_dir}; bye" {host}'
-    )
-    result = exec_command(command)
-    result = result.split("\n") if result != "" else []
-    return result
-
-
-def lftp_listdir(host, dirname="", debug=True):
-    """returns directory listing"""
-    cmnd = f'lftp -e "cd {dirname}; nlist; bye;" ftp://{host}'
-    if debug:
-        print(cmnd)
-    result = exec_command(cmnd)
-    return result.splitlines()
-
-
-def rsync_listdir(remote_path, dirname="", debug=True):
-    cmnd = f"{remote_path}{dirname}" if dirname else remote_path
-    cmnd = r"rsync --list-only rsync://%s" % cmnd
-    if debug:
-        print(cmnd)
-    result = exec_command(cmnd)
-    return result.splitlines()
-
-
-def _sort_dbs(dbnames):
-    """returns the dbnames sorted by their type"""
-    order = {"compara": 2, "variation": 3, "otherfeatures": 1}
-    names = [(order.get(n.type, 0), n.name, n) for n in dbnames]
-    return [db for i, n, db in sorted(names)]
-
-
-def reduce_dirnames(dirnames, species_dbs, verbose=False, debug=False):
-    """returns EnsemblNames corresponding to species db's and sort by type
-
-    sort order put's core db's first, compara and variation last"""
-    if debug:
-        pprint(dirnames)
-
-    db_names = []
-    for record in dirnames:
-        record = record.strip()
-        if not record or record.endswith(".gz"):
-            continue
-
-        record = record.split()[-1]
-        if not record[0].isalpha():
-            continue
-
-        try:
-            name = EnsemblDbName(record)
-        except (TypeError, RuntimeError):
-            # a non-species
-            if debug:
-                print(record)
-            continue
-
-        if name.species in species_dbs:
-            if name.type not in species_dbs[name.species] and species_dbs[name.species]:
-                if debug or verbose:
-                    print("Skipping", name)
-                continue
-
-            db_names.append(name)
-        elif name.type == "compara" and "compara" in species_dbs:
-            db_names.append(name)
-
-    db_names = _sort_dbs(db_names)
-    return db_names
 
 
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
