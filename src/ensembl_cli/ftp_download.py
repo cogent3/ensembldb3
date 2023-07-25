@@ -3,7 +3,7 @@ import pathlib
 import re
 
 from ftplib import FTP
-from typing import Iterable
+from typing import Callable, Iterable
 
 from rich.progress import track
 from unsync import unsync
@@ -20,11 +20,14 @@ def configured_ftp(host: str = "ftp.ensembl.org") -> FTP:
     return ftp
 
 
-def listdir(host: str, path: str, debug=True):
+def listdir(host: str, path: str, pattern: Callable = None, debug=True):
     """returns directory listing"""
+    pattern = pattern or (lambda x: True)
     ftp = configured_ftp(host=host)
     ftp.cwd(path)
-    yield from ftp.nlst()
+    for fn in ftp.nlst():
+        if pattern(fn):
+            yield f"{path}/{fn}"
     ftp.close()
 
 
@@ -65,6 +68,7 @@ def download_data(
         summed, blocks = checksum(path.read_bytes(), path.stat().st_size)
         checkpoint_file.write(f"{summed}\t{blocks}\t{path}\n")
         downloaded_chksums[path.name] = summed, blocks
-    for fn in checksums:
+
+    for fn in downloaded_chksums:
         assert checksums[fn] == downloaded_chksums[fn], fn
     return True

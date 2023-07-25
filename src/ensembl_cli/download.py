@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 
 import click
 
@@ -9,7 +10,7 @@ from cogent3 import open_
 from ensembl_cli.ftp_download import download_data, listdir
 from ensembl_cli.name import EnsemblDbName
 from ensembl_cli.species import Species
-from ensembl_cli.util import ENSEMBLDBRC, makedirs, read_config
+from ensembl_cli.util import ENSEMBLDBRC, read_config
 
 
 def get_download_checkpoint_path(local_path, dbname):
@@ -26,6 +27,7 @@ def is_downloaded(local_path, dbname):
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
+_valid_seq = re.compile("([.]dna[.]|README|CHECKSUMS)")
 
 
 def valid_seq_file(name: str) -> bool:
@@ -46,8 +48,10 @@ def download_dbs(configpath, verbose, debug):
 
     if verbose:
         click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
-        click.secho("\n".join(f"  {d.name}" for d in db_names), fg="green")
+        click.secho("\n".join(f"  {d.name}" for d in species_dbs), fg="green")
         click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
+
+    patterns = dict(fasta=valid_seq_file, gff3=None)
 
     for key in species_dbs:
         db_prefix = Species.get_ensembl_db_prefix(key)
@@ -56,15 +60,13 @@ def download_dbs(configpath, verbose, debug):
         with open_(local_root / "DOWNLOADED_CHECKSUMS", mode="w") as chkpt:
             for subdir in ("fasta", "gff3"):
                 path = remote_template.format(subdir, db_prefix)
-                if subdir == "fasta":
-                    path += "/dna"
+                path = f"{path}/dna" if subdir == "fasta" else path
                 dest_path = local_path / db_prefix / subdir
                 dest_path.mkdir(parents=True, exist_ok=True)
-                paths = [f"{path}/{fn}" for fn in listdir(host, path=path, debug=debug)]
                 download_data(
                     host,
                     dest_path,
-                    paths,
+                    listdir(host, path=path, pattern=patterns[subdir], debug=debug),
                     description=f"{db_prefix[:5]}.../{subdir}",
                     checkpoint_file=chkpt,
                 )
