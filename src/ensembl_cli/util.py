@@ -11,6 +11,7 @@ from typing import Union
 import numba
 import numpy
 
+
 # based on https://www.reddit.com/r/learnpython/comments/9bpgjl/implementing_bsd_16bit_checksum/
 # and https://www.gnu.org/software/coreutils/manual/html_node/sum-invocation.html#sum-invocation
 @numba.jit(nopython=True)
