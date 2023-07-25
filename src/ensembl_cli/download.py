@@ -26,37 +26,11 @@ def is_downloaded(local_path, dbname):
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
-class Download:
-    """callable instance that takes the database name and lftp downloads"""
 
-    def __init__(
-        self, host, local_base, release, numprocs, verbose, debug, dry_run=False
-    ):
-        self._host = host
-        self._local_base = local_base
-        self._release = release
-        self._numprocs = numprocs
-        self._verbose = verbose
-        self._debug = debug
-        self._dry_run = dry_run
 
-    def __call__(self, dbname):
-        if is_downloaded(self._local_base, dbname):
-            if self._verbose or self._debug:
-                click.secho(f"Already downloaded: {dbname}, skipping", fg="green")
-            return
-
-        commands = do_lftp_command(
-            self._host,
-            f"release-{self._release}/mysql/",
-            dbname,
-            os.path.join(self._local_base, dbname),
-            self._numprocs,
-        )
-        checkpoint_file = get_download_checkpoint_path(self._local_base, dbname)
-        with open(checkpoint_file, "w") as checked:
-            pass
-        click.secho(f"Completed download: {dbname}", fg="green")
+def valid_seq_file(name: str) -> bool:
+    """unmasked genomic DNA sequences"""
+    return _valid_seq.search(name) is not None
 
 
 def download_dbs(configpath, verbose, debug):
