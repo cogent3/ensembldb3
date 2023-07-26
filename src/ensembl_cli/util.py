@@ -2,11 +2,14 @@ import configparser
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
 from dataclasses import dataclass
-from typing import Iterable, Union
+from tempfile import mkdtemp
+from typing import IO, Iterable, Union
+import uuid
 
 import numba
 import numpy
@@ -243,3 +246,102 @@ def load_ensembl_checksum(path: os.PathLike) -> dict:
         result[p] = int(s), int(b)
     result.pop("README", None)
     return result
+
+
+class atomic_write:
+    """performs atomic write operations, cleans up if fails"""
+
+    def __init__(self, path: os.PathLike, tmpdir=None, mode="wb", encoding=None):
+        """
+
+        Parameters
+        ----------
+        path
+            path to file
+        tmpdir
+            directory where temporary file will be created
+        mode
+            file writing mode
+        encoding
+            text encoding
+        """
+        path = pathlib.Path(path).expanduser()
+
+        self._path = path
+        self._mode = mode
+        self._file = None
+        self._encoding = encoding
+        self._tmppath = self._make_tmppath(tmpdir)
+
+        self.succeeded = None
+        self._close_func = self._close_rename_standard
+
+    def _make_tmppath(self, tmpdir):
+        """returns path of temporary file
+
+        Parameters
+        ----------
+        tmpdir: Path
+            to directory
+
+        Returns
+        -------
+        full path to a temporary file
+
+        Notes
+        -----
+        Uses a random uuid as the file name, adds suffixes from path
+        """
+        suffixes = "".join(self._path.suffixes)
+        parent = self._path.parent
+        name = f"{uuid.uuid4()}{suffixes}"
+        tmpdir = (
+            pathlib.Path(mkdtemp(dir=parent))
+            if tmpdir is None
+            else pathlib.Path(tmpdir)
+        )
+
+        if not tmpdir.exists():
+            raise FileNotFoundError(f"{tmpdir} directory does not exist")
+
+        return tmpdir / name
+
+    def _get_fileobj(self):
+        """returns file to be written to"""
+        if self._file is None:
+            self._file = open(self._tmppath, self._mode)
+
+        return self._file
+
+    def __enter__(self) -> IO:
+        return self._get_fileobj()
+
+    def _close_rename_standard(self, src):
+        dest = pathlib.Path(self._path)
+        try:
+            dest.unlink()
+        except FileNotFoundError:
+            pass
+        finally:
+            src.rename(dest)
+
+        shutil.rmtree(src.parent)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._file.close()
+        if exc_type is None:
+            self._close_func(self._tmppath)
+            self.succeeded = True
+        else:
+            self.succeeded = False
+
+        shutil.rmtree(self._tmppath.parent, ignore_errors=True)
+
+    def write(self, text):
+        """writes text to file"""
+        fileobj = self._get_fileobj()
+        fileobj.write(text)
+
+    def close(self):
+        """closes file"""
+        self.__exit__(None, None, None)
