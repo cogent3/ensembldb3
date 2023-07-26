@@ -120,7 +120,8 @@ class atomic_write:
             self.succeeded = True
         else:
             self.succeeded = False
-            shutil.rmtree(self._tmppath.parent)
+
+        shutil.rmtree(self._tmppath.parent, ignore_errors=True)
 
     def write(self, text):
         """writes text to file"""

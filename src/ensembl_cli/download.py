@@ -28,7 +28,6 @@ _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
 _valid_seq = re.compile("([.]dna[.]|README|CHECKSUMS)")
-_valid_gff = re.compile("([.]\d+[.]gff3[.]gz|README|CHECKSUMS)")
 
 
 def valid_seq_file(name: str) -> bool:
@@ -36,10 +35,14 @@ def valid_seq_file(name: str) -> bool:
     return _valid_seq.search(name) is not None
 
 
-def valid_gff3_file(name: str) -> bool:
+class valid_gff3_file:
     """whole genome gff3"""
 
-    return _valid_gff.search(name) is not None
+    def __init__(self, release: int) -> None:
+        self._valid = re.compile(f"([.]{release}[.]gff3[.]gz|README|CHECKSUMS)")
+
+    def __call__(self, name: str) -> bool:
+        return self._valid.search(name) is not None
 
 
 def download_dbs(configpath, verbose):
@@ -56,7 +59,7 @@ def download_dbs(configpath, verbose):
         click.secho("\n".join(f"  {d.name}" for d in config.species_dbs), fg="green")
         click.secho(f"\nWRITING to output path={config.local_path}\n", fg="green")
 
-    patterns = dict(fasta=valid_seq_file, gff3=valid_gff3_file)
+    patterns = dict(fasta=valid_seq_file, gff3=valid_gff3_file(config.release))
 
     for key in config.species_dbs:
         db_prefix = Species.get_ensembl_db_prefix(key)
