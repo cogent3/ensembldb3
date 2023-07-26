@@ -20,7 +20,7 @@ def configured_ftp(host: str = "ftp.ensembl.org") -> FTP:
     return ftp
 
 
-def listdir(host: str, path: str, pattern: Callable = None, debug=True):
+def listdir(host: str, path: str, pattern: Callable = None):
     """returns directory listing"""
     pattern = pattern or (lambda x: True)
     ftp = configured_ftp(host=host)
