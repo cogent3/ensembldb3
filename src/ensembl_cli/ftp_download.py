@@ -133,9 +133,11 @@ class atomic_write:
 
 
 @unsync
-def unsynced_copy_to_local(host, src, dest):
-    #  TODO check if path exists and satisfies chksum
-    # return when both conditions satisfied
+def unsynced_copy_to_local(
+    host: str, src: os.PathLike, dest: os.PathLike
+) -> os.PathLike:
+    if dest.exists():
+        return dest
     ftp = configured_ftp(host=host)
     # pass in checksum and keep going until it's correct?
     with atomic_write(dest, mode="wb") as outfile:
