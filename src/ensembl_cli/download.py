@@ -28,6 +28,7 @@ _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
 _valid_seq = re.compile("([.]dna[.]|README|CHECKSUMS)")
+_valid_gff = re.compile("([.]\d+[.]gff3[.]gz|README|CHECKSUMS)")
 
 
 def valid_seq_file(name: str) -> bool:
@@ -35,42 +36,44 @@ def valid_seq_file(name: str) -> bool:
     return _valid_seq.search(name) is not None
 
 
-def download_dbs(configpath, verbose, debug):
+def valid_gff3_file(name: str) -> bool:
+    """whole genome gff3"""
+
+    return _valid_gff.search(name) is not None
+
+
+def download_dbs(configpath, verbose):
     if configpath.name == _cfg:
         click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
 
-    host, remote_path, release, local_path, species_dbs = read_config(
-        configpath, verbose=verbose
-    )
+    config = read_config(configpath, verbose=verbose)
 
     # TODO identify single file name convention enabling single file downloads from subdir
-    remote_template = f"{remote_path}/release-{release}/" + "{}/{}"
+    remote_template = f"{config.remote_path}/release-{config.release}/" + "{}/{}"
 
     if verbose:
-        click.secho(f"DOWNLOADING\n  ensembl release={release}", fg="green")
-        click.secho("\n".join(f"  {d.name}" for d in species_dbs), fg="green")
-        click.secho(f"\nWRITING to output path={local_path}\n", fg="green")
+        click.secho(f"DOWNLOADING\n  ensembl release={config.release}", fg="green")
+        click.secho("\n".join(f"  {d.name}" for d in config.species_dbs), fg="green")
+        click.secho(f"\nWRITING to output path={config.local_path}\n", fg="green")
 
-    patterns = dict(fasta=valid_seq_file, gff3=None)
+    patterns = dict(fasta=valid_seq_file, gff3=valid_gff3_file)
 
-    for key in species_dbs:
+    for key in config.species_dbs:
         db_prefix = Species.get_ensembl_db_prefix(key)
-        local_root = local_path / db_prefix
+        local_root = config.staging_path / db_prefix
         local_root.mkdir(parents=True, exist_ok=True)
         with open_(local_root / "DOWNLOADED_CHECKSUMS", mode="w") as chkpt:
             for subdir in ("fasta", "gff3"):
                 path = remote_template.format(subdir, db_prefix)
                 path = f"{path}/dna" if subdir == "fasta" else path
-                dest_path = local_path / db_prefix / subdir
+                dest_path = config.staging_path / db_prefix / subdir
                 dest_path.mkdir(parents=True, exist_ok=True)
                 download_data(
-                    host,
+                    config.host,
                     dest_path,
-                    listdir(host, path=path, pattern=patterns[subdir], debug=debug),
+                    listdir(config.host, path=path, pattern=patterns[subdir]),
                     description=f"{db_prefix[:5]}.../{subdir}",
                     checkpoint_file=chkpt,
                 )
 
-    # now check if downloaded files match expected checksum
-
-    click.secho(f"\nWROTE to output path={local_path}\n", fg="green")
+    click.secho(f"\nWROTE to output path={config.staging_path}\n", fg="green")

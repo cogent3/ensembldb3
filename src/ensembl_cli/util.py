@@ -5,8 +5,8 @@ import re
 import subprocess
 import sys
 
-from math import ceil
-from typing import Union
+from dataclasses import dataclass
+from typing import Iterable, Union
 
 import numba
 import numpy
@@ -186,6 +186,16 @@ class FileSet(set):
         self.update(collected)
 
 
+@dataclass
+class Config:
+    host: str
+    remote_path: str
+    release: int
+    staging_path: str
+    install_path: str
+    species_dbs: Iterable[str]
+
+
 def read_config(config_path, verbose=False):
     """returns ensembl release, local path, and db specifics from the provided
     config path"""
@@ -219,10 +229,11 @@ def read_config(config_path, verbose=False):
         for synonym in Species.get_synonymns(species):
             species_dbs[synonym] = dbs
 
-    return host, remote_path, release, local_path, species_dbs
+    return Config(host, remote_path, release, staging_path, install_path, species_dbs)
 
 
 def load_ensembl_checksum(path: os.PathLike) -> dict:
+    """loads the BSD checksums from Ensembl CHECKSUMS file"""
     result = {}
     for line in path.read_text().splitlines():
         line = line.strip()
