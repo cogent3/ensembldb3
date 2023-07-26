@@ -54,15 +54,6 @@ def get_resource_path(resource: Union[str, os.PathLike]) -> os.PathLike:
 ENSEMBLDBRC = _get_resource_dir()
 
 
-def lftp_installed():
-    """returns True if lftp installed"""
-    if sys.platform.lower() == "windows":
-        raise RuntimeError("not supported on windows")
-
-    r = subprocess.call(["which", "lftp"])
-    return r == 0
-
-
 def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """executes shell command and returns stdout if completes exit code 0
 
