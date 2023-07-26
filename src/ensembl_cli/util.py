@@ -197,7 +197,12 @@ def read_config(config_path, verbose=False):
     host = parser.get("remote path", "host")
     remote_path = parser.get("remote path", "path")
     remote_path = remote_path[:-1] if remote_path.endswith("/") else remote_path
-    local_path = pathlib.Path(parser.get("local path", "path")).expanduser().absolute()
+    staging_path = (
+        pathlib.Path(parser.get("local path", "staging_path")).expanduser().absolute()
+    )
+    install_path = (
+        pathlib.Path(parser.get("local path", "install_path")).expanduser().absolute()
+    )
     species_dbs = {}
     for section in parser.sections():
         if section in ("release", "remote path", "local path"):
