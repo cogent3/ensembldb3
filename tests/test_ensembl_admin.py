@@ -7,7 +7,7 @@ import pytest
 
 from click.testing import CliRunner
 
-from ensembl_cli.admin import ENSEMBLDBRC, download, exportrc
+from ensembl_cli.cli import ENSEMBLDBRC, download, exportrc
 from ensembl_cli.download import get_download_checkpoint_path
 
 
