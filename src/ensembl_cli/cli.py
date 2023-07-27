@@ -9,6 +9,7 @@ import click
 from ensembl_cli import __version__
 from ensembl_cli.download import _cfg, download_dbs
 from ensembl_cli.util import ENSEMBLDBRC, exec_command, read_config
+from src.ensembl_cli.install import local_install
 
 
 INSTALL_COMPLETED = "INSTALL COMPLETED"
@@ -113,6 +114,16 @@ def download(configpath, verbose):
 
 
 @main.command()
+@_cfgpath
+@_force
+@_verbose
+def install(configpath, force_overwrite, verbose):
+    """create the local db's"""
+    config = local_install(configpath, force_overwrite)
+
+    click.echo(f"Contents installed to {str(config.install_path)!r}")
+
+
 @_dbrc_out
 def exportrc(outpath):
     """exports the rc directory to the nominated path
