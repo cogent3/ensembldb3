@@ -8,7 +8,7 @@ import click
 
 from ensembl_cli import __version__
 from ensembl_cli.download import _cfg, download_dbs
-from ensembl_cli.util import ENSEMBLDBRC, exec_command, read_config
+from ensembl_cli.util import ENSEMBLDBRC
 from src.ensembl_cli.install import local_install
 
 
@@ -103,12 +103,13 @@ def install(configpath, force_overwrite, verbose):
     click.echo(f"Contents installed to {str(config.install_path)!r}")
 
 
+@main.command()
 @_dbrc_out
 def exportrc(outpath):
     """exports the rc directory to the nominated path
 
     setting an environment variable ENSEMBLDBRC with this path
-    will force it's contents to override the default ensembl_cli settings"""
+    will force its contents to override the default ensembl_cli settings"""
     shutil.copytree(ENSEMBLDBRC, outpath)
     # remove the python module file
     for fn in pathlib.Path(outpath).glob("__init__.py*"):
