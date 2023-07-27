@@ -77,19 +77,6 @@ def exec_command(cmnd, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return out.decode("utf8") if out is not None else None
 
 
-def makedirs(path):
-    """creates directory path if it doesn't exist"""
-    if os.path.exists(path):
-        return
-
-    os.makedirs(path)
-
-
-def abspath(path):
-    path = os.path.abspath(os.path.expanduser(path))
-    return path
-
-
 class DisplayString(str):
     """provides a mechanism for customising the str() and repr() of objects"""
 
@@ -131,62 +118,6 @@ class CaseInsensitiveString(str):
 
     def __str__(self):
         return "".join(list(self))
-
-
-def convert_strand(val):
-    """ensures a consistent internal representation of strand"""
-    if isinstance(val, str):
-        assert val in "-+", f'unknown strand "{val}"'
-        val = [-1, 1][val == "+"]
-    elif val is not None:
-        val = [-1, 1][val > 0]
-    else:
-        val = 1
-    return val
-
-
-class FileSet(set):
-    """Determines names of all files in a directory with matching suffixes.
-    Does not recurse."""
-
-    _dot = re.compile(r"^\.")
-
-    def __init__(self, path, suffixes=("txt", "sql"), trim_suffixes=True):
-        """
-        Parameters
-        ----------
-        path
-            directory path
-        suffixes
-            filename suffixes to match
-        trim_suffixes
-            whether suffixes are to be trimmed before adding to self
-        """
-        super().__init__()
-        if isinstance(suffixes, str):
-            suffixes = (suffixes,)
-
-        path = pathlib.Path(path).expanduser()
-        suffixes = {self._dot.sub("", s) for s in suffixes}
-        collected = set()
-        for p in path.glob("*"):
-            if p.is_dir() or p.name.startswith("."):
-                # don't consider nested directories, hidden files, files without a suffix
-                continue
-
-            if not {self._dot.sub("", s) for s in p.suffixes} & suffixes:
-                continue
-
-            if trim_suffixes:
-                num_suffixes = len(p.suffixes)
-                name = ".".join(p.name.split(".")[:-num_suffixes])
-            else:
-                name = p.name
-
-            collected.add(name)
-
-        self.path = path
-        self.update(collected)
 
 
 @dataclass
