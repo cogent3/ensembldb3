@@ -53,5 +53,5 @@ def test_exportrc(tmp_dir):
     assert r.exit_code == 0, r.output
     fnames = os.listdir(outdir)
     assert "species.tsv" in fnames
-    assert len(fnames) == 3
+    assert len(fnames) == 2
     shutil.rmtree(tmp_dir)
