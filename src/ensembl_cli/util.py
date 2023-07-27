@@ -5,11 +5,11 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 
 from dataclasses import dataclass
 from tempfile import mkdtemp
 from typing import IO, Iterable, Union
-import uuid
 
 import numba
 import numpy
@@ -124,13 +124,13 @@ class CaseInsensitiveString(str):
 class Config:
     host: str
     remote_path: str
-    release: int
-    staging_path: str
-    install_path: str
+    release: str
+    staging_path: os.PathLike
+    install_path: os.PathLike
     species_dbs: Iterable[str]
 
 
-def read_config(config_path, verbose=False):
+def read_config(config_path) -> Config:
     """returns ensembl release, local path, and db specifics from the provided
     config path"""
     from ensembl_cli.species import Species
@@ -158,7 +158,7 @@ def read_config(config_path, verbose=False):
             species_dbs["compara"] = dbs
             continue
 
-        # handle synonymns
+        # handle synonyms
         species = Species.get_species_name(section, level="raise")
         for synonym in Species.get_synonymns(species):
             species_dbs[synonym] = dbs
