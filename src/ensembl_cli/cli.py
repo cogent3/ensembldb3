@@ -18,24 +18,6 @@ INSTALL_COMPLETED = "INSTALL COMPLETED"
 def listpaths(dirname, glob_pattern):
     """return path to all files matching glob_pattern"""
     fns = [str(p) for p in pathlib.Path(dirname).glob(glob_pattern)]
-
-def decompress_files(local_path):
-    """gunzip files
-
-
-    Parameters
-    ----------
-    local_path: pathlib.Path
-        single file, or directory
-
-    Notes
-    -----
-    If directory, does all .gz files.
-    """
-    local_path = pathlib.Path(local_path)
-    paths = [local_path] if local_path.is_file() else local_path.glob("*.gz")
-    for path in paths:
-        _ = exec_command(f"gunzip {path}")
     return fns if fns else None
 
 
