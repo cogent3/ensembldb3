@@ -5,10 +5,7 @@ import re
 
 import click
 
-from cogent3 import open_
-
 from ensembl_cli.ftp_download import download_data, listdir
-from ensembl_cli.name import EnsemblDbName
 from ensembl_cli.species import Species
 from ensembl_cli.util import ENSEMBLDBRC, read_config
 
