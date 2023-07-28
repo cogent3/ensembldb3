@@ -1,7 +1,6 @@
 import configparser
 import os
 import pathlib
-import re
 import shutil
 import subprocess
 import sys
@@ -128,6 +127,13 @@ class Config:
     staging_path: os.PathLike
     install_path: os.PathLike
     species_dbs: Iterable[str]
+
+    @property
+    def db_names(self) -> Iterable[str]:
+        from ensembl_cli.species import Species
+
+        for species in self.species_dbs:
+            yield Species.get_ensembl_db_prefix(species)
 
 
 def read_config(config_path) -> Config:
