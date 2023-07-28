@@ -8,8 +8,8 @@ import click
 
 from ensembl_cli import __version__
 from ensembl_cli.download import _cfg, download_dbs
+from ensembl_cli.install import local_install
 from ensembl_cli.util import ENSEMBLDBRC
-from src.ensembl_cli.install import local_install
 
 
 INSTALL_COMPLETED = "INSTALL COMPLETED"
