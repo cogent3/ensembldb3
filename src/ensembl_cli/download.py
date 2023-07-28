@@ -43,7 +43,7 @@ def download_dbs(configpath, verbose):
     if configpath.name == _cfg:
         click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
 
-    config = read_config(configpath, verbose=verbose)
+    config = read_config(configpath)
 
     # TODO identify single file name convention enabling single file downloads from subdir
     remote_template = f"{config.remote_path}/release-{config.release}/" + "{}/{}"
