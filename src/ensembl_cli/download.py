@@ -13,7 +13,7 @@ from ensembl_cli.util import ENSEMBLDBRC, read_config
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
-_valid_seq = re.compile("([.]dna[.]|README|CHECKSUMS)")
+_valid_seq = re.compile("([.]dna[.](?!toplevel)|README|CHECKSUMS)")
 
 
 def valid_seq_file(name: str) -> bool:
