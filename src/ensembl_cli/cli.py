@@ -100,7 +100,7 @@ def install(configpath, force_overwrite, verbose):
     """create the local db's"""
     config = local_install(configpath, force_overwrite)
 
-    click.echo(f"Contents installed to {str(config.install_path)!r}")
+    click.secho(f"Contents installed to {str(config.install_path)!r}", fg="green")
 
 
 @main.command()
@@ -114,7 +114,7 @@ def exportrc(outpath):
     # remove the python module file
     for fn in pathlib.Path(outpath).glob("__init__.py*"):
         fn.unlink()
-    click.echo(f"Contents written to {outpath}")
+    click.secho(f"Contents written to {outpath}", fg="green")
 
 
 if __name__ == "__main__":
