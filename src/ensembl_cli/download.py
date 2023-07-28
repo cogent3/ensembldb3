@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 
 import click
 
@@ -31,6 +32,13 @@ class valid_gff3_file:
         return self._valid.search(name) is not None
 
 
+def _remove_tmpdirs(path: os.PathLike):
+    """delete any tmp dirs left over from unsuccessful runs"""
+    tmpdirs = [p for p in path.glob("tmp*") if p.is_dir()]
+    for tmpdir in tmpdirs:
+        shutil.rmtree(tmpdir)
+
+
 def download_dbs(configpath, verbose):
     if configpath.name == _cfg:
         click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
@@ -56,6 +64,7 @@ def download_dbs(configpath, verbose):
             path = f"{path}/dna" if subdir == "fasta" else path
             dest_path = config.staging_path / db_prefix / subdir
             dest_path.mkdir(parents=True, exist_ok=True)
+            _remove_tmpdirs(dest_path)
             download_data(
                 config.host,
                 dest_path,
