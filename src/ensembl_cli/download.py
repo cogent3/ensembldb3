@@ -13,17 +13,6 @@ from ensembl_cli.species import Species
 from ensembl_cli.util import ENSEMBLDBRC, read_config
 
 
-def get_download_checkpoint_path(local_path, dbname):
-    """returns path to db checkpoint file"""
-    return os.path.join(local_path, dbname, "ENSEMBLDB_DOWNLOADED")
-
-
-def is_downloaded(local_path, dbname):
-    """returns True if checkpoint file exists for dbname"""
-    chk = get_download_checkpoint_path(local_path, dbname)
-    return os.path.exists(chk)
-
-
 _cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
 
 
@@ -65,18 +54,16 @@ def download_dbs(configpath, verbose):
         db_prefix = Species.get_ensembl_db_prefix(key)
         local_root = config.staging_path / db_prefix
         local_root.mkdir(parents=True, exist_ok=True)
-        with open_(local_root / "DOWNLOADED_CHECKSUMS", mode="w") as chkpt:
-            for subdir in ("fasta", "gff3"):
-                path = remote_template.format(subdir, db_prefix)
-                path = f"{path}/dna" if subdir == "fasta" else path
-                dest_path = config.staging_path / db_prefix / subdir
-                dest_path.mkdir(parents=True, exist_ok=True)
-                download_data(
-                    config.host,
-                    dest_path,
-                    listdir(config.host, path=path, pattern=patterns[subdir]),
-                    description=f"{db_prefix[:5]}.../{subdir}",
-                    checkpoint_file=chkpt,
-                )
+        for subdir in ("fasta", "gff3"):
+            path = remote_template.format(subdir, db_prefix)
+            path = f"{path}/dna" if subdir == "fasta" else path
+            dest_path = config.staging_path / db_prefix / subdir
+            dest_path.mkdir(parents=True, exist_ok=True)
+            download_data(
+                config.host,
+                dest_path,
+                listdir(config.host, path=path, pattern=patterns[subdir]),
+                description=f"{db_prefix[:5]}.../{subdir}",
+            )
 
     click.secho(f"\nWROTE to output path={config.staging_path}\n", fg="green")

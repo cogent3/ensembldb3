@@ -51,7 +51,6 @@ def download_data(
     local_dest: os.PathLike,
     remote_paths: Iterable[os.PathLike],
     description,
-    checkpoint_file,
 ) -> bool:
     tasks = [
         unsynced_copy_to_local(host, path, local_dest / pathlib.Path(path).name)
@@ -68,7 +67,6 @@ def download_data(
             continue
 
         summed, blocks = checksum(path.read_bytes(), path.stat().st_size)
-        checkpoint_file.write(f"{summed}\t{blocks}\t{path}\n")
         downloaded_chksums[path.name] = summed, blocks
 
     for fn in downloaded_chksums:
