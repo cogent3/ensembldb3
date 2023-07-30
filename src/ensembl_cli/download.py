@@ -11,7 +11,7 @@ from ensembl_cli.species import Species
 from ensembl_cli.util import ENSEMBLDBRC, read_config
 
 
-_cfg = os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg")
+_cfg = ENSEMBLDBRC / "ensembldb_download.cfg"
 
 
 _valid_seq = re.compile("([.]dna[.](?!toplevel)|README|CHECKSUMS)")

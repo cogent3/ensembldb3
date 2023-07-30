@@ -142,7 +142,10 @@ def read_config(config_path) -> Config:
     from ensembl_cli.species import Species
 
     parser = configparser.ConfigParser()
-    parser.read_file(config_path)
+
+    with config_path.open() as f:
+        parser.read_file(f)
+
     release = parser.get("release", "release")
     host = parser.get("remote path", "host")
     remote_path = parser.get("remote path", "path")
