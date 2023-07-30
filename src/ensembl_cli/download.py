@@ -8,10 +8,10 @@ import click
 
 from ensembl_cli.ftp_download import download_data, listdir
 from ensembl_cli.species import Species
-from ensembl_cli.util import ENSEMBLDBRC, read_config
+from ensembl_cli.util import get_resource_path, read_config
 
 
-_cfg = ENSEMBLDBRC / "ensembldb_download.cfg"
+_cfg = get_resource_path("ensembldb_download.cfg")
 
 
 _valid_seq = re.compile("([.]dna[.](?!toplevel)|README|CHECKSUMS)")
