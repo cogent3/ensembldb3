@@ -7,7 +7,7 @@ from pprint import pprint
 import click
 
 from ensembl_cli import __version__
-from ensembl_cli.download import _cfg, download_dbs
+from ensembl_cli.download import _cfg, download_species
 from ensembl_cli.install import local_install
 from ensembl_cli.util import ENSEMBLDBRC
 
@@ -89,7 +89,7 @@ def main():
 @_verbose
 def download(configpath, verbose):
     """download databases from Ensembl using rsync, can be done in parallel"""
-    download_dbs(configpath, verbose)
+    download_species(configpath, verbose)
 
 
 @main.command()
