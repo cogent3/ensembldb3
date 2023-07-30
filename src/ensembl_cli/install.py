@@ -14,7 +14,7 @@ from ensembl_cli.util import read_config
 def install_one_seq(src, dest_dir):
     seq = load_seq(src, moltype="dna", label_to_name=lambda x: x.split()[0])
     with open_(dest_dir / f"{seq.name}.fa.gz", mode="wt") as outfile:
-        outfile.write(seq.to_fasta())
+        outfile.write(seq.to_fasta(block_size=int(1e9)))
     return True
 
 
