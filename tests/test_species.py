@@ -2,17 +2,7 @@ from unittest import TestCase, main
 
 from cogent3.util.table import Table
 
-from ensembldb3.species import Species
-
-
-__author__ = "Gavin Huttley, Hua Ying"
-__copyright__ = "Copyright 2016-, The EnsemblDb3 Project"
-__credits__ = ["Gavin Huttley", "Hua Ying"]
-__license__ = "BSD"
-__version__ = "2021.04.01"
-__maintainer__ = "Gavin Huttley"
-__email__ = "Gavin.Huttley@anu.edu.au"
-__status__ = "alpha"
+from ensembl_cli.species import Species
 
 
 class TestSpeciesNamemaps(TestCase):
