@@ -127,6 +127,7 @@ class Config:
     staging_path: os.PathLike
     install_path: os.PathLike
     species_dbs: Iterable[str]
+    align_names: Iterable[str]
 
     @property
     def db_names(self) -> Iterable[str]:
@@ -156,23 +157,36 @@ def read_config(config_path) -> Config:
     install_path = (
         pathlib.Path(parser.get("local path", "install_path")).expanduser().absolute()
     )
+
+    align_names = None
     species_dbs = {}
+    get_option = parser.get
     for section in parser.sections():
         if section in ("release", "remote path", "local path"):
             continue
 
-        dbs = [db.strip() for db in parser.get(section, "db").split(",")]
-
         if section == "compara":
-            species_dbs["compara"] = dbs
+            align_names = [
+                n.strip() for n in get_option(section, "align_names").split(",")
+            ]
             continue
+
+        dbs = [db.strip() for db in get_option(section, "db").split(",")]
 
         # handle synonyms
         species = Species.get_species_name(section, level="raise")
         for synonym in Species.get_synonymns(species):
             species_dbs[synonym] = dbs
 
-    return Config(host, remote_path, release, staging_path, install_path, species_dbs)
+    return Config(
+        host=host,
+        remote_path=remote_path,
+        release=release,
+        staging_path=staging_path,
+        install_path=install_path,
+        species_dbs=species_dbs,
+        align_names=align_names,
+    )
 
 
 def load_ensembl_checksum(path: os.PathLike) -> dict:
