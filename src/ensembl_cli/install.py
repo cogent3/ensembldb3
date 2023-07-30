@@ -11,7 +11,7 @@ from ensembl_cli.util import read_config
 
 
 @unsync(cpu_bound=True)
-def install_one(src, dest_dir):
+def install_one_seq(src, dest_dir):
     seq = load_seq(src, moltype="dna", label_to_name=lambda x: x.split()[0])
     with open_(dest_dir / f"{seq.name}.fa.gz", mode="wt") as outfile:
         outfile.write(seq.to_fasta())
@@ -25,7 +25,7 @@ def _install_gffdb(config, species):
 def _install_seqs(src_dir: os.PathLike, dest_dir: os.PathLike):
     src_dir = src_dir / "fasta"
     paths = list(src_dir.glob("*.fa.gz"))
-    return [install_one(path, dest_dir) for path in paths]
+    return [install_one_seq(path, dest_dir) for path in paths]
 
 
 def local_install(configpath, force_overwrite):
