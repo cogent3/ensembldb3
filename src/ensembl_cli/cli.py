@@ -12,9 +12,6 @@ from ensembl_cli.install import local_install
 from ensembl_cli.util import ENSEMBLDBRC
 
 
-INSTALL_COMPLETED = "INSTALL COMPLETED"
-
-
 def listpaths(dirname, glob_pattern):
     """return path to all files matching glob_pattern"""
     fns = [str(p) for p in pathlib.Path(dirname).glob(glob_pattern)]
