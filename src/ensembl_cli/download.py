@@ -8,7 +8,7 @@ import click
 
 from ensembl_cli.ftp_download import download_data, listdir
 from ensembl_cli.species import Species
-from ensembl_cli.util import get_resource_path, read_config
+from ensembl_cli.util import Config, get_resource_path, read_config
 
 
 _cfg = get_resource_path("ensembldb_download.cfg")
@@ -39,7 +39,7 @@ def _remove_tmpdirs(path: os.PathLike):
         shutil.rmtree(tmpdir)
 
 
-def download_species(configpath: os.PathLike, verbose: bool):
+def download_species(configpath: os.PathLike, verbose: bool) -> Config:
     """download seq and gff data"""
     if configpath.name == _cfg:
         click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
@@ -73,4 +73,8 @@ def download_species(configpath: os.PathLike, verbose: bool):
                 description=f"{db_prefix[:5]}.../{subdir}",
             )
 
-    click.secho(f"\nWROTE to output path={config.staging_path}\n", fg="green")
+    return config
+
+
+def download_compara(configpath: os.PathLike, verbose: bool) -> Config:
+    ...
