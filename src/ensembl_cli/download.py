@@ -39,7 +39,7 @@ def _remove_tmpdirs(path: os.PathLike):
         shutil.rmtree(tmpdir)
 
 
-def download_species(configpath, verbose):
+def download_species(configpath: os.PathLike, verbose: bool):
     """download seq and gff data"""
     if configpath.name == _cfg:
         click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
