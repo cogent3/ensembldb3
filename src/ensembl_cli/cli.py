@@ -41,7 +41,7 @@ _cfgpath = click.option(
     "-c",
     "--configpath",
     default=_cfg,
-    type=click.File(),
+    type=pathlib.Path,
     help="path to config file specifying databases, only "
     "species or compara at present",
 )
