@@ -7,9 +7,8 @@ from pprint import pprint
 import click
 
 from ensembl_cli import __version__
-from ensembl_cli.download import _cfg, download_species
-from ensembl_cli.install import local_install
-from ensembl_cli.util import ENSEMBLDBRC
+from ensembl_cli.download import _cfg, download_compara, download_species
+from ensembl_cli.install import local_install_compara, local_install_genomes
 
 
 def listpaths(dirname, glob_pattern):
@@ -86,7 +85,8 @@ def main():
 @_verbose
 def download(configpath, verbose):
     """download databases from Ensembl using rsync, can be done in parallel"""
-    download_species(configpath, verbose)
+    config = download_species(configpath, verbose)
+    click.secho(f"Downloaded to {config.staging_path}", fg="green")
 
 
 @main.command()

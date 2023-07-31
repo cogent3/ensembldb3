@@ -7,39 +7,46 @@ import pytest
 
 from click.testing import CliRunner
 
-from ensembl_cli.cli import ENSEMBLDBRC, download, exportrc
-from ensembl_cli.download import get_download_checkpoint_path
+from ensembl_cli.cli import download, exportrc, install
+from ensembl_cli.util import get_resource_path
 
 
-def test_download(tmp_dir):
-    """runs download, install, drop according to a special test cfg"""
-
-    test_mysql_cfg = os.environ.get("ENSEMBLDB_TEST_CFG", None)
+@pytest.fixture(scope="function")
+def tmp_config(tmp_dir):
     # create a simpler download config
     # we want a very small test set
     parser = ConfigParser()
-    parser.read(os.path.join(ENSEMBLDBRC, "ensembldb_download.cfg"))
+    parser.read(get_resource_path("ensembldb_download.cfg"))
     parser.remove_section("C.elegans")
-    parser.set("local path", "path", value=str(tmp_dir))
+    parser.set("local path", "staging_path", value=str(tmp_dir / "staging"))
+    parser.set("local path", "install_path", value=str(tmp_dir / "install"))
     download_cfg = tmp_dir / "download.cfg"
     with open(download_cfg, "wt") as out:
         parser.write(out)
 
+    yield download_cfg
+
+
+def test_download(tmp_config):
+    """runs download, install, drop according to a special test cfg"""
+    tmp_dir = tmp_config.parent
     # now download
     runner = CliRunner()
-    r = runner.invoke(download, [f"-c{download_cfg}"])
+    r = runner.invoke(download, [f"-c{tmp_config}"], catch_exceptions=False)
+    assert r.exit_code == 0, r.output
     # make sure the download checkpoint file exists
-    dirnames = [dn for dn in os.listdir(tmp_dir) if (tmp_dir / dn).is_dir()]
-    assert len(dirnames) == 1
-    chkpt = get_download_checkpoint_path(tmp_dir, dirnames[0])
-    assert os.path.exists(chkpt)
+    dirnames = [
+        dn
+        for dn in os.listdir(tmp_dir / "staging")
+        if (tmp_dir / "staging" / dn).is_dir()
+    ]
+    assert "saccharomyces_cerevisiae" in dirnames
 
     # make sure file sizes > 0
-    fnames = os.listdir(tmp_dir / dirnames[0])
+    paths = list((tmp_dir / "staging" / "saccharomyces_cerevisiae").glob("*"))
     size = 0
-    for fn in fnames:
-        path = tmp_dir / dirnames[0] / fn
-        size += os.path.getsize(path)
+    for p in paths:
+        size += p.stat().st_size
     assert size > 0
 
     assert r.exit_code == 0, r.output
