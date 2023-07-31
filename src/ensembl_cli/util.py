@@ -202,6 +202,19 @@ def load_ensembl_checksum(path: os.PathLike) -> dict:
     return result
 
 
+def load_ensembl_md5sum(path: os.PathLike) -> dict:
+    """loads the md5 sum from Ensembl MD5SUM file"""
+    result = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        s, p = line.split()
+        result[p] = s
+    result.pop("README", None)
+    return result
+
+
 class atomic_write:
     """performs atomic write operations, cleans up if fails"""
 
