@@ -7,11 +7,22 @@ import sys
 import uuid
 
 from dataclasses import dataclass
+from hashlib import md5
 from tempfile import mkdtemp
 from typing import IO, Iterable, Union
 
 import numba
 import numpy
+
+
+def md5sum(data: bytes, *args) -> str:
+    """computes MD5SUM
+
+    Notes
+    -----
+    *args is for signature compatability with checksum
+    """
+    return md5(data).hexdigest()
 
 
 # based on https://www.reddit.com/r/learnpython/comments/9bpgjl/implementing_bsd_16bit_checksum/
@@ -26,7 +37,7 @@ def checksum(data: bytes, size: int):
         cksum = (cksum >> 1) + ((cksum & 1) << 15)
         cksum += c
         cksum &= 0xFFFF
-    return cksum, nb
+    return cksum, int(nb)
 
 
 def _get_resource_dir() -> os.PathLike:

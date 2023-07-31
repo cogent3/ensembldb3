@@ -8,10 +8,27 @@ from typing import Callable, Iterable
 from rich.progress import track
 from unsync import unsync
 
-from ensembl_cli.util import atomic_write, checksum, load_ensembl_checksum
+from ensembl_cli.util import (
+    atomic_write,
+    checksum,
+    load_ensembl_checksum,
+    load_ensembl_md5sum,
+    md5sum,
+)
 
 
-dont_write = re.compile("(CHECKSUMS|README)")
+_sig_load_funcs = dict(CHECKSUMS=load_ensembl_checksum, MD5SUM=load_ensembl_md5sum)
+_sig_calc_funcs = dict(CHECKSUMS=checksum, MD5SUM=md5sum)
+_dont_write = re.compile("(CHECKSUMS|MD5SUM|README)")
+_sig_file = re.compile("(CHECKSUMS|MD5SUM)")
+
+
+def is_signature(path: os.PathLike) -> bool:
+    return _sig_file.search((path.name)) is not None
+
+
+def get_signature_data(path: os.PathLike) -> Callable:
+    return _sig_load_funcs[path.name](path)
 
 
 def configured_ftp(host: str = "ftp.ensembl.org") -> FTP:
@@ -60,14 +77,17 @@ def download_data(
         task.result() for task in track(tasks, description=description, transient=True)
     ]
     downloaded_chksums = {}
+    checksums = {}
+    calc_sig = None
     for path in saved_paths:
-        if dont_write.search(path.name):
-            if path.name == "CHECKSUMS":
-                checksums = load_ensembl_checksum(path)
+        if _dont_write.search(path.name):
+            if is_signature(path):
+                checksums = get_signature_data(path)
+                calc_sig = _sig_calc_funcs[path.name]
             continue
 
-        summed, blocks = checksum(path.read_bytes(), path.stat().st_size)
-        downloaded_chksums[path.name] = summed, blocks
+        signature = calc_sig(path.read_bytes(), path.stat().st_size)
+        downloaded_chksums[path.name] = signature
 
     for fn in downloaded_chksums:
         assert checksums[fn] == downloaded_chksums[fn], fn
