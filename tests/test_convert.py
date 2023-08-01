@@ -2,6 +2,8 @@ import pytest
 
 from cogent3 import make_seq
 
+from ensembl_cli.convert import gap_coords_to_seq, seq_to_gap_coords
+
 
 @pytest.mark.parametrize(
     "seq", ("----", "---AGC--TGC--", "AGC--TGC--", "---AGC--TGC", "AGCTGC")
