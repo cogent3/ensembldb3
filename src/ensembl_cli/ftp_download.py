@@ -1,6 +1,5 @@
 import os
 import pathlib
-import re
 
 from ftplib import FTP
 from typing import Callable, Iterable
@@ -10,25 +9,11 @@ from unsync import unsync
 
 from ensembl_cli.util import (
     atomic_write,
-    checksum,
-    load_ensembl_checksum,
-    load_ensembl_md5sum,
-    md5sum,
+    dont_checksum,
+    get_sig_calc_func,
+    get_signature_data,
+    is_signature,
 )
-
-
-_sig_load_funcs = dict(CHECKSUMS=load_ensembl_checksum, MD5SUM=load_ensembl_md5sum)
-_sig_calc_funcs = dict(CHECKSUMS=checksum, MD5SUM=md5sum)
-_dont_write = re.compile("(CHECKSUMS|MD5SUM|README)")
-_sig_file = re.compile("(CHECKSUMS|MD5SUM)")
-
-
-def is_signature(path: os.PathLike) -> bool:
-    return _sig_file.search((path.name)) is not None
-
-
-def get_signature_data(path: os.PathLike) -> Callable:
-    return _sig_load_funcs[path.name](path)
 
 
 def configured_ftp(host: str = "ftp.ensembl.org") -> FTP:
@@ -77,19 +62,22 @@ def download_data(
     saved_paths = [
         task.result() for task in track(tasks, description=description, transient=True)
     ]
-    downloaded_chksums = {}
-    checksums = {}
-    calc_sig = None
+
+    # load the signature data and sig calc keyed by parent dir
+    all_checksums = {}
+    all_check_funcs = {}
     for path in saved_paths:
-        if _dont_write.search(path.name):
-            if is_signature(path):
-                checksums = get_signature_data(path)
-                calc_sig = _sig_calc_funcs[path.name]
+        if is_signature(path):
+            all_checksums[str(path.parent)] = get_signature_data(path)
+            all_check_funcs[str(path.parent)] = get_sig_calc_func(path.name)
+
+    for path in saved_paths:
+        if dont_checksum(path):
             continue
-
+        key = str(path.parent)
+        expect_sig = all_checksums[key][path.name]
+        calc_sig = all_check_funcs[key]
         signature = calc_sig(path.read_bytes(), path.stat().st_size)
-        downloaded_chksums[path.name] = signature
+        assert signature == expect_sig, path
 
-    for fn in downloaded_chksums:
-        assert checksums[fn] == downloaded_chksums[fn], fn
     return True

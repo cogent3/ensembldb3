@@ -1,6 +1,8 @@
 import configparser
+import functools
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -9,7 +11,7 @@ import uuid
 from dataclasses import dataclass
 from hashlib import md5
 from tempfile import mkdtemp
-from typing import IO, Iterable, Union
+from typing import IO, Callable, Iterable, Union
 
 import numba
 import numpy
@@ -323,3 +325,37 @@ class atomic_write:
     def close(self):
         """closes file"""
         self.__exit__(None, None, None)
+
+
+_sig_load_funcs = dict(CHECKSUMS=load_ensembl_checksum, MD5SUM=load_ensembl_md5sum)
+_sig_calc_funcs = dict(CHECKSUMS=checksum, MD5SUM=md5sum)
+_dont_checksum = re.compile("(CHECKSUMS|MD5SUM|README)")
+_sig_file = re.compile("(CHECKSUMS|MD5SUM)")
+
+
+def dont_checksum(path: os.PathLike) -> bool:
+    return _dont_checksum.search(str(path)) is not None
+
+
+@functools.singledispatch
+def is_signature(path: os.PathLike) -> bool:
+    return _sig_file.search(path.name) is not None
+
+
+@is_signature.register
+def _(path: str) -> bool:
+    return _sig_file.search(path) is not None
+
+
+@functools.singledispatch
+def get_sig_calc_func(sig_path: os.PathLike) -> Callable:
+    return _sig_calc_funcs[sig_path.name]
+
+
+@get_sig_calc_func.register
+def _(sig_path: str) -> Callable:
+    return _sig_calc_funcs[sig_path]
+
+
+def get_signature_data(path: os.PathLike) -> Callable:
+    return _sig_load_funcs[path.name](path)
