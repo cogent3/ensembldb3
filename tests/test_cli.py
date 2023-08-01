@@ -45,9 +45,7 @@ def test_download(tmp_config):
 
     # make sure file sizes > 0
     paths = list((tmp_dir / "staging" / "saccharomyces_cerevisiae").glob("*"))
-    size = 0
-    for p in paths:
-        size += p.stat().st_size
+    size = sum(p.stat().st_size for p in paths)
     assert size > 0
 
     assert r.exit_code == 0, r.output
