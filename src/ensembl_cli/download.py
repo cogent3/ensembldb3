@@ -46,7 +46,6 @@ def download_species(configpath: os.PathLike, verbose: bool) -> Config:
 
     config = read_config(configpath)
 
-    # TODO identify single file name convention enabling single file downloads from subdir
     remote_template = f"{config.remote_path}/release-{config.release}/" + "{}/{}"
 
     if verbose:
