@@ -174,6 +174,7 @@ def read_config(config_path) -> Config:
     align_names = None
     species_dbs = {}
     get_option = parser.get
+    align_names = []
     for section in parser.sections():
         if section in ("release", "remote path", "local path"):
             continue
