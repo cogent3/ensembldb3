@@ -91,5 +91,48 @@ def download_species(configpath: os.PathLike, debug: bool, verbose: bool) -> Con
     return config
 
 
-def download_compara(configpath: os.PathLike, verbose: bool) -> Config:
-    ...
+class valid_compara_file:
+    """whole genome alignment data"""
+
+    def __init__(self) -> None:
+        self._valid = re.compile("([.]emf[.]gz|README|MD5SUM)")
+
+    def __call__(self, name: str) -> bool:
+        return self._valid.search(name) is not None
+
+
+def download_compara(configpath: os.PathLike, debug: bool, verbose: bool) -> Config:
+    if configpath.name == _cfg:
+        click.secho(
+            "WARN: using the built in demo cfg, will write to /tmp", fg="yellow"
+        )
+
+    config = read_config(configpath)
+
+    remote_template = (
+        f"{config.remote_path}/release-{config.release}/emf/ensembl-compara/multiple_alignments/"
+        + "{}"
+    )
+    valid_compara = valid_compara_file()
+    local = config.staging_path / "compara"
+    for align_name in config.align_names:
+        remote_path = remote_template.format(align_name)
+        remote_paths = list(listdir(config.host, remote_path, valid_compara))
+
+        if debug:
+            # we need the checksum files
+            paths = [p for p in remote_paths if is_signature(p)]
+            remote_paths = [p for p in remote_paths if not is_signature(p)]
+            remote_paths = remote_paths[:4] + paths
+
+        local_dir = local / align_name
+        local_dir.mkdir(parents=True, exist_ok=True)
+        _remove_tmpdirs(local_dir)
+        download_data(
+            host=config.host,
+            local_dest=local_dir,
+            remote_paths=remote_paths,
+            description=f"compara/{align_name[:5]}...",
+        )
+
+    return config
