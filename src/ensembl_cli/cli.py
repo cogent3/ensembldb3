@@ -115,6 +115,8 @@ def exportrc(outpath):
 
     setting an environment variable ENSEMBLDBRC with this path
     will force its contents to override the default ensembl_cli settings"""
+    from ensembl_cli.util import ENSEMBLDBRC
+
     shutil.copytree(ENSEMBLDBRC, outpath)
     # remove the python module file
     for fn in pathlib.Path(outpath).glob("__init__.py*"):
