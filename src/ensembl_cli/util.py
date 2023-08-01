@@ -171,7 +171,6 @@ def read_config(config_path) -> Config:
         pathlib.Path(parser.get("local path", "install_path")).expanduser().absolute()
     )
 
-    align_names = None
     species_dbs = {}
     get_option = parser.get
     align_names = []
