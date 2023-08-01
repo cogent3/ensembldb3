@@ -63,7 +63,12 @@ _force = click.option(
     is_flag=True,
     help="drop existing database if it exists prior to " "installing",
 )
-_debug = click.option("-d", "--debug", is_flag=True, help="maximum verbosity")
+_debug = click.option(
+    "-d",
+    "--debug",
+    is_flag=True,
+    help="maximum verbosity, and reduces number of downloads",
+)
 _dbrc_out = click.option(
     "-o",
     "--outpath",
@@ -82,10 +87,13 @@ def main():
 
 @main.command()
 @_cfgpath
+@_debug
 @_verbose
-def download(configpath, verbose):
+def download(configpath, debug, verbose):
     """download databases from Ensembl using rsync, can be done in parallel"""
-    config = download_species(configpath, verbose)
+    config = download_species(configpath, debug, verbose)
+    config = download_compara(configpath, debug, verbose)
+
     click.secho(f"Downloaded to {config.staging_path}", fg="green")
 
 
