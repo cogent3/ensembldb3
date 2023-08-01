@@ -8,7 +8,13 @@ import click
 
 from ensembl_cli.ftp_download import download_data, listdir
 from ensembl_cli.species import Species
-from ensembl_cli.util import Config, get_resource_path, read_config
+from ensembl_cli.util import (
+    Config,
+    dont_checksum,
+    get_resource_path,
+    is_signature,
+    read_config,
+)
 
 
 _cfg = get_resource_path("ensembldb_download.cfg")
@@ -64,11 +70,21 @@ def download_species(configpath: os.PathLike, debug: bool, verbose: bool) -> Con
             path = f"{path}/dna" if subdir == "fasta" else path
             dest_path = config.staging_path / db_prefix / subdir
             dest_path.mkdir(parents=True, exist_ok=True)
+            remote_paths = list(
+                listdir(config.host, path=path, pattern=patterns[subdir])
+            )
+            if debug:
+                # we need the checksum files
+                paths = [p for p in remote_paths if is_signature(p)]
+                # but fewer data files, to reduce time for debugging
+                remote_paths = [p for p in remote_paths if not dont_checksum(p)]
+                remote_paths = remote_paths[:4] + paths
+
             _remove_tmpdirs(dest_path)
             download_data(
                 host=config.host,
                 local_dest=dest_path,
-                remote_paths=listdir(config.host, path=path, pattern=patterns[subdir]),
+                remote_paths=remote_paths,
                 description=f"{db_prefix[:5]}.../{subdir}",
             )
 
