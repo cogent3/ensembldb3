@@ -51,8 +51,8 @@ def _get_resource_dir() -> os.PathLike:
 
         path = pathlib.Path(data.__file__).parent
 
-    path = os.path.abspath(os.path.expanduser(path))
-    if not os.path.exists(path):
+    path = pathlib.Path(path).expanduser().absolute()
+    if not path.exists():
         raise ValueError("ENSEMBLDBRC directory '%s' does not exist")
 
     return pathlib.Path(path)
@@ -157,7 +157,7 @@ def read_config(config_path) -> Config:
 
     parser = configparser.ConfigParser()
 
-    with config_path.open() as f:
+    with config_path.expanduser().open() as f:
         parser.read_file(f)
 
     release = parser.get("release", "release")
