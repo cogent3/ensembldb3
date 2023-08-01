@@ -50,7 +50,7 @@ def download_species(configpath: os.PathLike, verbose: bool) -> Config:
 
     if verbose:
         click.secho(f"DOWNLOADING\n  ensembl release={config.release}", fg="green")
-        click.secho("\n".join(f"  {d.name}" for d in config.species_dbs), fg="green")
+        click.secho("\n".join(f"  {d}" for d in config.species_dbs), fg="green")
         click.secho(f"\nWRITING to output path={config.local_path}\n", fg="green")
 
     patterns = dict(fasta=valid_seq_file, gff3=valid_gff3_file(config.release))
