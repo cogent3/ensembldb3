@@ -64,6 +64,7 @@ def unsynced_copy_to_local(
 
 
 def download_data(
+    *,
     host: str,
     local_dest: os.PathLike,
     remote_paths: Iterable[os.PathLike],

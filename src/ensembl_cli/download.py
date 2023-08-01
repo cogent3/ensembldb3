@@ -66,9 +66,9 @@ def download_species(configpath: os.PathLike, verbose: bool) -> Config:
             dest_path.mkdir(parents=True, exist_ok=True)
             _remove_tmpdirs(dest_path)
             download_data(
-                config.host,
-                dest_path,
-                listdir(config.host, path=path, pattern=patterns[subdir]),
+                host=config.host,
+                local_dest=dest_path,
+                remote_paths=listdir(config.host, path=path, pattern=patterns[subdir]),
                 description=f"{db_prefix[:5]}.../{subdir}",
             )
 
