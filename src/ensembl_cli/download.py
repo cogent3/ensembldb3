@@ -25,7 +25,7 @@ def valid_seq_file(name: str) -> bool:
 class valid_gff3_file:
     """whole genome gff3"""
 
-    def __init__(self, release: int) -> None:
+    def __init__(self, release: str) -> None:
         self._valid = re.compile(f"([.]{release}[.]gff3[.]gz|README|CHECKSUMS)")
 
     def __call__(self, name: str) -> bool:
