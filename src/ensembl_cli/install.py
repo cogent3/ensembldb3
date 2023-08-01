@@ -1,13 +1,11 @@
 import os
 import shutil
 
-import click
-
 from cogent3 import load_annotations, load_seq, open_
 from rich.progress import track
 from unsync import unsync
 
-from ensembl_cli.util import read_config
+from ensembl_cli.util import Config, read_config
 
 
 @unsync(cpu_bound=True)
@@ -40,13 +38,11 @@ def _install_seqs(src_dir: os.PathLike, dest_dir: os.PathLike):
     return [_install_one_seq(path, dest_dir) for path in paths]
 
 
-def local_install(configpath, force_overwrite):
+def local_install_genomes(configpath: os.PathLike, force_overwrite: bool) -> Config:
     config = read_config(configpath)
-    if config.install_path.exists() and not force_overwrite:
-        click.secho(f"EXITING: {config.install_path} already exists", fg="red")
-        exit(1)
     if force_overwrite:
         shutil.rmtree(config.install_path, ignore_errors=True)
+
     # we create the local installation
     config.install_path.mkdir(parents=True, exist_ok=True)
     # we create subdirectories for each species
@@ -69,4 +65,16 @@ def local_install(configpath, force_overwrite):
     # we do all tasks in one go
     _ = [t.result() for t in track(tasks, description="Installing...", transient=True)]
 
+    return config
+
+
+def local_install_compara(configpath: os.PathLike, force_overwrite: bool) -> Config:
+    config = read_config(configpath)
+    if force_overwrite:
+        shutil.rmtree(config.install_path, ignore_errors=True)
+
+    # we create the local installation
+    config.install_path.mkdir(parents=True, exist_ok=True)
+
+    # create the tasks for each alignment name
     return config

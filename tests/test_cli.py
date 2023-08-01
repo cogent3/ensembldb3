@@ -61,3 +61,8 @@ def test_exportrc(tmp_dir):
     assert "species.tsv" in fnames
     assert len(fnames) == 2
     shutil.rmtree(tmp_dir)
+
+
+def test_install(tmp_config):
+    runner = CliRunner()
+    r = runner.invoke(install, [f"-c{tmp_config}"])

@@ -8,7 +8,6 @@ import click
 
 from ensembl_cli import __version__
 from ensembl_cli.download import _cfg, download_compara, download_species
-from ensembl_cli.install import local_install_compara, local_install_genomes
 
 
 def listpaths(dirname, glob_pattern):
@@ -103,7 +102,13 @@ def download(configpath, debug, verbose):
 @_verbose
 def install(configpath, force_overwrite, verbose):
     """create the local db's"""
-    config = local_install(configpath, force_overwrite)
+    from ensembl_cli.install import (
+        local_install_compara,
+        local_install_genomes,
+    )
+
+    config = local_install_genomes(configpath, force_overwrite)
+    config = local_install_compara(configpath, force_overwrite)
 
     click.secho(f"Contents installed to {str(config.install_path)!r}", fg="green")
 
