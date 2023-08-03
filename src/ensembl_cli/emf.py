@@ -18,8 +18,11 @@ def _get_block_seqnames(data) -> dict[str, str]:
         elif line.startswith("DATA"):
             break
 
-    seq_data = [aln_col.split()[0].strip() for aln_col in data[i + 1 :]]
-    # we ignore the ancestral sequences
+    # EMF compara alignments store one alignment column per line
+    # with the order corresponding to SEQ order
+    num_seqs = len(names)
+    seq_data = [aln_col[:num_seqs] for aln_col in data[i + 1 :]]
+    # they also include ancestral sequences, which exclude
     return {
         n: "".join(s)
         for n, *s in zip(names, *seq_data)
