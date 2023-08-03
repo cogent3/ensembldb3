@@ -138,3 +138,7 @@ class EmfName:
 
     def __hash__(self):
         return hash(str(self))
+
+    def to_dict(self) -> dict:
+        attrs = "species", "coord_name", "start", "end", "strand"
+        return {attr: getattr(self, attr) for attr in attrs}
