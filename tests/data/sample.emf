@@ -10,9 +10,9 @@ SEQ mouse 17 780000 790000 -1 (chr_length=201709)
 SEQ rat   12 879999 889998 1 (chr_length=201709)
 SCORE GERP
 DATA
-AAA -5
+-AA -5
 TTA +1
-CGA +1
-GG- +4
+C-A +1
+G-- +4
 CG- +4
 //

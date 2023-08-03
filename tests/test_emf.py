@@ -7,10 +7,10 @@ def test_load(DATA_DIR):
     path = DATA_DIR / "sample.emf"
     got = list(parse_emf(path))[0]
     expect = {
-        EmfName("human", "4", "450000", "560000", "1", "(chr_length=201709)"): "ATCGC",
+        EmfName("human", "4", "450000", "560000", "1", "(chr_length=201709)"): "-TCGC",
         EmfName(
             "mouse", "17", "780000", "790000", "-1", "(chr_length=201709)"
-        ): "ATGGG",
+        ): "AT--G",
         EmfName("rat", "12", "879999", "889998", "1", "(chr_length=201709)"): "AAA--",
     }
     assert got == expect
