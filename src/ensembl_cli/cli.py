@@ -8,6 +8,7 @@ import click
 
 from ensembl_cli import __version__
 from ensembl_cli.download import _cfg, download_compara, download_species
+from ensembl_cli.util import read_config
 
 
 def listpaths(dirname, glob_pattern):
@@ -90,8 +91,15 @@ def main():
 @_verbose
 def download(configpath, debug, verbose):
     """download databases from Ensembl using rsync, can be done in parallel"""
-    config = download_species(configpath, debug, verbose)
-    config = download_compara(configpath, debug, verbose)
+    if configpath.name == _cfg:
+        click.secho(
+            "WARN: using the built in demo cfg, will write to /tmp", fg="yellow"
+        )
+
+    config = read_config(configpath)
+
+    download_species(config, debug, verbose)
+    download_compara(config, debug, verbose)
 
     click.secho(f"Downloaded to {config.staging_path}", fg="green")
 

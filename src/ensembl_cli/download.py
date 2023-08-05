@@ -45,13 +45,8 @@ def _remove_tmpdirs(path: os.PathLike):
         shutil.rmtree(tmpdir)
 
 
-def download_species(configpath: os.PathLike, debug: bool, verbose: bool) -> Config:
+def download_species(config: Config, debug: bool, verbose: bool):
     """download seq and gff data"""
-    if configpath.name == _cfg:
-        click.secho("WARN: using the built in demo cfg, will write to /tmp", fg="red")
-
-    config = read_config(configpath)
-
     remote_template = f"{config.remote_path}/release-{config.release}/" + "{}/{}"
 
     if verbose:
@@ -88,7 +83,7 @@ def download_species(configpath: os.PathLike, debug: bool, verbose: bool) -> Con
                 description=f"{db_prefix[:5]}.../{subdir}",
             )
 
-    return config
+    return
 
 
 class valid_compara_file:
@@ -101,14 +96,7 @@ class valid_compara_file:
         return self._valid.search(name) is not None
 
 
-def download_compara(configpath: os.PathLike, debug: bool, verbose: bool) -> Config:
-    if configpath.name == _cfg:
-        click.secho(
-            "WARN: using the built in demo cfg, will write to /tmp", fg="yellow"
-        )
-
-    config = read_config(configpath)
-
+def download_compara(config: Config, debug: bool, verbose: bool):
     remote_template = (
         f"{config.remote_path}/release-{config.release}/emf/ensembl-compara/multiple_alignments/"
         + "{}"
@@ -135,4 +123,4 @@ def download_compara(configpath: os.PathLike, debug: bool, verbose: bool) -> Con
             description=f"compara/{align_name[:5]}...",
         )
 
-    return config
+    return
