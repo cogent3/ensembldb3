@@ -8,7 +8,7 @@ from cogent3.core.location import LostSpan, Map, Span
 def seq_to_gap_coords(seq: Sequence) -> numpy.ndarray:
     """returns coordinates of sequence gaps"""
     m, x = seq.parse_out_gaps()
-    return numpy.array(m.get_gap_coordinates())
+    return numpy.array(m.get_gap_coordinates(), dtype=int)
 
 
 def gap_coords_to_seq(coords: numpy.ndarray, ungapped: Sequence) -> Aligned:
