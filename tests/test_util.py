@@ -62,3 +62,37 @@ def test_parse_config_gorilla(gorilla_cfg):
     cfg = read_config(gorilla_cfg)
     num_gorilla = sum(1 for k in cfg.species_dbs if "gorilla" in k)
     assert num_gorilla == 1
+
+
+@pytest.mark.parametrize(
+    "name",
+    (
+        "Gallus_gallus.bGalGall.mat.broiler.GRCg7b.dna_rm.primary_assembly.MT.fa.gz",
+        "Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna_rm.primary_assembly.Z.fa.gz",
+        "Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna_rm.toplevel.fa.gz",
+        "Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna_sm.nonchromosomal.fa.gz",
+        "Homo_sapiens.GRCh38.dna_rm.alt.fa.gz",
+        "Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+        "Homo_sapiens.GRCh38.dna.toplevel.fa.gz",
+    ),
+)
+def test_invalid_seq(name):
+    from ensembl_cli.download import valid_seq_file
+
+    assert not valid_seq_file(name)
+
+
+@pytest.mark.parametrize(
+    "name",
+    (
+        "Homo_sapiens.GRCh38.dna.chromosome.Y.fa.gz",
+        "Homo_sapiens.GRCh38.dna.nonchromosomal.fa.gz",
+        "Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.primary_assembly.W.fa.gz",
+        "Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.nonchromosomal.fa.gz",
+        "Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.primary_assembly.MT.fa.gz",
+    ),
+)
+def test_valid_seq(name):
+    from ensembl_cli.download import valid_seq_file
+
+    assert valid_seq_file(name)

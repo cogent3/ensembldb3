@@ -13,25 +13,17 @@ from ensembl_cli.util import (
     dont_checksum,
     get_resource_path,
     is_signature,
-    read_config,
 )
 
 
 _cfg = get_resource_path("ensembldb_download.cfg")
 
-_valid_meta = re.compile("(MD5SUM|README|CHECKSUMS)")
+_invalid_seq = re.compile("(dna_(sm|rm)|(toplevel|primary_assembly).fa.gz)")
 
 
 def valid_seq_file(name: str) -> bool:
     """unmasked genomic DNA sequences"""
-    if _valid_meta.search(name):
-        return True
-
-    if not name.endswith(".fa.gz"):
-        return False
-
-    name = name.split(".")
-    return name[-3] == "nonchromosomal" or name[-4] != "dna" and name[2] == "dna"
+    return _invalid_seq.search(name) is None
 
 
 class valid_gff3_file:
@@ -73,6 +65,8 @@ def download_species(config: Config, debug: bool, verbose: bool):
             remote_paths = list(
                 listdir(config.host, path=path, pattern=patterns[subdir])
             )
+            if verbose:
+                print(f"{remote_paths=}")
             if debug:
                 # we need the checksum files
                 paths = [p for p in remote_paths if is_signature(p)]
