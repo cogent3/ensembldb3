@@ -52,10 +52,9 @@ def download_species(config: Config, debug: bool, verbose: bool):
     if verbose:
         click.secho(f"DOWNLOADING\n  ensembl release={config.release}", fg="green")
         click.secho("\n".join(f"  {d}" for d in config.species_dbs), fg="green")
-        click.secho(f"\nWRITING to output path={config.local_path}\n", fg="green")
+        click.secho(f"\nWRITING to output path={config.staging_path}\n", fg="green")
 
     patterns = dict(fasta=valid_seq_file, gff3=valid_gff3_file(config.release))
-
     for key in config.species_dbs:
         db_prefix = Species.get_ensembl_db_prefix(key)
         local_root = config.staging_path / db_prefix
@@ -106,6 +105,8 @@ def download_compara(config: Config, debug: bool, verbose: bool):
     for align_name in config.align_names:
         remote_path = remote_template.format(align_name)
         remote_paths = list(listdir(config.host, remote_path, valid_compara))
+        if verbose:
+            print(remote_paths)
 
         if debug:
             # we need the checksum files
