@@ -5,6 +5,7 @@ import shutil
 from pprint import pprint
 
 import click
+import wakepy.keep
 
 from ensembl_cli import __version__
 from ensembl_cli.download import _cfg, download_compara, download_species
@@ -98,8 +99,9 @@ def download(configpath, debug, verbose):
 
     config = read_config(configpath)
 
-    download_species(config, debug, verbose)
-    download_compara(config, debug, verbose)
+    with wakepy.keep.running():
+        download_species(config, debug, verbose)
+        download_compara(config, debug, verbose)
 
     click.secho(f"Downloaded to {config.staging_path}", fg="green")
 
@@ -115,8 +117,18 @@ def install(configpath, force_overwrite, verbose):
         local_install_genomes,
     )
 
-    config = local_install_genomes(configpath, force_overwrite)
-    config = local_install_compara(configpath, force_overwrite)
+    if configpath.name == _cfg:
+        click.secho(
+            "WARN: using the built in demo cfg, will write to /tmp", fg="yellow"
+        )
+
+    config = read_config(configpath)
+    if force_overwrite:
+        shutil.rmtree(config.install_path, ignore_errors=True)
+
+    with wakepy.keep.running():
+        local_install_genomes(config)
+        local_install_compara(config)
 
     click.secho(f"Contents installed to {str(config.install_path)!r}", fg="green")
 

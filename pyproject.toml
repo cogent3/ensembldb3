@@ -23,6 +23,7 @@ dependencies = ["click",
         "numba",
         "numpy",
         "unsync",
+        "wakepy",
         ]
 classifiers = [
         "Development Status :: 5 - Production/Stable",
