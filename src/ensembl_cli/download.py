@@ -19,13 +19,19 @@ from ensembl_cli.util import (
 
 _cfg = get_resource_path("ensembldb_download.cfg")
 
-
-_valid_seq = re.compile("([.]dna[.](?!toplevel)|README|CHECKSUMS)")
+_valid_meta = re.compile("(MD5SUM|README|CHECKSUMS)")
 
 
 def valid_seq_file(name: str) -> bool:
     """unmasked genomic DNA sequences"""
-    return _valid_seq.search(name) is not None
+    if _valid_meta.search(name):
+        return True
+
+    if not name.endswith(".fa.gz"):
+        return False
+
+    name = name.split(".")
+    return name[-3] == "nonchromosomal" or name[-4] != "dna" and name[2] == "dna"
 
 
 class valid_gff3_file:
