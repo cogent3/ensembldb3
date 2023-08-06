@@ -40,3 +40,25 @@ def test_load_ensembl_checksum(DATA_DIR):
     got = load_ensembl_checksum(DATA_DIR / "sample-CHECKSUMS")
     assert len(got) == 4  # README line is ignored
     assert got["c.fa.gz"] == (7242, 327577)
+
+
+@pytest.fixture(scope="function")
+def gorilla_cfg(tmp_config):
+    # we add gorilla genome
+    parser = ConfigParser()
+    parser.read(get_resource_path(tmp_config))
+    parser.add_section("Gorilla")
+    parser.set("Gorilla", "db", value="core")
+    with open(tmp_config, "wt") as out:
+        parser.write(out)
+
+    yield tmp_config
+
+
+def test_parse_config_gorilla(gorilla_cfg):
+    from ensembl_cli.util import read_config
+
+    # Gorilla has two synonyms, we need only one
+    cfg = read_config(gorilla_cfg)
+    num_gorilla = sum(1 for k in cfg.species_dbs if "gorilla" in k)
+    assert num_gorilla == 1

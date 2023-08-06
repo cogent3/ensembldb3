@@ -188,8 +188,7 @@ def read_config(config_path) -> Config:
 
         # handle synonyms
         species = Species.get_species_name(section, level="raise")
-        for synonym in Species.get_synonymns(species):
-            species_dbs[synonym] = dbs
+        species_dbs[species] = dbs
 
     return Config(
         host=host,
