@@ -10,26 +10,23 @@ from ensembl_cli.util import (
 
 
 @pytest.fixture(scope="function")
-def tmp_config(tmp_dir):
-    # create a simpler download config
-    # we want a very small test set
+def compara_cfg(tmp_config):
+    # we just add compara sections
     parser = ConfigParser()
-    parser.read(get_resource_path("ensembldb_download.cfg"))
-    parser.remove_section("C.elegans")
-    parser.set("local path", "path", value=str(tmp_dir))
+    parser.read(get_resource_path(tmp_config))
+    parser.add_section("compara")
     alns = ",".join(("17_sauropsids.epc", "10_primates.epo"))
     parser.set("compara", "align_names", value=alns)
-    download_cfg = tmp_dir / "download.cfg"
-    with open(download_cfg, "wt") as out:
+    with open(tmp_config, "wt") as out:
         parser.write(out)
 
-    yield download_cfg
+    yield tmp_config
 
 
-def test_parse_config(tmp_config):
+def test_parse_config(compara_cfg):
     from ensembl_cli.util import read_config
 
-    cfg = read_config(tmp_config)
+    cfg = read_config(compara_cfg)
     assert set(cfg.align_names) == {"17_sauropsids.epc", "10_primates.epo"}
 
 
