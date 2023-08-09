@@ -1,0 +1,18 @@
+##FORMAT (compara)
+##DATE Wed Feb 23 22:24:44 2022
+##RELEASE 106
+# Alignments: 10 primates EPO
+# Region: ALL scaffolds
+# File 1
+
+SEQ human 4  450000 560000 1 (chr_length=201709)
+SEQ mouse 17 780000 790000 -1 (chr_length=201709)
+SEQ rat   12 879999 889998 1 (chr_length=201709)
+SCORE GERP
+DATA
+-AA -5
+TTA +1
+C-A +1
+G-- +4
+CG- +4
+//

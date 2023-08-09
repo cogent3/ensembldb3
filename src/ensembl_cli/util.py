@@ -1,17 +1,30 @@
 import configparser
+import functools
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
 import uuid
 
 from dataclasses import dataclass
+from hashlib import md5
 from tempfile import mkdtemp
-from typing import IO, Iterable, Union
+from typing import IO, Callable, Iterable, Union
 
 import numba
 import numpy
+
+
+def md5sum(data: bytes, *args) -> str:
+    """computes MD5SUM
+
+    Notes
+    -----
+    *args is for signature compatability with checksum
+    """
+    return md5(data).hexdigest()
 
 
 # based on https://www.reddit.com/r/learnpython/comments/9bpgjl/implementing_bsd_16bit_checksum/
@@ -26,7 +39,7 @@ def checksum(data: bytes, size: int):
         cksum = (cksum >> 1) + ((cksum & 1) << 15)
         cksum += c
         cksum &= 0xFFFF
-    return cksum, nb
+    return cksum, int(nb)
 
 
 def _get_resource_dir() -> os.PathLike:
@@ -38,8 +51,8 @@ def _get_resource_dir() -> os.PathLike:
 
         path = pathlib.Path(data.__file__).parent
 
-    path = os.path.abspath(os.path.expanduser(path))
-    if not os.path.exists(path):
+    path = pathlib.Path(path).expanduser().absolute()
+    if not path.exists():
         raise ValueError("ENSEMBLDBRC directory '%s' does not exist")
 
     return pathlib.Path(path)
@@ -127,6 +140,7 @@ class Config:
     staging_path: os.PathLike
     install_path: os.PathLike
     species_dbs: Iterable[str]
+    align_names: Iterable[str]
 
     @property
     def db_names(self) -> Iterable[str]:
@@ -142,7 +156,10 @@ def read_config(config_path) -> Config:
     from ensembl_cli.species import Species
 
     parser = configparser.ConfigParser()
-    parser.read_file(config_path)
+
+    with config_path.expanduser().open() as f:
+        parser.read_file(f)
+
     release = parser.get("release", "release")
     host = parser.get("remote path", "host")
     remote_path = parser.get("remote path", "path")
@@ -153,23 +170,35 @@ def read_config(config_path) -> Config:
     install_path = (
         pathlib.Path(parser.get("local path", "install_path")).expanduser().absolute()
     )
+
     species_dbs = {}
+    get_option = parser.get
+    align_names = []
     for section in parser.sections():
         if section in ("release", "remote path", "local path"):
             continue
 
-        dbs = [db.strip() for db in parser.get(section, "db").split(",")]
-
         if section == "compara":
-            species_dbs["compara"] = dbs
+            align_names = [
+                n.strip() for n in get_option(section, "align_names").split(",")
+            ]
             continue
+
+        dbs = [db.strip() for db in get_option(section, "db").split(",")]
 
         # handle synonyms
         species = Species.get_species_name(section, level="raise")
-        for synonym in Species.get_synonymns(species):
-            species_dbs[synonym] = dbs
+        species_dbs[species] = dbs
 
-    return Config(host, remote_path, release, staging_path, install_path, species_dbs)
+    return Config(
+        host=host,
+        remote_path=remote_path,
+        release=release,
+        staging_path=staging_path,
+        install_path=install_path,
+        species_dbs=species_dbs,
+        align_names=align_names,
+    )
 
 
 def load_ensembl_checksum(path: os.PathLike) -> dict:
@@ -181,6 +210,19 @@ def load_ensembl_checksum(path: os.PathLike) -> dict:
             continue
         s, b, p = line.split()
         result[p] = int(s), int(b)
+    result.pop("README", None)
+    return result
+
+
+def load_ensembl_md5sum(path: os.PathLike) -> dict:
+    """loads the md5 sum from Ensembl MD5SUM file"""
+    result = {}
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        s, p = line.split()
+        result[p] = s
     result.pop("README", None)
     return result
 
@@ -282,3 +324,37 @@ class atomic_write:
     def close(self):
         """closes file"""
         self.__exit__(None, None, None)
+
+
+_sig_load_funcs = dict(CHECKSUMS=load_ensembl_checksum, MD5SUM=load_ensembl_md5sum)
+_sig_calc_funcs = dict(CHECKSUMS=checksum, MD5SUM=md5sum)
+_dont_checksum = re.compile("(CHECKSUMS|MD5SUM|README)")
+_sig_file = re.compile("(CHECKSUMS|MD5SUM)")
+
+
+def dont_checksum(path: os.PathLike) -> bool:
+    return _dont_checksum.search(str(path)) is not None
+
+
+@functools.singledispatch
+def is_signature(path: os.PathLike) -> bool:
+    return _sig_file.search(path.name) is not None
+
+
+@is_signature.register
+def _(path: str) -> bool:
+    return _sig_file.search(path) is not None
+
+
+@functools.singledispatch
+def get_sig_calc_func(sig_path: os.PathLike) -> Callable:
+    return _sig_calc_funcs[sig_path.name]
+
+
+@get_sig_calc_func.register
+def _(sig_path: str) -> Callable:
+    return _sig_calc_funcs[sig_path]
+
+
+def get_signature_data(path: os.PathLike) -> Callable:
+    return _sig_load_funcs[path.name](path)

@@ -5,14 +5,11 @@ import shutil
 from pprint import pprint
 
 import click
+import wakepy.keep
 
 from ensembl_cli import __version__
-from ensembl_cli.download import _cfg, download_dbs
-from ensembl_cli.install import local_install
-from ensembl_cli.util import ENSEMBLDBRC
-
-
-INSTALL_COMPLETED = "INSTALL COMPLETED"
+from ensembl_cli.download import _cfg, download_compara, download_species
+from ensembl_cli.util import read_config
 
 
 def listpaths(dirname, glob_pattern):
@@ -44,7 +41,7 @@ _cfgpath = click.option(
     "-c",
     "--configpath",
     default=_cfg,
-    type=click.File(),
+    type=pathlib.Path,
     help="path to config file specifying databases, only "
     "species or compara at present",
 )
@@ -67,7 +64,12 @@ _force = click.option(
     is_flag=True,
     help="drop existing database if it exists prior to " "installing",
 )
-_debug = click.option("-d", "--debug", is_flag=True, help="maximum verbosity")
+_debug = click.option(
+    "-d",
+    "--debug",
+    is_flag=True,
+    help="maximum verbosity, and reduces number of downloads",
+)
 _dbrc_out = click.option(
     "-o",
     "--outpath",
@@ -86,10 +88,22 @@ def main():
 
 @main.command()
 @_cfgpath
+@_debug
 @_verbose
-def download(configpath, verbose):
+def download(configpath, debug, verbose):
     """download databases from Ensembl using rsync, can be done in parallel"""
-    download_dbs(configpath, verbose)
+    if configpath.name == _cfg:
+        click.secho(
+            "WARN: using the built in demo cfg, will write to /tmp", fg="yellow"
+        )
+
+    config = read_config(configpath)
+
+    with wakepy.keep.running():
+        download_species(config, debug, verbose)
+        download_compara(config, debug, verbose)
+
+    click.secho(f"Downloaded to {config.staging_path}", fg="green")
 
 
 @main.command()
@@ -98,7 +112,23 @@ def download(configpath, verbose):
 @_verbose
 def install(configpath, force_overwrite, verbose):
     """create the local db's"""
-    config = local_install(configpath, force_overwrite)
+    from ensembl_cli.install import (
+        local_install_compara,
+        local_install_genomes,
+    )
+
+    if configpath.name == _cfg:
+        click.secho(
+            "WARN: using the built in demo cfg, will write to /tmp", fg="yellow"
+        )
+
+    config = read_config(configpath)
+    if force_overwrite:
+        shutil.rmtree(config.install_path, ignore_errors=True)
+
+    with wakepy.keep.running():
+        local_install_genomes(config)
+        local_install_compara(config)
 
     click.secho(f"Contents installed to {str(config.install_path)!r}", fg="green")
 
@@ -110,6 +140,8 @@ def exportrc(outpath):
 
     setting an environment variable ENSEMBLDBRC with this path
     will force its contents to override the default ensembl_cli settings"""
+    from ensembl_cli.util import ENSEMBLDBRC
+
     shutil.copytree(ENSEMBLDBRC, outpath)
     # remove the python module file
     for fn in pathlib.Path(outpath).glob("__init__.py*"):

@@ -1,9 +1,11 @@
 import re
 
+from dataclasses import dataclass
+
 from .species import Species
 
 
-_release = re.compile("\d+")
+_release = re.compile(r"\d+")
 
 
 def get_version_from_name(name):
@@ -111,3 +113,32 @@ class EnsemblDbName(object):
 
     def __hash__(self):
         return hash(self.name)
+
+
+@dataclass
+class EmfName:
+    """stores information from EMF SEQ records"""
+
+    species: str
+    coord_name: str
+    start: int
+    end: int
+    strand: str
+    coord_length: str
+
+    def __post_init__(self):
+        # adjust the lengths to be ints and put into python coord
+        self.start = int(self.start) - 1
+        self.end = int(self.end)
+
+    def __str__(self):
+        attrs = "species", "coord_name", "start", "end", "strand"
+        n = [str(getattr(self, attr)) for attr in attrs]
+        return ":".join(n)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def to_dict(self) -> dict:
+        attrs = "species", "coord_name", "start", "end", "strand"
+        return {attr: getattr(self, attr) for attr in attrs}

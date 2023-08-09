@@ -1,6 +1,5 @@
 import os
 import pathlib
-import re
 
 from ftplib import FTP
 from typing import Callable, Iterable
@@ -8,10 +7,13 @@ from typing import Callable, Iterable
 from rich.progress import track
 from unsync import unsync
 
-from ensembl_cli.util import atomic_write, checksum, load_ensembl_checksum
-
-
-dont_write = re.compile("(CHECKSUMS|README)")
+from ensembl_cli.util import (
+    atomic_write,
+    dont_checksum,
+    get_sig_calc_func,
+    get_signature_data,
+    is_signature,
+)
 
 
 def configured_ftp(host: str = "ftp.ensembl.org") -> FTP:
@@ -47,6 +49,7 @@ def unsynced_copy_to_local(
 
 
 def download_data(
+    *,
     host: str,
     local_dest: os.PathLike,
     remote_paths: Iterable[os.PathLike],
@@ -59,16 +62,22 @@ def download_data(
     saved_paths = [
         task.result() for task in track(tasks, description=description, transient=True)
     ]
-    downloaded_chksums = {}
+
+    # load the signature data and sig calc keyed by parent dir
+    all_checksums = {}
+    all_check_funcs = {}
     for path in saved_paths:
-        if dont_write.search(path.name):
-            if path.name == "CHECKSUMS":
-                checksums = load_ensembl_checksum(path)
+        if is_signature(path):
+            all_checksums[str(path.parent)] = get_signature_data(path)
+            all_check_funcs[str(path.parent)] = get_sig_calc_func(path.name)
+
+    for path in saved_paths:
+        if dont_checksum(path):
             continue
+        key = str(path.parent)
+        expect_sig = all_checksums[key][path.name]
+        calc_sig = all_check_funcs[key]
+        signature = calc_sig(path.read_bytes(), path.stat().st_size)
+        assert signature == expect_sig, path
 
-        summed, blocks = checksum(path.read_bytes(), path.stat().st_size)
-        downloaded_chksums[path.name] = summed, blocks
-
-    for fn in downloaded_chksums:
-        assert checksums[fn] == downloaded_chksums[fn], fn
     return True

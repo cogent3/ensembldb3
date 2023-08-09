@@ -11,7 +11,7 @@ authors = [
     { name = "Gavin Huttley", email = "Gavin.Huttley@anu.edu.au"},
 ]
 keywords = ["biology", "genomics", "evolution", "bioinformatics"]
-readme = "README.rst"
+readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8,<3.12"
 dependencies = ["click",
@@ -23,6 +23,7 @@ dependencies = ["click",
         "numba",
         "numpy",
         "unsync",
+        "wakepy",
         ]
 classifiers = [
         "Development Status :: 5 - Production/Stable",
